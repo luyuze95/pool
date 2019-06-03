@@ -13,6 +13,9 @@ python_env = os.getenv('python_env', True)
 if python_env in ('0', False, 'prod', "PRODUCTION"):
     GLOBAL_DEBUG = False
     from .conf_prod import *
+elif python_env == '144':
+    GLOBAL_DEBUG = True
+    from .conf_144 import *
 else:
     GLOBAL_DEBUG = True
     from .conf_debug import *

@@ -9,6 +9,8 @@ from flask_script import Manager
 
 from app import app
 from models import db
+from models.block_offset import BlockOffset
+from models.deposit_transaction import DepositTranscation
 
 migrate = Migrate(app, db, compare_type=True, compare_server_default=True)
 manager = Manager(app)

@@ -30,7 +30,7 @@ def email_sender_task(to_mail, pass_code, frozen, lan='zh'):
     :param lan:
     :return:
     """
-    celery_logger.info("to_mail:%s, " % to_mail)
+    celery_logger.info("email_sender_task to_mail:%s, " % to_mail)
 
     if lan == 'zh':
         t = mail_task(to_mail, WITHDRAWAL_VALIDATION_TITLE,

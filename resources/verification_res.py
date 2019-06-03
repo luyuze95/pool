@@ -11,7 +11,6 @@ from flask import g
 from flask_restful import Resource, reqparse
 
 from resources.auth_decorator import login_required
-from schedule.task_email import email_sender_task
 from utils.redis_ins import redis_auth
 from utils.response import make_resp
 
@@ -29,7 +28,7 @@ class VerifyApi(Resource):
         pass_code = randint(0, 999999)
         key = "%s:seccode:%s" % (code_type, account_key)
         redis_auth.set(key, pass_code, ex=5 * 60)
-
+        from schedule.task_email import email_sender_task
         email_sender_task.delay(g.user.email, pass_code, g.token)
 
         return make_resp(200, True)

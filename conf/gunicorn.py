@@ -10,7 +10,7 @@ import multiprocessing
 
 from conf import WORKDIR
 
-bind = '0.0.0.0:80'      #绑定ip和端口号
+bind = '0.0.0.0:5000'      #绑定ip和端口号
 backlog = 512                #监听队列
 chdir = WORKDIR  #gunicorn要切换到的目的工作目录
 timeout = 10      #超时

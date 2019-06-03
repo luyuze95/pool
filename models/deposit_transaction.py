@@ -21,7 +21,7 @@ class DepositTranscation(db.Model):
     # 需要确认数
     need_confirm_num = db.Column(db.SmallInteger)
     # 推送过的确认数
-    pushed_confirm = db.Column(db.SmallInteger, server_default=0)
+    pushed_confirm = db.Column(db.SmallInteger, server_default='0')
     # 币种名
     coin_name = db.Column(db.String(32))
     # 交易id

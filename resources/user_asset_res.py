@@ -32,6 +32,8 @@ class UserAssetApi(Resource):
         if not user_asset:
             return make_resp(404, False)
         user_capacity = MinerPlotter.query.with_entities(func.sum(MinerPlotter.capacity)).first()
+        if not user_capacity:
+            return make_resp(401, False, message="user capacity not found")
         theory_pledge = user_capacity[0]*3
 
         pledge_rate = user_asset.pledge_asset/theory_pledge

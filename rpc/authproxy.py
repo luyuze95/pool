@@ -63,6 +63,8 @@ def encode_python_object(o):
         return float(round(o, 8))
     if isinstance(o, datetime):
         return str(o )
+    if isinstance(o, tuple):
+        return list(o)
     raise TypeError(repr(o) + " is not JSON serializable")
 
 

@@ -22,8 +22,8 @@ PASSWORD = 'ExnowBimao12345678'
 JWT_SECRET = 'bimao'
 
 ''' redis config'''
-REDIS_PASSWORD = 'bhdpool'
-REDIS_HOST = '47.97.116.19'
+REDIS_PASSWORD = 'exnow2018'
+REDIS_HOST = '192.168.10.144'
 REDIS_PORT = 6379
 # miner capacity
 CAPACITY_DB = 9
@@ -32,8 +32,8 @@ AUTH_DB = 0
 
 ''' mysql config'''
 MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'bhdpool'
-MYSQL_HOST = '47.97.116.19'
+MYSQL_PASSWORD = '123456'
+MYSQL_HOST = '192.168.10.144'
 MYSQL_PORT = 3306
 MYSQL_DB = 'pool'
 
@@ -58,7 +58,7 @@ SQLALCHEMY_RECORD_QUERIES = True
 
 
 """ kafka config"""
-KAFKA_HOST = ["47.97.116.19:9092"]
+KAFKA_HOST = ["192.168.10.144:9092", "192.168.10.144:9093", "192.168.10.144:9094"]
 GBT_TOPIC_BHD = "BitcoinHDRaw"
 JOB_TOPIC_BHD = "JobMakerMsgBhd"
 LATEST_BLOCK_MININGINFO = "latestBlockMiniInfo"

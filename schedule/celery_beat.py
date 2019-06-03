@@ -15,6 +15,7 @@ from models.bhd_address import BhdAddress
 from rpc.bhd_rpc import bhd_client
 from schedule.task_bhd_deposit import bhd_block_number_deposit_task, \
     confirm_deposit_transaction
+from schedule.task_email import email_sender_task
 from schedule.task_income_calculate import calculate_income
 
 

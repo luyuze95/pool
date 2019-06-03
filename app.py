@@ -8,10 +8,9 @@ import os
 import sys
 
 from flask import Flask
+from flask_sqlalchemy import get_debug_queries
 
 from models import db
-from resources.earnings_res import EarningsApi
-from resources.verification_res import VerifyApi
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.pardir))
 
@@ -28,11 +27,25 @@ from utils.handler_exception import APIHandleError
 api = APIHandleError(app)
 from resources.user_asset_res import UserAssetApi
 from resources.wallet_res import WalletAPI
+from resources.earnings_res import BlockEarningsApi, DayEarningsApi
+from resources.verification_res import VerifyApi
 
 api.add_resource(WalletAPI, '/v1/wallet/', '/v1/wallet', endpoint="wallet")
 api.add_resource(UserAssetApi, '/v1/asset/', '/v1/asset', endpoint="asset")
-api.add_resource(EarningsApi, '/v1/earnings/', '/v1/earnings', endpoint="earnings")
+api.add_resource(BlockEarningsApi, '/v1/earnings/blocks/', '/v1/earnings/blocks', endpoint="block_earnings")
+api.add_resource(DayEarningsApi, '/v1/earnings/days/', '/v1/earnings/days', endpoint="day_earnings")
 api.add_resource(VerifyApi, '/v1/seccode/', '/v1/seccode', endpoint="seccode")
+
+
+@app.after_request
+def after_request_func(response):
+    for query in get_debug_queries():
+        if query.duration >= app.config['FLASKY_DB_QUERY_TIMEOUT']:
+            print('Slow query:%s ,Parameters:%s, Duration:%fs, Context:%s\n' %
+                  (query.statement, query.parameters, query.duration,
+                   query.context))  # 打印超时sql执行信息
+    return response
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
