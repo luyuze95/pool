@@ -14,7 +14,7 @@ from logs import celery_logger
 from models.bhd_address import BhdAddress
 from rpc.bhd_rpc import bhd_client
 from schedule.task_bhd_deposit import bhd_block_number_deposit_task, \
-    confirm_deposit_transaction
+    confirm_deposit_transaction, bhd_block_scan
 from schedule.task_email import email_sender_task
 from schedule.task_income_calculate import calculate_income
 
@@ -24,7 +24,7 @@ def setup_period_task(sender, **kwargs):
     # sender.add_periodic_task(crontab(minute='*/3'),
     #                          add_wallet_address.s())
     sender.add_periodic_task(crontab(minute='*/1'),
-                             bhd_block_number_deposit_task.s())
+                             bhd_block_scan.s())
     sender.add_periodic_task(crontab(minute='*/1'),
                              confirm_deposit_transaction.s())
     sender.add_periodic_task(crontab(hour='*/24'),

@@ -25,17 +25,17 @@ def bhd_block_scan():
     # 如果之前没有bhd，初始化最新区块到数据库
     bhd_offset = initialize_offset(BHD_COIN_NAME, bhd_offset,
                                    latest_block_number)
-    wait_scan_block_size = latest_block_number - bhd_offset.value
+    wait_scan_block_size = latest_block_number - bhd_offset.offset_value
     if wait_scan_block_size < buffer_window:
         buffer_window = wait_scan_block_size
     # 根据高度差，下发最新的扫描任务
-    for block_number in range(bhd_offset.value,
-                              bhd_offset.value + buffer_window):
+    for block_number in range(bhd_offset.offset_value,
+                              bhd_offset.offset_value + buffer_window):
         bhd_block_number_deposit_task.apply_async((block_number, BHD_COIN_NAME),
                                                   expires=20)
 
     # 更新区块高度
-    bhd_offset.value += buffer_window
+    bhd_offset.offset_value += buffer_window
     db.session.commit()
 
 

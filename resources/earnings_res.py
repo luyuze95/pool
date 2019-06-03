@@ -68,7 +68,7 @@ class DayEarningsApi(Resource):
         results = db.session.execute("""
             SELECT
 	        sum( amount ),
-	        to_days( create_time ) ,
+	        create_time,
 	        AVG(capacity)
             FROM
 	        pool_bhd_income_record 
@@ -78,6 +78,7 @@ class DayEarningsApi(Resource):
             TO_DAYS( create_time )
             ORDER BY 
             create_time
+            DESC 
             limit %s, %s
             """ % (account_key, offset, limit)).fetchall()
         for index, result in enumerate(results):
