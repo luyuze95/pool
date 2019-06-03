@@ -35,6 +35,7 @@ def login_required(f):
             return make_resp(401, False, message="account key not found")
         g.account_key = account_key
         g.user = user
+        g.token = token
         return f(*args, **kwargs)
     return wrapper
 

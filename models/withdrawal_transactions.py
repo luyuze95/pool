@@ -18,15 +18,15 @@ class WithdrawalTransaction(db.Model):
     amount = db.Column(db.DECIMAL(32, 16))
     coin_name = db.Column(db.String(32))
     txid = db.Column(db.String(256))
+    # 提现状态， 1：用户验证通过， 2： 后台审核通过， 3： 提现中， 4： 提现成功， 5， 提现失败
+    status = db.Column(db.SmallInteger, default=1)
     create_time = db.Column(db.TIMESTAMP(), default=datetime.now)
 
-    def __init__(self, account_key, amount, txid, to_address, coin_name=BHD_COIN_NAME):
+    def __init__(self, account_key, amount, to_address, coin_name=BHD_COIN_NAME):
         self.account_key = account_key
         self.amount = amount
         self.coin_name = coin_name
-        self.status = 1
         self.to_address = to_address
-        self.txid = txid
 
     def to_dict(self):
         withdrawal_transaction_dict = {
@@ -36,6 +36,7 @@ class WithdrawalTransaction(db.Model):
             "coin_name": self.coin_name,
             "txid": self.txid,
             "create_time": self.create_time,
+            "status": self.status,
         }
 
         return withdrawal_transaction_dict

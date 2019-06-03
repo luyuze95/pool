@@ -11,6 +11,7 @@ from flask import Flask
 
 from models import db
 from resources.earnings_res import EarningsApi
+from resources.verification_res import VerifyApi
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.pardir))
 
@@ -31,6 +32,7 @@ from resources.wallet_res import WalletAPI
 api.add_resource(WalletAPI, '/v1/wallet/', '/v1/wallet', endpoint="wallet")
 api.add_resource(UserAssetApi, '/v1/asset/', '/v1/asset', endpoint="asset")
 api.add_resource(EarningsApi, '/v1/earnings/', '/v1/earnings', endpoint="earnings")
+api.add_resource(VerifyApi, '/v1/seccode/', '/v1/seccode', endpoint="seccode")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

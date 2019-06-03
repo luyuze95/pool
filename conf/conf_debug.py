@@ -8,6 +8,15 @@ from decimal import Decimal
 
 DEBUG = True
 
+''' email config'''
+MAIL_APP_ID = '13140'
+MAIL_APP_KEY = '6761599fc5e24ab82e2646069d517b87'
+
+DOMAIN = 'www.exnow.com'
+
+USERNAME = 'noreply@noreply.exnow.com'
+PASSWORD = 'ExnowBimao12345678'
+
 
 ''' secret'''
 JWT_SECRET = 'bimao'
@@ -18,6 +27,7 @@ REDIS_HOST = '47.97.116.19'
 REDIS_PORT = 6379
 # miner capacity
 CAPACITY_DB = 9
+AUTH_DB = 0
 
 
 ''' mysql config'''
@@ -45,7 +55,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 
 """ kafka config"""
-KAFKA_HOST = ["192.168.10.134:9092", "192.168.10.134:9094", "192.168.10.134:9093"]
+KAFKA_HOST = ["47.97.116.19:9092"]
 GBT_TOPIC_BHD = "BitcoinHDRaw"
 JOB_TOPIC_BHD = "JobMakerMsgBhd"
 LATEST_BLOCK_MININGINFO = "latestBlockMiniInfo"

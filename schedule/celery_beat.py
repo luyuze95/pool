@@ -26,7 +26,7 @@ def setup_period_task(sender, **kwargs):
                              bhd_block_number_deposit_task.s())
     sender.add_periodic_task(crontab(minute='*/1'),
                              confirm_deposit_transaction.s())
-    sender.add_periodic_task(crontab(minute='*/1'),
+    sender.add_periodic_task(crontab(hour='*/24'),
                              calculate_income.s())
 
 

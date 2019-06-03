@@ -6,6 +6,8 @@
 """
 import os
 
+WORKDIR = os.path.join(os.getcwd(), os.path.pardir)
+
 python_env = os.getenv('python_env', True)
 
 if python_env in ('0', False, 'prod', "PRODUCTION"):

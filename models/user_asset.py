@@ -24,6 +24,8 @@ class UserAsset(db.Model):
     pledge_asset = db.Column(db.DECIMAL(32, 16))
     # 可用资产
     available_asset = db.Column(db.DECIMAL(32, 16))
+    # 冻结资产
+    frozen_asset = db.Column(db.DECIMAL(32, 16))
     # 总资产
     total_asset = db.Column(db.DECIMAL(32, 16))
     # 理论抵押

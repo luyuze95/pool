@@ -9,13 +9,14 @@ from decimal import Decimal
 from flask import g
 from flask_restful import Resource, reqparse
 
-from models import db
 from logs import api_logger
+from models import db
 from models.bhd_address import BhdAddress
 from models.user_asset import UserAsset
 from models.withdrawal_transactions import WithdrawalTransaction
 from resources.auth_decorator import login_required
 from rpc.bhd_rpc import bhd_client
+from utils.redis_ins import redis_auth
 from utils.response import make_resp
 
 
@@ -28,7 +29,8 @@ class WalletAPI(Resource):
         :return:
         """
         parse = reqparse.RequestParser()
-        parse.add_argument('coin_name', type=str, required=False, trim=True, default='bhd')
+        parse.add_argument('coin_name', type=str, required=False, trim=True,
+                           default='bhd')
         args = parse.parse_args()
         account_key = g.account_key
         coin_name = args.get('coin_name').lower()
@@ -65,11 +67,13 @@ class WalletAPI(Resource):
         parse.add_argument('coin_name', type=str, required=False, trim=True)
         parse.add_argument('amount', type=str, required=True)
         parse.add_argument('to_address', type=str, required=True, trim=True)
+        parse.add_argument('seccode', type=str, required=True, trim=True)
         args = parse.parse_args()
         coin_name = args.get('coin_name')
         account_key = g.account_key
         amount = Decimal(str(args.get('amount')))
         to_address = args.get('to_address')
+        seccode = args.get('seccode')
 
         api_logger.info("Withdrawal api, to:%s, amount:%s, account_key:%s"
                         % (to_address, amount, account_key))
@@ -80,27 +84,30 @@ class WalletAPI(Resource):
             if not user_asset:
                 api_logger.error("withdrawal,user not found %s" % account_key)
                 return make_resp(404, False, message="user asset not found")
+
+            key = "withdrawal:seccode:%s" % account_key
+            seccode_cache = redis_auth.get(key)
+            if seccode != seccode_cache:
+                api_logger.error("withdrawal, seccode error")
+                return make_resp(400, False, message="seccode verify failed")
             if user_asset.available_asset < amount:
                 api_logger.error(
                     "withdrawal, user:%s, available_asset:%s, amount:%s"
                     % (account_key, user_asset.available_asset, amount))
                 return make_resp(400, False, message="balance not enough")
-            user_asset.pledge_asset -= amount
-            user_asset.total_asset -= amount
+
+            user_asset.available_asset -= amount
+            user_asset.frozen_asset += amount
+            withdrawal_transaction = WithdrawalTransaction(account_key, amount,
+                                                           to_address)
+            db.session.add(withdrawal_transaction)
             db.session.commit()
         except Exception as e:
             api_logger.error("withdrawal, error %s" % str(e))
             db.session.rollback()
             return make_resp(500, False, message="withdrawal failed")
 
-        txid = bhd_client.withdrawal(to_address, amount)
-        withdrawal_transaction = WithdrawalTransaction(account_key, amount,
-                                                       txid,
-                                                       to_address)
-        db.session.add(withdrawal_transaction)
-        db.session.commit()
-
         api_logger.info("Withdrawal api, insert into withdrawal_transaction %s"
                         % withdrawal_transaction.to_dict())
 
-        return make_resp(txid=withdrawal_transaction.txid)
+        return make_resp(200, True)

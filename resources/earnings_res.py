@@ -22,9 +22,6 @@ class EarningsApi(Resource):
         获取收益列表
         :return:
         """
-        print('headers'*10 + "\n%s" % request.headers)
-        print('args'*10 + "\n%s" % request.args)
-        print('json'*10 + "\n%s" % request.json)
         parse = reqparse.RequestParser()
         parse.add_argument('limit', type=int, required=False)
         parse.add_argument('offset', type=int, required=False)
