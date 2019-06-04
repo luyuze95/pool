@@ -28,22 +28,13 @@ class IncomeRecord(db.Model):
     # 类型
     type = db.Column(db.INTEGER)
     # 矿机名
-    # miner_name = db.Column(db.String(64))
+    capacity = db.Column(db.DECIMAL(32, 16))
 
     # 是否已经计算收益
     is_add_asset = db.Column(db.SmallInteger)
 
     create_time = db.Column(db.TIMESTAMP(), default=datetime.now)
     update_time = db.Column(db.TIMESTAMP(), default=datetime.now)
-
-    def __init__(self, account_key, pledge_asset, fraction, height,
-                 plotter_id, is_add_asset):
-        self.account_key = account_key
-        self.income_amount = pledge_asset
-        self.fraction = fraction
-        self.height = height
-        self.plotter_id = plotter_id
-        self.is_add_asset = is_add_asset
 
     def __setattr__(self, key, value):
         super(IncomeRecord, self).__setattr__(key, value)
@@ -59,5 +50,6 @@ class IncomeRecord(db.Model):
             "mortgage_rate": self.mortgage_rate,
             "create_time": self.create_time,
             "is_add_asset": self.is_add_asset,
+            "capacity": self.capacity,
         }
         return income_record_dict

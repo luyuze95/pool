@@ -43,6 +43,8 @@ def bhd_block_scan():
 def bhd_block_number_deposit_task(block_number, series):
     # 获取区块交易信息
     transaction_hashs = bhd_client.get_transaction_hashs(block_number)
+    if not transaction_hashs:
+        return True
     for transaction_hash in transaction_hashs:
         try:
             # 获取交易详情

@@ -24,8 +24,8 @@ def calculate_income():
                 read=True).first()
             db.session.begin_nested()
             # 添加用户资产
-            user_asset.available_asset += income.income_amount
-            user_asset.total_asset += income.income_amount
+            user_asset.available_asset += income.amount
+            user_asset.total_asset += income.amount
             income.is_add_asset = 1
             celery_logger.info("user:%s, income %s " % (
                 user_asset.to_dict(), income.to_dict()))

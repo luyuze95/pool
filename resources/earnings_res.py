@@ -73,7 +73,7 @@ class DayEarningsApi(Resource):
             FROM
 	        pool_bhd_income_record 
             WHERE
-	        account_key = '%s' 
+	        is_add_asset=1 and account_key = '%s' and to_days(create_time)<to_days(now())
             GROUP BY
             TO_DAYS( create_time )
             ORDER BY 
