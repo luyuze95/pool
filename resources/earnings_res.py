@@ -6,9 +6,8 @@
 """
 import json
 
-from flask import g, request
+from flask import g
 from flask_restful import Resource, reqparse
-from sqlalchemy import func
 
 from models import db
 from models.income_record import IncomeRecord
@@ -67,9 +66,9 @@ class DayEarningsApi(Resource):
         account_key = g.account_key
         results = db.session.execute("""
             SELECT
-	        sum( amount ),
-	        create_time,
-	        AVG(capacity)/1000
+	        SUM(amount),
+	        MAX(create_time),
+	        AVG(capacity)
             FROM
 	        pool_bhd_income_record 
             WHERE
@@ -79,13 +78,11 @@ class DayEarningsApi(Resource):
             ORDER BY 
             create_time
             DESC 
-            limit %s, %s
+            LIMIT %s, %s
             """ % (account_key, offset, limit)).fetchall()
         if not results:
             return make_resp(200, True)
         for index, result in enumerate(results):
-            if index != 0:
-                result[1] = result[1].timestamp()
             results[index] = json.loads(json.dumps(list(result), default=encode_python_object))
         return make_resp(200, True, days_earnings=results)
 

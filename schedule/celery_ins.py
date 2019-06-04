@@ -15,7 +15,7 @@ def make_celery(app):
                     )
 
     celery.conf.update(
-        CELERY_DEFAULT_QUEUE='tut_celery_queue',
+        CELERY_DEFAULT_QUEUE='pool_queue',
         CELERY_TASK_SERIALIZER='json',
         CELERY_ACCEPT_CONTENT=['json'],
         CELERY_RESULT_SERIALIZER='json',

@@ -80,10 +80,12 @@ class BhdRpcClient(object):
 
 bhd_client = BhdRpcClient(BHD_NODE_URL, BHD_WALLET_PASSWORD)
 if __name__ == '__main__':
-    print(bhd_client.get_latest_block_number())
-    print(bhd_client.get_transaction_hashs(86346))
+    last_block_num = bhd_client.get_latest_block_number()
+    print(last_block_num)
+    block_hashs = bhd_client.get_transaction_hashs(last_block_num)
+    print(block_hashs)
     from pprint import pprint
-    pprint(bhd_client.get_transaction_detail("34f4127fb39d2ce22f4601cdbc4d9a4fddfe159115e44b1cd6075f017024c8ec"))
+    pprint(bhd_client.get_transaction_detail(block_hashs[0]))
     # print(bhd_client.unlock_account())
     # print(bhd_client.generate_address(1))
     # print(bhd_client.get_balance())

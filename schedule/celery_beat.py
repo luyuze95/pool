@@ -27,9 +27,8 @@ def setup_period_task(sender, **kwargs):
                              bhd_block_scan.s())
     sender.add_periodic_task(crontab(minute='*/1'),
                              confirm_deposit_transaction.s())
-    sender.add_periodic_task(crontab(hour='*/24'),
+    sender.add_periodic_task(crontab(minute='*/5'),
                              calculate_income.s())
-
 
 @celery.task
 def add_wallet_address():

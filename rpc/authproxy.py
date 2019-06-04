@@ -60,9 +60,9 @@ from conf import *
 
 def encode_python_object(o):
     if isinstance(o, decimal.Decimal):
-        return float(round(o, 8))
+        return str(o)
     if isinstance(o, datetime):
-        return str(o )
+        return str(o)
     if isinstance(o, tuple):
         return list(o)
     raise TypeError(repr(o) + " is not JSON serializable")
