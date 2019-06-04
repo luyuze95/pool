@@ -33,12 +33,20 @@ class UserAssetApi(Resource):
         if not user_asset:
             return make_resp(404, False)
         income = IncomeRecord.query.filter_by(account_key=account_key).order_by(IncomeRecord.height.desc()).limit(1).first()
+        context = {
+            "total_asset": user_asset.total_asset,
+            "pledge_asset": user_asset.pledge_asset,
+            "available_asset": user_asset.available_asset,
+            "earning_rate": 1,
+            "theory_pledge": 0,
+            "pledge_rate": 1,
+        }
         if not income:
-            return make_resp(404, False)
+            return make_resp(200, True, )
         user_capacity = income.capacity
         if not user_capacity:
             return make_resp(401, False, message="user capacity not found")
-        theory_pledge = user_capacity[0]*3
+        theory_pledge = user_capacity*3
 
         pledge_rate = user_asset.pledge_asset/theory_pledge
 
@@ -46,14 +54,13 @@ class UserAssetApi(Resource):
         if pledge_rate > 1:
             earning_rate = MORTGAGE_YIELD_RATE
 
-        context = {
-            "total_asset": user_asset.total_asset,
-            "pledge_asset": user_asset.pledge_asset,
-            "available_asset": user_asset.available_asset,
+        calculate_data = {
             "earning_rate": earning_rate,
             "theory_pledge": theory_pledge,
             "pledge_rate": pledge_rate,
         }
+
+        context.update(calculate_data)
 
         return make_resp(200, True, **context)
 
@@ -98,7 +105,7 @@ class UserAssetApi(Resource):
             return make_resp(500, False, message="transfer failed")
         api_logger.info("asset transfer succeed, amount:%s, user:%s, direction:%s"
                         % (amount, account_key, direction))
-        return make_resp(200, True)
+        return make_resp(205, True)
 
 
 
