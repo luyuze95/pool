@@ -12,6 +12,7 @@ from sqlalchemy import func
 from models import db
 from conf import *
 from logs import api_logger
+from models.income_record import IncomeRecord
 from models.miner_plotter import MinerPlotter
 from models.user_asset import UserAsset
 from resources.auth_decorator import login_required
@@ -31,7 +32,10 @@ class UserAssetApi(Resource):
         user_asset = UserAsset.query.filter_by(account_key=account_key).first()
         if not user_asset:
             return make_resp(404, False)
-        user_capacity = MinerPlotter.query.with_entities(func.sum(MinerPlotter.capacity)).first()
+        income = IncomeRecord.query.filter_by(account_key=account_key).order_by(IncomeRecord.height.desc()).limit(1).first()
+        if not income:
+            return make_resp(404, False)
+        user_capacity = income.capacity
         if not user_capacity:
             return make_resp(401, False, message="user capacity not found")
         theory_pledge = user_capacity[0]*3

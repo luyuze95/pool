@@ -46,7 +46,6 @@ class UserAsset(db.Model):
         self.pledge_asset = pledge_asset
         self.available_asset = available_asset
         self.total_asset = total_asset
-        self.theory_asset = theory_asset
         self.yield_rate = yield_rate
 
     def __setattr__(self, key, value):
@@ -61,7 +60,5 @@ class UserAsset(db.Model):
             "income_amount": self.pledge_asset,
             "available_asset": self.available_asset,
             "total_asset": self.total_asset,
-            "theory_asset": self.theory_asset,
-            "yield_rate": self.yield_rate,
         }
         return transaction_dict
