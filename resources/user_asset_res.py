@@ -42,11 +42,11 @@ class UserAssetApi(Resource):
             "pledge_rate": 1,
         }
         if not income:
-            return make_resp(200, True, )
+            return make_resp(200, True, **context)
         user_capacity = income.capacity
         if not user_capacity:
             return make_resp(401, False, message="user capacity not found")
-        theory_pledge = user_capacity*3
+        theory_pledge = user_capacity/1000*3
 
         pledge_rate = user_asset.pledge_asset/theory_pledge
 
@@ -76,7 +76,6 @@ class UserAssetApi(Resource):
         args = parse.parse_args()
         amount = Decimal(args.get('amount'))
         direction = args.get('direction')
-        print(direction)
         account_key = g.account_key
         api_logger.info("asset transfer, amount:%s, user:%s, direction:%s"
                         % (amount, account_key, direction))
@@ -95,7 +94,6 @@ class UserAssetApi(Resource):
                 return make_resp(400, False, message="available not enough")
             if not direction:
                 amount = -amount
-            print(amount)
             user_asset.pledge_asset -= amount
             user_asset.available_asset += amount
             db.session.commit()
@@ -105,7 +103,7 @@ class UserAssetApi(Resource):
             return make_resp(500, False, message="transfer failed")
         api_logger.info("asset transfer succeed, amount:%s, user:%s, direction:%s"
                         % (amount, account_key, direction))
-        return make_resp(205, True)
+        return make_resp(200, True)
 
 
 

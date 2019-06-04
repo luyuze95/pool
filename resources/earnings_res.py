@@ -69,11 +69,11 @@ class DayEarningsApi(Resource):
             SELECT
 	        sum( amount ),
 	        create_time,
-	        AVG(capacity)
+	        AVG(capacity)/1000
             FROM
 	        pool_bhd_income_record 
             WHERE
-	        is_add_asset=1 and account_key = '%s' and to_days(create_time)<to_days(now())
+	        is_add_asset=1 and account_key = '%s'
             GROUP BY
             TO_DAYS( create_time )
             ORDER BY 
@@ -81,7 +81,11 @@ class DayEarningsApi(Resource):
             DESC 
             limit %s, %s
             """ % (account_key, offset, limit)).fetchall()
+        if not results:
+            return make_resp(200, True)
         for index, result in enumerate(results):
+            if index != 0:
+                result[1] = result[1].timestamp()
             results[index] = json.loads(json.dumps(list(result), default=encode_python_object))
         return make_resp(200, True, days_earnings=results)
 
