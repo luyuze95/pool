@@ -46,7 +46,7 @@ class UserAssetApi(Resource):
         user_capacity = income.capacity
         if not user_capacity:
             return make_resp(401, False, message="user capacity not found")
-        theory_pledge = user_capacity/1000*3
+        theory_pledge = user_capacity/1024*3
 
         pledge_rate = user_asset.pledge_asset/theory_pledge
 

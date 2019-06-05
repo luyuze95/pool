@@ -19,15 +19,15 @@ class UserAsset(db.Model):
     # 用户id
     account_key = db.Column(db.String(64), index=True)
     # 币种名
-    coin_name = db.Column(db.String(32))
+    coin_name = db.Column(db.String(32), default='0')
     # 抵押资产
-    pledge_asset = db.Column(db.DECIMAL(32, 16))
+    pledge_asset = db.Column(db.DECIMAL(32, 16), default='0')
     # 可用资产
-    available_asset = db.Column(db.DECIMAL(32, 16))
+    available_asset = db.Column(db.DECIMAL(32, 16), default='0')
     # 冻结资产
-    frozen_asset = db.Column(db.DECIMAL(32, 16))
+    frozen_asset = db.Column(db.DECIMAL(32, 16), default='0')
     # 总资产
-    total_asset = db.Column(db.DECIMAL(32, 16))
+    total_asset = db.Column(db.DECIMAL(32, 16), default='0')
     # 理论抵押
     # theory_asset = db.Column(db.BigInteger)
 

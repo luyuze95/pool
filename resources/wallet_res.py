@@ -83,29 +83,32 @@ class WalletAPI(Resource):
                 account_key=account_key).with_for_update(read=True).first()
             if not user_asset:
                 api_logger.error("withdrawal,user not found %s" % account_key)
-                return make_resp(404, False, message="user asset not found")
+                return make_resp(404, False, message="用户资产错误")
 
             key = "withdrawal:seccode:%s" % account_key
             seccode_cache = redis_auth.get(key)
             if seccode != seccode_cache:
                 api_logger.error("withdrawal, seccode error")
-                return make_resp(400, False, message="seccode verify failed")
+                return make_resp(400, False, message="验证码错误")
+            redis_auth.delete(key)
             if user_asset.available_asset < amount:
                 api_logger.error(
                     "withdrawal, user:%s, available_asset:%s, amount:%s"
                     % (account_key, user_asset.available_asset, amount))
-                return make_resp(400, False, message="balance not enough")
+                return make_resp(400, False, message="余额不足")
 
             user_asset.available_asset -= amount
-            user_asset.frozen_asset += amount
-            withdrawal_transaction = WithdrawalTransaction(account_key, amount,
-                                                           to_address)
+            actual_amount = amount*Decimal('0.995')
+            poundage = amount*Decimal('0.005')
+            user_asset.frozen_asset += actual_amount
+            withdrawal_transaction = WithdrawalTransaction(account_key, actual_amount,
+                                                           to_address, poundage)
             db.session.add(withdrawal_transaction)
             db.session.commit()
         except Exception as e:
             api_logger.error("withdrawal, error %s" % str(e))
             db.session.rollback()
-            return make_resp(500, False, message="withdrawal failed")
+            return make_resp(500, False, message="提现失败")
 
         api_logger.info("Withdrawal api, insert into withdrawal_transaction %s"
                         % withdrawal_transaction.to_dict())

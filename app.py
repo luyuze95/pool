@@ -37,14 +37,15 @@ api.add_resource(DayEarningsApi, '/v1/earnings/days/', '/v1/earnings/days', endp
 api.add_resource(VerifyApi, '/v1/seccode/', '/v1/seccode', endpoint="seccode")
 
 
-@app.after_request
-def after_request_func(response):
-    for query in get_debug_queries():
-        if query.duration >= app.config['FLASKY_DB_QUERY_TIMEOUT']:
-            print('Slow query:%s ,Parameters:%s, Duration:%fs, Context:%s\n' %
-                  (query.statement, query.parameters, query.duration,
-                   query.context))  # 打印超时sql执行信息
-    return response
+if conf.DEBUG:
+    @app.after_request
+    def after_request_func(response):
+        for query in get_debug_queries():
+            if query.duration >= app.config['FLASKY_DB_QUERY_TIMEOUT']:
+                print('Slow query:%s ,Parameters:%s, Duration:%fs, Context:%s\n' %
+                      (query.statement, query.parameters, query.duration,
+                       query.context))  # 打印超时sql执行信息
+        return response
 
 
 if __name__ == '__main__':

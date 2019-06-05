@@ -5,13 +5,14 @@
     @date: 2019/5/29
 """
 from app import celery
-from models import db
 from conf import CELERY_MAX_CHILDREN_TASK, BHD_COIN_NAME, MIN_CONFIRMED, \
     MIN_DEPOSIT_AMOUNT
 from logs import celery_logger
+from models import db
 from models.bhd_address import BhdAddress
 from models.block_offset import BlockOffset
 from models.deposit_transaction import DepositTranscation
+from models.user_asset import UserAsset
 from rpc.bhd_rpc import bhd_client
 from utils.msyql_ins import initialize_offset
 
@@ -90,7 +91,8 @@ def bhd_block_number_deposit_task(block_number, series):
 
 @celery.task
 def confirm_deposit_transaction():
-    confirming_deposit_transactions = DepositTranscation.query.filter_by(status=1).all()
+    confirming_deposit_transactions = DepositTranscation.query.filter_by(
+        status=1).all()
     for transaction in confirming_deposit_transactions:
         transaction_info = bhd_client.get_transaction_detail(transaction.tx_id)
         confirmed = transaction_info['confirmations']
@@ -99,13 +101,36 @@ def confirm_deposit_transaction():
             transaction.status = 2
         if confirmed != transaction.confirmed:
             transaction.confirmed = confirmed
-        celery_logger.info("deposit update confirmed %s " % transaction.to_dict())
+        celery_logger.info(
+            "deposit update confirmed %s " % transaction.to_dict())
         db.session.commit()
+
+
+@celery.task
+def deposit_add_asset():
+    confirmed_deposit_transactions = DepositTranscation.query.filter_by(
+        status=2).all()
+    for transaction in confirmed_deposit_transactions:
+        try:
+            user_asset = UserAsset.query.filter_by(
+                account_key=transaction.account_key).with_for_update(
+                read=True).first()
+            user_asset.available_asset += transaction.amount
+            user_asset.total_asset += transaction.amount
+            transaction.status = 3
+            celery_logger.info(
+                "deposit update asset %s " % transaction.to_dict())
+            db.session.commit()
+        except Exception as e:
+            celery_logger.error("deposit_add_asset task, error %s" % str(e))
+            db.session.rollback()
+            continue
 
 
 # 检查是否大于最小充值要求
 def check_deposit_amount(coin_code, amount):
-    return False if float(amount) < MIN_DEPOSIT_AMOUNT.get(coin_code, 1) else True
+    return False if float(amount) < MIN_DEPOSIT_AMOUNT.get(coin_code,
+                                                           1) else True
 
 
 # 检查是否大于最小确认数

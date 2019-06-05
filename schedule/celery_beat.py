@@ -8,15 +8,15 @@
 from celery.schedules import crontab
 
 from app import celery
-from models import db
 from conf import *
 from logs import celery_logger
+from models import db
 from models.bhd_address import BhdAddress
 from rpc.bhd_rpc import bhd_client
-from schedule.task_bhd_deposit import bhd_block_number_deposit_task, \
-    confirm_deposit_transaction, bhd_block_scan
-from schedule.task_email import email_sender_task
+from schedule.task_bhd_deposit import confirm_deposit_transaction, \
+    bhd_block_scan, deposit_add_asset
 from schedule.task_income_calculate import calculate_income
+from schedule.task_withdrawal import withdrawal_coin
 
 
 @celery.on_after_configure.connect
@@ -27,8 +27,13 @@ def setup_period_task(sender, **kwargs):
                              bhd_block_scan.s())
     sender.add_periodic_task(crontab(minute='*/1'),
                              confirm_deposit_transaction.s())
+    sender.add_periodic_task(crontab(minute='*/1'),
+                             deposit_add_asset.s())
     sender.add_periodic_task(crontab(minute='*/5'),
                              calculate_income.s())
+    sender.add_periodic_task(crontab(minute='*/5'),
+                             withdrawal_coin.s())
+
 
 @celery.task
 def add_wallet_address():
@@ -44,5 +49,3 @@ def add_wallet_address():
             db.session.commit()
     except Exception as e:
         celery_logger.error(str(e))
-
-
