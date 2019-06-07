@@ -32,21 +32,19 @@ class UserAssetApi(Resource):
         user_asset = UserAsset.query.filter_by(account_key=account_key).first()
         if not user_asset:
             return make_resp(404, False)
-        income = IncomeRecord.query.filter_by(account_key=account_key).order_by(IncomeRecord.height.desc()).limit(1).first()
+        miner_capacity = MinerPlotter.query.with_entities(func.sum(MinerPlotter.capacity)).filter_by(account_key=account_key).first()[0]
         context = {
             "total_asset": user_asset.total_asset,
             "pledge_asset": user_asset.pledge_asset,
             "available_asset": user_asset.available_asset,
-            "earning_rate": 1,
+            "earning_rate": 0,
             "theory_pledge": 0,
-            "pledge_rate": 1,
+            "pledge_rate": 0,
+            "total_income": 0,
         }
-        if not income:
+        if not miner_capacity:
             return make_resp(200, True, **context)
-        user_capacity = income.capacity
-        if not user_capacity:
-            return make_resp(401, False, message="user capacity not found")
-        theory_pledge = user_capacity/1024*3
+        theory_pledge = miner_capacity/1024*3
 
         pledge_rate = user_asset.pledge_asset/theory_pledge
 
@@ -54,10 +52,17 @@ class UserAssetApi(Resource):
         if pledge_rate > 1:
             earning_rate = MORTGAGE_YIELD_RATE
 
+        total_income = IncomeRecord.query.with_entities(
+            func.sum(IncomeRecord.amount)).filter_by(
+            account_key=account_key).first()
+        if not total_income:
+            total_income = [0]
+
         calculate_data = {
             "earning_rate": earning_rate,
             "theory_pledge": theory_pledge,
             "pledge_rate": pledge_rate,
+            "total_income": total_income[0],
         }
 
         context.update(calculate_data)

@@ -48,7 +48,7 @@ def bhd_block_number_deposit_task(block_number, series):
         return True
     for transaction_hash in transaction_hashs:
         try:
-            # 获取交易详情
+            #todo 获取交易详情,更换为gettransaction。
             transaction_info = bhd_client.get_transaction_detail(
                 transaction_hash)
         except Exception as e:
@@ -62,6 +62,7 @@ def bhd_block_number_deposit_task(block_number, series):
             tx_type = tx_out['scriptPubKey']['type']
             if tx_type != 'scripthash':
                 continue
+
             address = tx_out['scriptPubKey']['addresses'][0]
             # 不满足最小充值数，跳过检查
             if not check_deposit_amount(series, amount):

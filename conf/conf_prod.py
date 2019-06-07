@@ -19,10 +19,10 @@ PASSWORD = 'ExnowBimao12345678'
 
 
 ''' secret'''
-JWT_SECRET = 'bimao'
+JWT_SECRET = 'dpool9787506377294'
 
 ''' redis config'''
-REDIS_PASSWORD = 'bhdpool'
+REDIS_PASSWORD = '5ZHx3IYixd'
 REDIS_HOST = 'pool.redis.server'
 REDIS_PORT = 6379
 # miner capacity
@@ -32,7 +32,7 @@ AUTH_DB = 0
 
 ''' mysql config'''
 MYSQL_USER = 'root'
-MYSQL_PASSWORD = 'bhdpool'
+MYSQL_PASSWORD = '5ZHx3IYixd'
 MYSQL_HOST = 'pool.mysql.server'
 MYSQL_PORT = 3306
 MYSQL_DB = 'pool'

@@ -15,6 +15,7 @@ from models.bhd_address import BhdAddress
 from rpc.bhd_rpc import bhd_client
 from schedule.task_bhd_deposit import confirm_deposit_transaction, \
     bhd_block_scan, deposit_add_asset
+from schedule.task_email import email_sender_task
 from schedule.task_income_calculate import calculate_income
 from schedule.task_withdrawal import withdrawal_coin
 

@@ -29,7 +29,7 @@ class BhdRpcClient(object):
         return self.client.getblockchaininfo()
 
     def get_balance(self, address=None,):
-        if address:
+        if address is not None:
             return self.client.getbalance(address)
         return self.client.getbalance()
 
@@ -43,17 +43,20 @@ class BhdRpcClient(object):
     def get_transactions(self, count=5, skip=0):
         return self.client.listtransactions('*', count, skip)[::-1]
 
-    def withdrawal(self, to_address, amount, from_address=None):
+    def withdrawal(self, to_address, amount, from_account=None):
         self.unlock_account()
         if not self.check_address(to_address):
             raise Exception("bhd withdraw exception, invalid address %s"
                             % to_address)
 
-        if self.get_balance() < amount:
+        if self.get_balance(from_account) < amount:
             raise Exception("bhd withdraw exception, money not enough, "
                             "to:%s, amount:%s"
                             % (to_address, amount))
-        tx_id = self.client.sendtoaddress(to_address, amount)
+        if from_account is None:
+            tx_id = self.client.sendtoaddress(to_address, amount)
+        else:
+            tx_id = self.client.sendfrom(from_account, to_address, amount)
         return tx_id
 
     def check_address(self, address):
@@ -80,6 +83,7 @@ class BhdRpcClient(object):
 
 bhd_client = BhdRpcClient(BHD_NODE_URL, BHD_WALLET_PASSWORD)
 if __name__ == '__main__':
+    print(bhd_client.get_transaction_hashs(174096))
     last_block_num = bhd_client.get_latest_block_number()
     print(last_block_num)
     block_hashs = bhd_client.get_transaction_hashs(last_block_num)

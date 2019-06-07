@@ -33,7 +33,7 @@ class DepositTranscation(db.Model):
     status = db.Column(db.SmallInteger)
     create_time = db.Column(db.TIMESTAMP(), default=datetime.now)
     update_time = db.Column(db.TIMESTAMP(), default=datetime.now)
-    # 是否发送到资产管理系统， 0， 为发送， 1， 发送
+    # 是否发送到汇聚地址， 0， 为发送， 1， 发送
     is_pushed = db.Column(db.SmallInteger)
 
     __table_args__ = (db.UniqueConstraint('account_key', 'tx_id', name='account_key_unite_tx_id'), {'extend_existing': True})
