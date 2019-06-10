@@ -29,7 +29,7 @@ class WithdrawalTransaction(db.Model):
         self.coin_name = coin_name
         self.to_address = to_address
         if not poundage:
-            poundage = amount*0.005
+            poundage = amount*Decimal("0.005")
         self.poundage = poundage
 
     def to_dict(self):
@@ -39,7 +39,7 @@ class WithdrawalTransaction(db.Model):
             "amount": self.amount,
             "coin_name": self.coin_name,
             "txid": self.txid,
-            "create_time": self.create_time,
+            "create_time": str(self.create_time),
             "status": self.status,
         }
 

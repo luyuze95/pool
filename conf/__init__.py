@@ -26,3 +26,24 @@ PRIVATE_TOKEN = b"<O\\wbUn%S~e`@T888@]cyb.,:GanzziM"
 
 PRIVATE_TOKEN_IV = b"zmI666&s_2{+sTuT"
 
+"""
+平台账单，记录所有资产转移记录。
+目前包括type：
+充提
+1、充值，
+2、提现，
+划转
+3、余额->抵押
+4、抵押->余额
+挖矿收益
+5、合作
+6、非合作
+7、活动奖励
+"""
+DEPOSIT = 1
+WITHDRAWAL = 2
+BALANCE_2_PLEDGE = 3
+PLEDGE_2_BALANCE = 4
+MINING_COOPERATION = 5
+MINING_NO_COOP = 6
+ACTIVITY_REWORD = 7

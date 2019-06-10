@@ -12,6 +12,10 @@ from flask_restful import Resource, reqparse
 from logs import api_logger
 from models import db
 from models.bhd_address import BhdAddress
+from models.bhd_burst import BurstBlock
+from models.deposit_transaction import DepositTranscation
+from models.dl_fraction import DeadlineFraction
+from models.transfer_info import AssetTransfer
 from models.user_asset import UserAsset
 from models.withdrawal_transactions import WithdrawalTransaction
 from resources.auth_decorator import login_required
@@ -98,10 +102,11 @@ class WalletAPI(Resource):
                 return make_resp(400, False, message="余额不足")
 
             user_asset.available_asset -= amount
-            actual_amount = amount*Decimal('0.995')
-            poundage = amount*Decimal('0.005')
+            actual_amount = amount * Decimal('0.995')
+            poundage = amount * Decimal('0.005')
             user_asset.frozen_asset += actual_amount
-            withdrawal_transaction = WithdrawalTransaction(account_key, actual_amount,
+            withdrawal_transaction = WithdrawalTransaction(account_key,
+                                                           actual_amount,
                                                            to_address, poundage)
             db.session.add(withdrawal_transaction)
             db.session.commit()
@@ -114,3 +119,34 @@ class WalletAPI(Resource):
                         % withdrawal_transaction.to_dict())
 
         return make_resp(200, True)
+
+
+class UserAssetTransferInfoAPI(Resource):
+    decorators = [login_required]
+
+    transaction_types = {
+        "deposit": DepositTranscation,
+        "withdrawal": WithdrawalTransaction,
+        "blocks": BurstBlock,
+        "transfer": AssetTransfer,
+        "dl_fraction": DeadlineFraction,
+    }
+
+    def get(self, transaction_type):
+        if transaction_type not in transaction_type:
+            return make_resp(404, message="查询列表内容不存在")
+        account_key = g.account_key
+        model = self.transaction_types.get(transaction_type)
+        parse = reqparse.RequestParser()
+        parse.add_argument('limit', type=int, required=False, default=10)
+        parse.add_argument('offset', type=int, required=False, default=0)
+        parse.add_argument('t', type=int, required=False)
+        args = parse.parse_args()
+        limit = args.get('limit')
+        offset = args.get('offset')
+        infos = model.query.filter_by(
+            account_key=account_key).order_by(
+            model.create_time.desc()).limit(limit).offset(
+            offset).all()
+        records = [info.to_dict() for info in infos]
+        return make_resp(records=records)

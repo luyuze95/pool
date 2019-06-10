@@ -60,7 +60,7 @@ class DepositTranscation(db.Model):
         transaction_dict = {
             "account_key": self.account_key,
             "amount": self.amount,
-            "coin_name": self.coin_name,
+            "coin_name": str(self.coin_name),
             "tx_id": self.tx_id,
             "block_number": self.block_number,
             "need_confirm_num": self.need_confirm_num,

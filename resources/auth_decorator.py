@@ -26,7 +26,7 @@ def login_required(f):
             auth_dict = jwt.decode(token, JWT_SECRET, audience='pool')
         except Exception as e:
             api_logger.error("auth failed %s" % str(e))
-            return make_resp(401, False, message="auth failed")
+            return make_resp(401, False, message="用户登陆过期，请重新登录")
 
         account_key = auth_dict.get("accountKey")
         userid = auth_dict.get("userid")

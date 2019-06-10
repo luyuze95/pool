@@ -26,7 +26,7 @@ from utils.handler_exception import APIHandleError
 
 api = APIHandleError(app)
 from resources.user_asset_res import UserAssetApi
-from resources.wallet_res import WalletAPI
+from resources.wallet_res import WalletAPI, UserAssetTransferInfoAPI
 from resources.earnings_res import BlockEarningsApi, DayEarningsApi
 from resources.verification_res import VerifyApi
 
@@ -35,6 +35,7 @@ api.add_resource(UserAssetApi, '/v1/asset/', '/v1/asset', endpoint="asset")
 api.add_resource(BlockEarningsApi, '/v1/earnings/blocks/', '/v1/earnings/blocks', endpoint="block_earnings")
 api.add_resource(DayEarningsApi, '/v1/earnings/days/', '/v1/earnings/days', endpoint="day_earnings")
 api.add_resource(VerifyApi, '/v1/seccode/', '/v1/seccode', endpoint="seccode")
+api.add_resource(UserAssetTransferInfoAPI, '/v1/transactions/<string:transaction_type>/', '/v1/transactions/<string:transaction_type>', endpoint="transactions")
 
 
 if conf.DEBUG:

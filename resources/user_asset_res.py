@@ -14,6 +14,7 @@ from conf import *
 from logs import api_logger
 from models.income_record import IncomeRecord
 from models.miner_plotter import MinerPlotter
+from models.transfer_info import AssetTransfer
 from models.user_asset import UserAsset
 from resources.auth_decorator import login_required
 from utils.response import make_resp
@@ -101,6 +102,8 @@ class UserAssetApi(Resource):
                 amount = -amount
             user_asset.pledge_asset -= amount
             user_asset.available_asset += amount
+            asset_transfer = AssetTransfer(account_key, amount, direction)
+            db.session.add(asset_transfer)
             db.session.commit()
         except Exception as e:
             api_logger.error("asset transfer, error %s" % str(e))
