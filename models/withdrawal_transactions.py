@@ -16,24 +16,23 @@ class WithdrawalTransaction(db.Model):
     account_key = db.Column(db.String(64), index=True)
     to_address = db.Column(db.String(128))
     amount = db.Column(db.DECIMAL(32, 16))
-    poundage = db.Column(db.DECIMAL(32, 16))
+    actual_amount = db.Column(db.DECIMAL(32, 16))
     coin_name = db.Column(db.String(32))
     txid = db.Column(db.String(256), default='')
-    # 提现状态， 1：用户验证通过， 2： 后台审核通过， 3： 提现中， 4： 提现成功， 5， 提现失败
     status = db.Column(db.SmallInteger, default='1')
     create_time = db.Column(db.TIMESTAMP(), default=datetime.now)
 
-    def __init__(self, account_key, amount, to_address, poundage=None, coin_name=BHD_COIN_NAME):
+    def __init__(self, account_key, amount, to_address, status=WITHDRAWAL_APPLY, coin_name=BHD_COIN_NAME):
         self.account_key = account_key
         self.amount = amount
         self.coin_name = coin_name
         self.to_address = to_address
-        if not poundage:
-            poundage = amount*Decimal("0.005")
-        self.poundage = poundage
+        self.actual_amount = amount*WITHDRAWAL_ACTUAL
+        self.status = status
 
     def to_dict(self):
         withdrawal_transaction_dict = {
+            "id": self.id,
             "account_key": self.account_key,
             "to_address": self.to_address,
             "amount": self.amount,

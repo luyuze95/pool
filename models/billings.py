@@ -23,6 +23,7 @@ class Billings(db.Model):
             5、合作
             6、非合作
         7、活动奖励
+        8、汇聚
     """
     __tablename__ = 'pool_billings'
     __table_args__ = {'extend_existing': True}

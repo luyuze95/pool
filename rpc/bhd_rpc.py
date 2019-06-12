@@ -80,6 +80,14 @@ class BhdRpcClient(object):
         block_info = self.client.getblock(block_hash)
         return block_info.get('tx')
 
+    def list_received_by_address(self):
+        data = self.client.listreceivedbyaddress()
+        return data
+
+    def list_unspent(self, minconf=1, maxconf=999999, addresses=[], include_unsafe=False, minimumAmount=Decimal("0.01")):
+        unspents = self.client.listunspent(minconf, maxconf, addresses, include_unsafe, {"minimumAmount":minimumAmount})
+        return unspents
+
 
 bhd_client = BhdRpcClient(BHD_NODE_URL, BHD_WALLET_PASSWORD)
 if __name__ == '__main__':

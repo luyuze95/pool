@@ -33,7 +33,7 @@ class DepositTranscation(db.Model):
     status = db.Column(db.SmallInteger)
     create_time = db.Column(db.TIMESTAMP(), default=datetime.now)
     update_time = db.Column(db.TIMESTAMP(), default=datetime.now)
-    # 是否发送到汇聚地址， 0， 为发送， 1， 发送
+    # 是否发送到汇聚地址， 0， 未发送， 1， 发送
     is_pushed = db.Column(db.SmallInteger)
 
     __table_args__ = (db.UniqueConstraint('account_key', 'tx_id', name='account_key_unite_tx_id'), {'extend_existing': True})
@@ -65,7 +65,10 @@ class DepositTranscation(db.Model):
             "block_number": self.block_number,
             "need_confirm_num": self.need_confirm_num,
             "confirmed": self.confirmed,
-            "pushed_confirm": self.pushed_confirm,
+            "status": self.status,
+            "create_time": str(self.create_time),
+            "update_time": str(self.update_time),
+
         }
         return transaction_dict
 

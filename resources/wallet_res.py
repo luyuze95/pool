@@ -9,6 +9,7 @@ from decimal import Decimal
 from flask import g
 from flask_restful import Resource, reqparse
 
+from conf import *
 from logs import api_logger
 from models import db
 from models.bhd_address import BhdAddress
@@ -102,23 +103,53 @@ class WalletAPI(Resource):
                 return make_resp(400, False, message="余额不足")
 
             user_asset.available_asset -= amount
-            actual_amount = amount * Decimal('0.995')
-            poundage = amount * Decimal('0.005')
-            user_asset.frozen_asset += actual_amount
+            user_asset.frozen_asset += amount
             withdrawal_transaction = WithdrawalTransaction(account_key,
-                                                           actual_amount,
-                                                           to_address, poundage)
+                                                           amount,
+                                                           to_address)
             db.session.add(withdrawal_transaction)
             db.session.commit()
         except Exception as e:
             api_logger.error("withdrawal, error %s" % str(e))
             db.session.rollback()
-            return make_resp(500, False, message="提现失败")
+            return make_resp(500, False, message="提现提交失败")
 
         api_logger.info("Withdrawal api, insert into withdrawal_transaction %s"
                         % withdrawal_transaction.to_dict())
 
         return make_resp(200, True)
+
+    def put(self):
+        """
+        撤销转账
+        :return:
+        """
+        parse = reqparse.RequestParser()
+        parse.add_argument('id', type=int, required=True)
+        args = parse.parse_args()
+        account_key = g.account_key
+        id = args.get('id')
+        withdrawal = WithdrawalTransaction.query.filter_by(
+            id=id, account_key=account_key, status=WITHDRAWAL_APPLY
+            ).first()
+        if not withdrawal:
+            api_logger.warning("account_key:%s, apply revocation:%s" % id)
+            return make_resp(406, False, message="撤销订单不存在")
+        try:
+            user_asset = UserAsset.query.filter_by(
+                account_key=account_key).with_for_update(read=True).first()
+
+            user_asset.frozen_asset -= withdrawal.amount
+            user_asset.available_asset += withdrawal.amount
+            withdrawal.status = WITHDRAWAL_UNDO
+            db.session.commit()
+            api_logger.info("account_key:%s, revoke:%s " % (account_key, id))
+            return make_resp(200)
+        except Exception as e:
+            api_logger.error("account_key:%s, 撤销转账失败:%s " % (account_key, e))
+            withdrawal.status = WITHDRAWAL_FAILED
+            db.session.rollback()
+            return make_resp(400, False, message="撤销订单失败")
 
 
 class UserAssetTransferInfoAPI(Resource):

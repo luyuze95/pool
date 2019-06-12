@@ -6,7 +6,7 @@
 """
 from app import celery
 from conf import CELERY_MAX_CHILDREN_TASK, BHD_COIN_NAME, MIN_CONFIRMED, \
-    MIN_DEPOSIT_AMOUNT
+    MIN_DEPOSIT_AMOUNT, BHD_MINER_ADDRESS
 from logs import celery_logger
 from models import db
 from models.bhd_address import BhdAddress
@@ -42,7 +42,7 @@ def bhd_block_scan():
 
 @celery.task
 def bhd_block_number_deposit_task(block_number, series):
-    # 获取区块交易信息
+    # 获取每个地址收取的详情 listreceivedbyaddress
     transaction_hashs = bhd_client.get_transaction_hashs(block_number)
     if not transaction_hashs:
         return True
@@ -88,6 +88,58 @@ def bhd_block_number_deposit_task(block_number, series):
             celery_logger.info("deposit transaction: %s" % tr.to_dict())
             db.session.add(tr)
             db.session.commit()
+
+
+@celery.task
+def bhd_deposit_scan():
+    # 获取所有地址收款交易
+    addresses_transactions = bhd_client.listreceivedbyaddress()
+    for address_recevied in addresses_transactions:
+        address = address_recevied.get("address")
+        account = address_recevied.get("account")
+        total_amount = address_recevied.get("amount")
+        txids = address_recevied.get("txids")
+        # 挖矿地址的交易暂时忽略
+        if address == BHD_MINER_ADDRESS:
+            continue
+        # 根据地址查询用户资产信息
+        asset = BhdAddress.query.filter_by(address=address).first()
+        if asset is None:
+            continue
+        for txid in txids:
+            # 检查交易是否已经存在
+            deposit_tx = DepositTranscation.query.filter_by(
+                tx_id=txid, account_key=asset.account_key).first()
+            if deposit_tx:
+                continue
+
+            # 获取交易详情
+            transaction = bhd_client.get_transaction_detail(txid)
+            tx_outs = transaction.get('vout', [])
+            confirmed = transaction['confirmations']
+            height = transaction['locktime']
+            for tx_out in tx_outs:
+                amount = tx_out['value']
+                tx_type = tx_out['scriptPubKey']['type']
+                if tx_type != 'scripthash':
+                    continue
+
+                address_vout = tx_out['scriptPubKey']['addresses'][0]
+                if address_vout == BHD_MINER_ADDRESS:
+                    continue
+                if not check_deposit_amount("bhd", amount):
+                    celery_logger.info("bhd deposit too small, transaction:%s"
+                                       % transaction)
+                    continue
+                need_confirmed = MIN_CONFIRMED.get(BHD_COIN_NAME)
+
+                tr = DepositTranscation(asset.account_key, amount,
+                                        asset.coin_name,
+                                        txid, height,
+                                        need_confirmed, confirmed)
+                celery_logger.info("deposit transaction: %s" % tr.to_dict())
+                db.session.add(tr)
+                db.session.commit()
 
 
 @celery.task

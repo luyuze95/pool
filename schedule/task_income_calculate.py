@@ -4,19 +4,23 @@
     @author: anzz
     @date: 2019/5/29
 """
+from sqlalchemy import and_
 
 from app import celery
 from models import db
 from logs import celery_logger
 from models.income_record import IncomeRecord
 from models.user_asset import UserAsset
+from rpc.bhd_rpc import bhd_client
 
 
 @celery.task
 def calculate_income():
     # 查询未统计收益
-    not_add_incomes = IncomeRecord.query.filter_by(
-        is_add_asset=0).with_for_update(read=True).all()
+    latest_height = bhd_client.get_latest_block_number()
+    mature_height = latest_height - 100
+    not_add_incomes = IncomeRecord.query.filter(and_(IncomeRecord.is_add_asset==0,
+                                                     IncomeRecord.height>mature_height))
     for income in not_add_incomes:
         try:
             user_asset = UserAsset.query.filter_by(

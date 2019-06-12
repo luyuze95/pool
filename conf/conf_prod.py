@@ -70,6 +70,8 @@ BHD_NODE_URL = "http://hemon:16761123@pool.bhd.server:8888/"
 ADDRESS_LEAST_REMAINING_COUNT = 10
 BHD_COIN_NAME = "bhd"
 BHD_WALLET_PASSWORD = "7ujMko0admin"
+BHD_MINER_ADDRESS = "3PURWR7vxZRiK8afgLB1Brx9Y9cBEan7gL"
+
 # 全抵押和非全抵押收益
 MORTGAGE_YIELD_RATE = Decimal('1')
 NOT_MORTGAGE_YIELD_RATE = Decimal('0.3')
@@ -79,5 +81,10 @@ MIN_DEPOSIT_AMOUNT = {
 }
 
 MIN_CONFIRMED = {
-    BHD_COIN_NAME: 12
+    BHD_COIN_NAME: 3
 }
+
+# 最小汇聚余额
+MIN_CONVERGE_AMOUNT = Decimal('0.1')
+# 手续费保留金
+POUNDAGE_BAlANCE = Decimal('0.00006')

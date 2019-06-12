@@ -20,6 +20,7 @@ class DeadlineFraction(db.Model):
     capacity = db.Column(db.DECIMAL(32, 16))
     height = db.Column(db.INTEGER)
     create_time = db.Column(db.TIMESTAMP(), default=datetime.now)
+    deadline = db.Column(db.BigInteger)
 
     def to_dict(self):
         dl_fraction_dict = {
@@ -30,6 +31,7 @@ class DeadlineFraction(db.Model):
             "capacity": self.capacity,
             "height": self.height,
             "create_time": str(self.create_time),
+            "deadline": self.deadline,
         }
 
         return dl_fraction_dict

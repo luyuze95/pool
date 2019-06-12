@@ -102,7 +102,7 @@ class UserAssetApi(Resource):
                 amount = -amount
             user_asset.pledge_asset -= amount
             user_asset.available_asset += amount
-            asset_transfer = AssetTransfer(account_key, amount, direction)
+            asset_transfer = AssetTransfer(account_key, abs(amount), direction)
             db.session.add(asset_transfer)
             db.session.commit()
         except Exception as e:
