@@ -40,7 +40,7 @@ def mail_task(to_email, title, content):
 
     msg = MIMEMultipart('alternative')
     msg['Subject'] = Header(title).encode()
-    msg['From'] = '%s <%s>' % (Header('F1pool').encode(), USERNAME)
+    msg['From'] = '%s <%s>' % (Header('F1pooL').encode(), USERNAME)
     msg['To'] = rcptto
     msg['Message-id'] = email.utils.make_msgid()
     msg['Date'] = email.utils.formatdate()

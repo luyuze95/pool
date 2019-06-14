@@ -33,7 +33,7 @@ AUTH_DB = 0
 ''' mysql config'''
 MYSQL_USER = 'admin'
 MYSQL_PASSWORD = 'gpafXl1nu6yMuEMHKN6U'
-MYSQL_HOST = 'pool.mysql.server'
+MYSQL_HOST = 'pooldatabase-instance-1.c3ccengcrirl.ap-northeast-2.rds.amazonaws.com'
 MYSQL_PORT = 3306
 MYSQL_DB = 'pool'
 

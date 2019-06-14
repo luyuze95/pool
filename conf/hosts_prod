@@ -1,0 +1,6 @@
+172.31.45.131 pool.redis.server
+172.31.45.131 pool.kafka.server
+172.31.45.131 pool.zookeeper.server
+
+pool.bhd.server pool.bhd.server
+pool.bhd.server pool.usdt.server
