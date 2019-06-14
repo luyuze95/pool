@@ -5,6 +5,8 @@
     @date: 2019/5/30
 """
 import json
+import time
+from datetime import datetime
 
 from flask import g
 from flask_restful import Resource, reqparse
@@ -45,12 +47,22 @@ class DayEarningsApi(Resource):
         :return:
         """
         parse = reqparse.RequestParser()
+
+        now = int(time.time())
+        ten_days = now - 864000
         parse.add_argument('limit', type=int, required=False, default=10)
         parse.add_argument('offset', type=int, required=False, default=0)
-        parse.add_argument('t', type=int, required=False)
+        parse.add_argument('from', type=int, required=False, default=ten_days)
+        parse.add_argument('end', type=int, required=False, default=now)
+        parse.add_argument('status', type=int, required=False)
         args = parse.parse_args()
         limit = args.get('limit')
         offset = args.get('offset')
+        from_ts = args.get('from')
+        end_ts = args.get('end')
+        status = args.get('status')
+        from_dt = datetime.fromtimestamp(from_ts)
+        end_dt = datetime.fromtimestamp(end_ts)
 
         account_key = g.account_key
         results = db.session.execute("""
