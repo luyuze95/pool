@@ -16,14 +16,6 @@ class BhdRpcClient(object):
         self.url = url
         self.client = AuthServiceProxy(service_url=self.url, timeout=30)
         self.password = password
-        heat = Thread(target=self.heartbeat)
-        heat.setDaemon(True)
-        heat.start()
-
-    def heartbeat(self):
-        while 1:
-            self.block_info()
-            time.sleep(10)
 
     def block_info(self, block_number=None):
         return self.client.getblockchaininfo()
@@ -84,20 +76,30 @@ class BhdRpcClient(object):
         data = self.client.listreceivedbyaddress()
         return data
 
-    def list_unspent(self, minconf=1, maxconf=999999, addresses=[], include_unsafe=False, minimumAmount=Decimal("0.01")):
-        unspents = self.client.listunspent(minconf, maxconf, addresses, include_unsafe, {"minimumAmount":minimumAmount})
+    def list_unspent(self, minconf=1,
+                     maxconf=999999,
+                     addresses=[],
+                     include_unsafe=False,
+                     minimumAmount=Decimal("0.01")):
+        unspents = self.client.listunspent(minconf,
+                                           maxconf,
+                                           addresses,
+                                           include_unsafe,
+                                           {"minimumAmount": minimumAmount})
         return unspents
 
 
 bhd_client = BhdRpcClient(BHD_NODE_URL, BHD_WALLET_PASSWORD)
 if __name__ == '__main__':
-    print(bhd_client.get_transaction_hashs(174096))
-    last_block_num = bhd_client.get_latest_block_number()
-    print(last_block_num)
-    block_hashs = bhd_client.get_transaction_hashs(last_block_num)
-    print(block_hashs)
     from pprint import pprint
-    pprint(bhd_client.get_transaction_detail(block_hashs[0]))
+    # print(bhd_client.get_transaction_hashs(174096))
+    last_block_num = bhd_client.get_latest_block_number()
+    # print(last_block_num)
+    # block_hashs = bhd_client.get_transaction_hashs(last_block_num)
+    # print(block_hashs)
+    # pprint(bhd_client.get_transaction_detail(block_hashs[0]))
     # print(bhd_client.unlock_account())
     # print(bhd_client.generate_address(1))
     # print(bhd_client.get_balance())
+    # print(bhd_client.list_received_by_address())
+    pprint(bhd_client.list_unspent())

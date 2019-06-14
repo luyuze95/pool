@@ -72,6 +72,12 @@ BHD_COIN_NAME = "bhd"
 BHD_WALLET_PASSWORD = "7ujMko0admin"
 BHD_MINER_ADDRESS = "2N46yZncdY3vUnHUBUdhTJ2urFZmGozhFvw"
 
+""" usdt node config"""
+USDT_WITHDRAWAL_ADDRESS = '1CyXN7vZsMn7vVxTGmfaHNz3JcsrkeBjWo'
+USDT_CONVERGE_ADDRESS = USDT_WITHDRAWAL_ADDRESS
+USDT_URI = 'http://bimaousdt:usdt7ujMko0admin@127.0.0.1:9999'
+USDT_NAME = "usdt"
+
 # 全抵押和非全抵押收益
 MORTGAGE_YIELD_RATE = Decimal('1')
 NOT_MORTGAGE_YIELD_RATE = Decimal('0.3')
@@ -81,10 +87,12 @@ MIN_DEPOSIT_AMOUNT = {
 }
 
 MIN_CONFIRMED = {
-    BHD_COIN_NAME: 3
+    BHD_COIN_NAME: 3,
+    USDT_NAME: 3,
 }
 
 # 最小汇聚余额
-MIN_CONVERGE_AMOUNT = Decimal('0.1')
+MIN_CONVERGE_AMOUNT_BHD = Decimal('0.1')
+MIN_CONVERGE_AMOUNT_USDT = Decimal('1')
 # 手续费
-POUNDAGE_BAlANCE = Decimal('0.00006')
+POUNDAGE_BALANCE = Decimal('0.00006')

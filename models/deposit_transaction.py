@@ -5,7 +5,7 @@
     @date: 2019/5/29
 """
 from datetime import datetime
-
+from conf import DEPOSIT_CONFIRMING
 from models import db
 
 
@@ -44,7 +44,7 @@ class DepositTranscation(db.Model):
         self.amount = float(amount)
         self.coin_name = coin_name
         self.tx_id = tx_id
-        self.status = 1
+        self.status = DEPOSIT_CONFIRMING
         self.is_pushed = 0
         self.block_number = block_number
         self.need_confirm_num = need_confirm_num
@@ -60,7 +60,7 @@ class DepositTranscation(db.Model):
         transaction_dict = {
             "account_key": self.account_key,
             "amount": self.amount,
-            "coin_name": str(self.coin_name),
+            "coin_name": self.coin_name,
             "tx_id": self.tx_id,
             "block_number": self.block_number,
             "need_confirm_num": self.need_confirm_num,

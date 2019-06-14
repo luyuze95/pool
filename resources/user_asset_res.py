@@ -29,20 +29,27 @@ class UserAssetApi(Resource):
         :return:
         """
         account_key = g.account_key
+        parse = reqparse.RequestParser()
+        parse.add_argument('coin_name', type=str, required=True)
+        args = parse.parse_args()
+        coin_name = args.get('coin_name')
 
-        user_asset = UserAsset.query.filter_by(account_key=account_key).first()
+        user_asset = UserAsset.query.filter_by(account_key=account_key,
+                                               coin_name=coin_name).first()
         if not user_asset:
             return make_resp(404, False)
-        miner_capacity = MinerPlotter.query.with_entities(func.sum(MinerPlotter.capacity)).filter_by(account_key=account_key).first()[0]
-        context = {
-            "total_asset": user_asset.total_asset,
-            "pledge_asset": user_asset.pledge_asset,
-            "available_asset": user_asset.available_asset,
+        context = user_asset.to_dict()
+        if coin_name == USDT_NAME:
+            return make_resp(200, True, **context)
+        miner_capacity = MinerPlotter.query.with_entities(
+            func.sum(MinerPlotter.capacity)).filter_by(
+            account_key=account_key).first()[0]
+        context.update({
             "earning_rate": 0,
             "theory_pledge": 0,
             "pledge_rate": 0,
             "total_income": 0,
-        }
+        })
         if not miner_capacity:
             return make_resp(200, True, **context)
         theory_pledge = miner_capacity/1024*3
@@ -87,7 +94,8 @@ class UserAssetApi(Resource):
                         % (amount, account_key, direction))
         try:
             user_asset = UserAsset.query.filter_by(
-                account_key=account_key).with_for_update(read=True).first()
+                account_key=account_key, coin_name=BHD_COIN_NAME
+            ).with_for_update(read=True).first()
             if direction and user_asset.pledge_asset < amount:
                 api_logger.error(
                     "asset transfer, user:%s, pledge_asset:%s, amount:%s"

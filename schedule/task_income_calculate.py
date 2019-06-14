@@ -12,6 +12,7 @@ from logs import celery_logger
 from models.income_record import IncomeRecord
 from models.user_asset import UserAsset
 from rpc.bhd_rpc import bhd_client
+from conf import *
 
 
 @celery.task
@@ -24,7 +25,8 @@ def calculate_income():
     for income in not_add_incomes:
         try:
             user_asset = UserAsset.query.filter_by(
-                account_key=income.account_key).with_for_update(
+                account_key=income.account_key,
+                coin_name=BHD_COIN_NAME).with_for_update(
                 read=True).first()
             db.session.begin_nested()
             # 添加用户资产

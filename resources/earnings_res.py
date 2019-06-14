@@ -33,7 +33,7 @@ class BlockEarningsApi(Resource):
         limit = args.get('limit')
         offset = args.get('offset')
         account_key = g.account_key
-        incomes = IncomeRecord.query.filter_by(account_key=account_key, is_add_asset=0).order_by(IncomeRecord.create_time.desc()).limit(limit).offset(offset).all()
+        incomes = IncomeRecord.query.filter_by(account_key=account_key).order_by(IncomeRecord.create_time.desc()).limit(limit).offset(offset).all()
 
         for index, income in enumerate(incomes):
             income_dict = income.to_dict()

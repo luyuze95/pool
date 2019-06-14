@@ -213,8 +213,6 @@ class AuthServiceProxy(object):
 
         responsedata = http_response.read().decode('utf8')
         response = json.loads(responsedata, parse_float=decimal.Decimal)
-        if "error" in response and response["error"]:
-            pass
         return response
 
 

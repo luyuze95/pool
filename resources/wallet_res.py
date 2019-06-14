@@ -4,15 +4,17 @@
     @author: anzz
     @date: 2019/5/29
 """
-from decimal import Decimal
+import time
+from datetime import datetime
 
 from flask import g
 from flask_restful import Resource, reqparse
+from sqlalchemy import and_
 
 from conf import *
 from logs import api_logger
 from models import db
-from models.bhd_address import BhdAddress
+from models.pool_address import PoolAddress
 from models.bhd_burst import BurstBlock
 from models.deposit_transaction import DepositTranscation
 from models.dl_fraction import DeadlineFraction
@@ -20,7 +22,7 @@ from models.transfer_info import AssetTransfer
 from models.user_asset import UserAsset
 from models.withdrawal_transactions import WithdrawalTransaction
 from resources.auth_decorator import login_required
-from rpc.bhd_rpc import bhd_client
+from rpc import get_rpc
 from utils.redis_ins import redis_auth
 from utils.response import make_resp
 
@@ -34,7 +36,7 @@ class WalletAPI(Resource):
         :return:
         """
         parse = reqparse.RequestParser()
-        parse.add_argument('coin_name', type=str, required=False, trim=True,
+        parse.add_argument('coin_name', type=str, required=True, trim=True,
                            default='bhd')
         args = parse.parse_args()
         account_key = g.account_key
@@ -44,23 +46,28 @@ class WalletAPI(Resource):
                         % (account_key, coin_name))
 
         # 检查是否已有地址
-        bhd_address = BhdAddress.query.filter_by(account_key=account_key,
+        bhd_address = PoolAddress.query.filter_by(account_key=account_key,
                                                  coin_name=coin_name).first()
 
         if bhd_address:
             return make_resp(**bhd_address.to_dict())
 
         # 从节点获取地址
-        address, priv_key = bhd_client.generate_address(g.user.id)
+        client = get_rpc(coin_name)
+        try:
+            address, priv_key = client.generate_address(g.user.id)
 
-        # 插入数据库
-        bhd_address = BhdAddress(account_key, address, priv_key)
-        db.session.add(bhd_address)
-        db.session.commit()
+            # 插入数据库
+            bhd_address = PoolAddress(account_key, address, priv_key, coin_name)
+            db.session.add(bhd_address)
+            db.session.commit()
 
-        api_logger.info("wallet address api, insert into wallet_address %s"
-                        % bhd_address.to_dict())
-
+            api_logger.info("wallet address api, insert into wallet_address %s"
+                            % bhd_address.to_dict())
+        except Exception as e:
+            db.session.rollback()
+            api_logger.error("generate address %s " % e)
+            return make_resp(400, False, message="生成地址失败")
         return make_resp(**bhd_address.to_dict())
 
     def post(self):
@@ -69,7 +76,7 @@ class WalletAPI(Resource):
         :return:
         """
         parse = reqparse.RequestParser()
-        parse.add_argument('coin_name', type=str, required=False, trim=True)
+        parse.add_argument('coin_name', type=str, required=True, trim=True)
         parse.add_argument('amount', type=str, required=True)
         parse.add_argument('to_address', type=str, required=True, trim=True)
         parse.add_argument('seccode', type=str, required=True, trim=True)
@@ -85,7 +92,7 @@ class WalletAPI(Resource):
 
         try:
             user_asset = UserAsset.query.filter_by(
-                account_key=account_key).with_for_update(read=True).first()
+                account_key=account_key, coin_name=coin_name).with_for_update(read=True).first()
             if not user_asset:
                 api_logger.error("withdrawal,user not found %s" % account_key)
                 return make_resp(404, False, message="用户资产错误")
@@ -106,13 +113,14 @@ class WalletAPI(Resource):
             user_asset.frozen_asset += amount
             withdrawal_transaction = WithdrawalTransaction(account_key,
                                                            amount,
-                                                           to_address)
+                                                           to_address,
+                                                           coin_name=coin_name)
             db.session.add(withdrawal_transaction)
             db.session.commit()
         except Exception as e:
             api_logger.error("withdrawal, error %s" % str(e))
             db.session.rollback()
-            return make_resp(500, False, message="提现提交失败")
+            return make_resp(500, False, message="提现申请提交失败")
 
         api_logger.info("Withdrawal api, insert into withdrawal_transaction %s"
                         % withdrawal_transaction.to_dict())
@@ -126,18 +134,25 @@ class WalletAPI(Resource):
         """
         parse = reqparse.RequestParser()
         parse.add_argument('id', type=int, required=True)
+        parse.add_argument('coin_name', type=str, required=True, trim=True)
+
         args = parse.parse_args()
         account_key = g.account_key
         id = args.get('id')
+        coin_name = args.get('coin_name')
+
         withdrawal = WithdrawalTransaction.query.filter_by(
-            id=id, account_key=account_key, status=WITHDRAWAL_APPLY
-            ).first()
+            id=id, account_key=account_key).first()
         if not withdrawal:
-            api_logger.warning("account_key:%s, apply revocation:%s" % id)
+            api_logger.warning("account_key:%s, apply revocation:%s" % withdrawal.to_dict())
             return make_resp(406, False, message="撤销订单不存在")
+        if withdrawal.status != WITHDRAWAL_APPLY:
+            api_logger.warning(
+                "account_key:%s, apply revocation:%s" % withdrawal.to_dict())
+            return make_resp(400, False, message="订单状态不可撤销")
         try:
             user_asset = UserAsset.query.filter_by(
-                account_key=account_key).with_for_update(read=True).first()
+                account_key=account_key, coin_name=coin_name).with_for_update(read=True).first()
 
             user_asset.frozen_asset -= withdrawal.amount
             user_asset.available_asset += withdrawal.amount
@@ -169,15 +184,39 @@ class UserAssetTransferInfoAPI(Resource):
         account_key = g.account_key
         model = self.transaction_types.get(transaction_type)
         parse = reqparse.RequestParser()
+        now = int(time.time())
+        ten_days = now - 864000
         parse.add_argument('limit', type=int, required=False, default=10)
         parse.add_argument('offset', type=int, required=False, default=0)
-        parse.add_argument('t', type=int, required=False)
+        parse.add_argument('from', type=int, required=False, default=ten_days)
+        parse.add_argument('end', type=int, required=False, default=now)
+        parse.add_argument('coin_name', type=str, required=False)
         args = parse.parse_args()
         limit = args.get('limit')
         offset = args.get('offset')
-        infos = model.query.filter_by(
-            account_key=account_key).order_by(
-            model.create_time.desc()).limit(limit).offset(
-            offset).all()
+        from_ts = args.get('from')
+        end_ts = args.get('end')
+        coin_name = args.get('coin_name')
+        from_dt = datetime.fromtimestamp(from_ts)
+        end_dt = datetime.fromtimestamp(end_ts)
+        if coin_name:
+            infos = model.query.filter_by(
+                account_key=account_key,
+                coin_name=coin_name
+            ).filter(
+                and_(model.create_time > from_dt,
+                     model.create_time < end_dt)
+            ).order_by(
+                model.create_time.desc()
+            ).limit(limit).offset(offset).all()
+        else:
+            infos = model.query.filter_by(
+                account_key=account_key,
+            ).filter(
+                and_(model.create_time > from_dt,
+                     model.create_time < end_dt)
+            ).order_by(
+                model.create_time.desc()
+            ).limit(limit).offset(offset).all()
         records = [info.to_dict() for info in infos]
         return make_resp(records=records)

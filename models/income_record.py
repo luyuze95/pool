@@ -48,7 +48,7 @@ class IncomeRecord(db.Model):
             "actual_amount": self.actual_amount,
             "height": self.height,
             "mortgage_rate": self.mortgage_rate,
-            "create_time": self.create_time,
+            "create_time": str(self.create_time),
             "is_add_asset": self.is_add_asset,
             "capacity": self.capacity,
         }

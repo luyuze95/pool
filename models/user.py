@@ -41,6 +41,6 @@ class User(db.Model):
             "account_key": self.account_key,
             "email": self.email,
             "is_freeze": self.is_freeze,
-            "create_time": self.create_time,
+            "create_time": str(self.create_time),
         }
         return user_dict

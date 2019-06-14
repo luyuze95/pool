@@ -22,10 +22,10 @@ def make_celery(app):
         CELERY_TIMEZONE='Asia/Shanghai',
         CELERY_ENABLE_UTC=True,
         CELERY_TASK_RESULT_EXPIRES=1200,
-        CELERYD_CONCURRENCY=10,
+        CELERYD_CONCURRENCY=12,
         CELERYD_FORCE_EXECV=True,
         CELERY_TASK_PUBLISH_RETRY=3,
-        CELERYD_TASK_SOFT_TIME_LIMIT=360,
+        CELERYD_TASK_SOFT_TIME_LIMIT=60,
     )
 
     task_base = celery.Task

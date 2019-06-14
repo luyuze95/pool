@@ -10,7 +10,7 @@ from logs import celery_logger
 from models import db
 from models.user_asset import UserAsset
 from models.withdrawal_transactions import WithdrawalTransaction
-from rpc.bhd_rpc import bhd_client
+from rpc import get_rpc
 from conf import *
 
 
@@ -25,17 +25,17 @@ def withdrawal_coin():
         assert user_asset
         assert withdrawal_apply.amount <= user_asset.frozen_asset
         try:
-            txid = bhd_client.withdrawal(withdrawal_apply.to_address,
+            client = get_rpc(withdrawal_apply.coin_name)
+            txid = client.withdrawal(withdrawal_apply.to_address,
                                          withdrawal_apply.actual_amount)
             status = WITHDRAWAL_SENDING
+            user_asset.frozen_asset -= withdrawal_apply.amount
+            user_asset.total_asset -= withdrawal_apply.amount
         except Exception as e:
             celery_logger.error("withdrawal task,withdrawal error %s" % str(e))
             txid = 0
             status = WITHDRAWAL_FAILED
         try:
-            if status == WITHDRAWAL_SENDING:
-                user_asset.frozen_asset -= withdrawal_applys.amount
-                user_asset.total_asset -= withdrawal_applys.amount
             withdrawal_apply.txid = txid
             withdrawal_apply.status = status
             db.session.commit()
@@ -53,9 +53,10 @@ def withdrawal_confirm():
         status=WITHDRAWAL_SENDING).all()
 
     for withdrawal_sending in withdrawal_sendings:
-        detail = bhd_client.get_transaction_detail(withdrawal_sending.txid)
+        client = get_rpc(withdrawal_sending.coin_name)
+        detail = client.get_transaction_detail(withdrawal_sending.txid)
         confirmed = detail.get('confirmations', 0)
-        if confirmed > MIN_CONFIRMED[BHD_COIN_NAME]:
+        if confirmed > MIN_CONFIRMED[withdrawal_sending.coin_name]:
             try:
                 withdrawal_sending.status = WITHDRAWAL_SENDED
                 celery_logger.info("withdrawal confirmed %s " % withdrawal_sending.to_dict())

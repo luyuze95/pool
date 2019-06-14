@@ -7,7 +7,6 @@
 
 from datetime import datetime
 
-from sqlalchemy import func
 
 from models import db
 
@@ -38,7 +37,7 @@ class MinerPlotter(db.Model):
             "account_key": self.account_key,
             "miner_name": self.miner_name,
             "capacity": self.capacity,
-            "create_time": self.create_time,
-            "update_time": self.update_time,
+            "create_time": str(self.create_time),
+            "update_time": str(self.update_time),
         }
         return miner_plotter_dict

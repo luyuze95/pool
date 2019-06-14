@@ -85,6 +85,6 @@ MIN_CONFIRMED = {
 }
 
 # 最小汇聚余额
-MIN_CONVERGE_AMOUNT = Decimal('0.1')
+MIN_CONVERGE_AMOUNT_BHD = Decimal('0.1')
 # 手续费保留金
 POUNDAGE_BAlANCE = Decimal('0.00006')

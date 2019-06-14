@@ -11,8 +11,8 @@ from conf import BHD_COIN_NAME
 from utils.crypto import crypto
 
 
-class BhdAddress(db.Model):
-    __tablename__ = 'pool_bhd_address'
+class PoolAddress(db.Model):
+    __tablename__ = 'pool_address'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     account_key = db.Column(db.String(64), index=True)
@@ -49,13 +49,13 @@ class BhdAddress(db.Model):
             "account_key": self.account_key,
             "address": self.address,
             "coin_name": self.coin_name,
-            "create_time": self.create_time,
-            "update_time": self.update_time,
+            "create_time": str(self.create_time),
+            "update_time": str(self.update_time),
         }
 
         return dict_addr
 
     def __setattr__(self, key, value):
-        super(BhdAddress, self).__setattr__(key, value)
+        super(PoolAddress, self).__setattr__(key, value)
         if key != "update_time":
             self.update_time = datetime.now()

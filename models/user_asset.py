@@ -21,7 +21,7 @@ class UserAsset(db.Model):
     # 用户id
     user_id = db.Column(db.INTEGER)
     # 资产id
-    asset_id = db.Column(db.DECIMAL(32, 16), default='0')
+    asset_id = db.Column(db.INTEGER)
     # 币种名
     coin_name = db.Column(db.String(32), default='0')
     # 抵押资产
@@ -70,6 +70,6 @@ class UserAsset(db.Model):
             "total_asset": self.total_asset,
             "frozen_asset": self.frozen_asset,
             "trading_asset": self.trading_asset,
-            "create_time": self.create_time,
+            "create_time": str(self.create_time),
         }
         return user_asset_dict
