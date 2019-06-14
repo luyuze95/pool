@@ -209,6 +209,11 @@ class UserAssetTransferInfoAPI(Resource):
             ).order_by(
                 model.create_time.desc()
             ).limit(limit).offset(offset).all()
+            total_records = model.query.filter_by(
+                account_key=account_key,
+                coin_name=coin_name
+            ).count()
+
         else:
             infos = model.query.filter_by(
                 account_key=account_key,
@@ -218,5 +223,8 @@ class UserAssetTransferInfoAPI(Resource):
             ).order_by(
                 model.create_time.desc()
             ).limit(limit).offset(offset).all()
+            total_records = model.query.filter_by(
+                account_key=account_key,
+            ).count()
         records = [info.to_dict() for info in infos]
-        return make_resp(records=records)
+        return make_resp(records=records, total_records=total_records)

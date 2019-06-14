@@ -39,7 +39,7 @@ api.add_resource(UserAssetTransferInfoAPI, '/v1/transactions/<string:transaction
 
 
 if conf.DEBUG:
-    @app.after_request
+    #@app.after_request
     def after_request_func(response):
         for query in get_debug_queries():
             if query.duration >= app.config['FLASKY_DB_QUERY_TIMEOUT']:
