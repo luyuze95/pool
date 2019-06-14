@@ -13,7 +13,6 @@ from email.mime.text import MIMEText
 from app import celery
 from communicate.withdrawal_content import WITHDRAWAL_VALIDATION_TITLE, \
     WITHDRAWAL_VALIDATION_CONTENT
-from conf import *
 from conf import USERNAME, PASSWORD
 from logs import celery_logger
 
@@ -30,13 +29,10 @@ def email_sender_task(to_mail, pass_code, frozen):
     """
     celery_logger.info("email_sender_task to_mail:%s, " % to_mail)
 
-    t = mail_task(to_mail, WITHDRAWAL_VALIDATION_TITLE,
-                  WITHDRAWAL_VALIDATION_CONTENT.format(
-                      code=pass_code, email=to_mail
-                  ))
-    if isinstance(t, Exception):
-        return False
-    return True
+    mail_task(to_mail, WITHDRAWAL_VALIDATION_TITLE,
+              WITHDRAWAL_VALIDATION_CONTENT.format(
+                  code=pass_code, email=to_mail
+              ))
 
 
 def mail_task(to_email, title, content):
@@ -50,14 +46,14 @@ def mail_task(to_email, title, content):
     msg['Date'] = email.utils.formatdate()
     texthtml = MIMEText(content, _subtype='html', _charset='UTF-8')
     msg.attach(texthtml)
-    try:
-        client = smtplib.SMTP()
-        client.connect('smtpdm-ap-southeast-1.aliyun.com', 80)
-        client.set_debuglevel(0)
-        client.login(USERNAME, PASSWORD)
-        client.sendmail(USERNAME, rcptto, msg.as_string())
-        client.quit()
-        return True
-    except Exception as e:
-        return e
+    client = smtplib.SMTP()
+    client.connect('smtpdm.aliyun.com', 80)
+    client.set_debuglevel(0)
+    client.login(USERNAME, PASSWORD)
+    client.sendmail(USERNAME, rcptto, msg.as_string())
+    client.quit()
+    return True
 
+
+if __name__ == '__main__':
+    mail_task("anzhaozhong@163.com", "hello", "qwer")

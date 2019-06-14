@@ -12,9 +12,9 @@ DEBUG = True
 MAIL_APP_ID = '13140'
 MAIL_APP_KEY = '6761599fc5e24ab82e2646069d517b87'
 
-DOMAIN = 'www.exnow.com'
+DOMAIN = 'www.f1pool.com'
 
-USERNAME = 'noreply@noreply.exnow.com'
+USERNAME = 'noreply@mail.f1pool.com'
 PASSWORD = 'ExnowBimao12345678'
 
 
