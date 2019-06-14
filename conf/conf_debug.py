@@ -73,9 +73,9 @@ BHD_WALLET_PASSWORD = "7ujMko0admin"
 BHD_MINER_ADDRESS = "2N46yZncdY3vUnHUBUdhTJ2urFZmGozhFvw"
 
 """ usdt node config"""
-USDT_WITHDRAWAL_ADDRESS = '1CyXN7vZsMn7vVxTGmfaHNz3JcsrkeBjWo'
+USDT_WITHDRAWAL_ADDRESS = 'n1ErRubbXNKP59gdFf4joWepskgGq7P6mN'
 USDT_CONVERGE_ADDRESS = USDT_WITHDRAWAL_ADDRESS
-USDT_URI = 'http://bimaousdt:usdt7ujMko0admin@127.0.0.1:9999'
+USDT_URI = 'http://bimaousdt:lfkdsjalfdsafjkdshfakjdsffkldsjalfkj@127.0.0.1:8332'
 USDT_NAME = "usdt"
 
 # 全抵押和非全抵押收益

@@ -12,9 +12,9 @@ DEBUG = False
 MAIL_APP_ID = '13140'
 MAIL_APP_KEY = '6761599fc5e24ab82e2646069d517b87'
 
-DOMAIN = 'www.bpool.io'
+DOMAIN = 'www.f1pool.com'
 
-USERNAME = 'noreply@noreply.exnow.com'
+USERNAME = 'noreply@mail.f1pool.com'
 PASSWORD = 'ExnowBimao12345678'
 
 
@@ -31,8 +31,8 @@ AUTH_DB = 0
 
 
 ''' mysql config'''
-MYSQL_USER = 'root'
-MYSQL_PASSWORD = '5ZHx3IYixd'
+MYSQL_USER = 'admin'
+MYSQL_PASSWORD = 'gpafXl1nu6yMuEMHKN6U'
 MYSQL_HOST = 'pool.mysql.server'
 MYSQL_PORT = 3306
 MYSQL_DB = 'pool'
@@ -72,6 +72,13 @@ BHD_COIN_NAME = "bhd"
 BHD_WALLET_PASSWORD = "7ujMko0admin"
 BHD_MINER_ADDRESS = "3PURWR7vxZRiK8afgLB1Brx9Y9cBEan7gL"
 
+""" usdt node config"""
+USDT_WITHDRAWAL_ADDRESS = 'n1ErRubbXNKP59gdFf4joWepskgGq7P6mN'
+USDT_CONVERGE_ADDRESS = USDT_WITHDRAWAL_ADDRESS
+USDT_URI = 'http://f1poolusdt:lfkdsjalfdsafjkdshfakjdsffkldsjalfkj@pool.usdt.server:6666'
+USDT_NAME = "usdt"
+
+
 # 全抵押和非全抵押收益
 MORTGAGE_YIELD_RATE = Decimal('1')
 NOT_MORTGAGE_YIELD_RATE = Decimal('0.3')
@@ -81,10 +88,12 @@ MIN_DEPOSIT_AMOUNT = {
 }
 
 MIN_CONFIRMED = {
-    BHD_COIN_NAME: 3
+    BHD_COIN_NAME: 3,
+    USDT_NAME: 3,
 }
 
 # 最小汇聚余额
 MIN_CONVERGE_AMOUNT_BHD = Decimal('0.1')
+MIN_CONVERGE_AMOUNT_USDT = Decimal('1')
 # 手续费保留金
-POUNDAGE_BAlANCE = Decimal('0.00006')
+POUNDAGE_BALANCE = Decimal('0.00006')

@@ -104,11 +104,15 @@ class WalletAPI(Resource):
                 api_logger.error("withdrawal, seccode error")
                 return make_resp(400, False, message="验证码错误")
             redis_auth.delete(key)
+            api_logger.error(
+                "withdrawal, user:%s, available_asset:%s, amount:%s"
+                % (account_key, user_asset.available_asset, amount))
             if user_asset.available_asset < amount:
-                api_logger.error(
-                    "withdrawal, user:%s, available_asset:%s, amount:%s"
-                    % (account_key, user_asset.available_asset, amount))
                 return make_resp(400, False, message="余额不足")
+
+            client = get_rpc(coin_name)
+            if not client.check_address(to_address):
+                return make_resp(400, False, message="地址错误")
 
             user_asset.available_asset -= amount
             user_asset.frozen_asset += amount
@@ -135,12 +139,10 @@ class WalletAPI(Resource):
         """
         parse = reqparse.RequestParser()
         parse.add_argument('id', type=int, required=True)
-        parse.add_argument('coin_name', type=str, required=True, trim=True)
-
         args = parse.parse_args()
         account_key = g.account_key
         id = args.get('id')
-        coin_name = args.get('coin_name')
+        coin_name = BHD_COIN_NAME
 
         withdrawal = WithdrawalTransaction.query.filter_by(
             id=id, account_key=account_key).first()

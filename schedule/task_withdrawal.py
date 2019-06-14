@@ -17,6 +17,8 @@ from conf import *
 @celery.task
 def withdrawal_coin():
     withdrawal_applys = WithdrawalTransaction.query.filter_by(status=WITHDRAWAL_PASS).all()
+    if not withdrawal_applys:
+        return
     for withdrawal_apply in withdrawal_applys:
         account_key = withdrawal_apply.account_key
 
@@ -51,6 +53,8 @@ def withdrawal_coin():
 def withdrawal_confirm():
     withdrawal_sendings = WithdrawalTransaction.query.filter_by(
         status=WITHDRAWAL_SENDING).all()
+    if not withdrawal_sendings:
+        return
 
     for withdrawal_sending in withdrawal_sendings:
         client = get_rpc(withdrawal_sending.coin_name)

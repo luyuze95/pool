@@ -27,7 +27,7 @@ class USDTRPCClient():
         return Decimal(self.client.omni_getbalance(address, self.property_id)['balance'])
 
     def generate_address(self, username):
-        return self.client.getnewaddress(str(username)), None
+        return self.client.getnewaddress(str(username)), ''
 
     def get_transactions(self, count=5, skip=10):
         return self.client.omni_listtransactions('*', 10000)
