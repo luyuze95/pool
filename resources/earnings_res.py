@@ -8,42 +8,31 @@ import json
 
 from flask import g
 from flask_restful import Resource, reqparse
+from sqlalchemy import func
 
 from models import db
-from models.income_record import IncomeRecord
+from models.income_record import IncomeRecord, IncomeEcologyRecord
 from resources.auth_decorator import login_required
 from rpc.authproxy import encode_python_object
-from utils.redis_ins import redis_capacity
 from utils.response import make_resp
 
 
-class BlockEarningsApi(Resource):
+class EarningsTotalApi(Resource):
     decorators = [login_required]
 
     def get(self):
         """
-        获取收益列表，按块
+        获取用户总收益
         :return:
         """
-        parse = reqparse.RequestParser()
-        parse.add_argument('limit', type=int, required=False)
-        parse.add_argument('offset', type=int, required=False)
-        parse.add_argument('t', type=int, required=False)
-        args = parse.parse_args()
-        limit = args.get('limit')
-        offset = args.get('offset')
         account_key = g.account_key
-        incomes = IncomeRecord.query.filter_by(account_key=account_key).order_by(IncomeRecord.create_time.desc()).limit(limit).offset(offset).all()
-
-        for index, income in enumerate(incomes):
-            income_dict = income.to_dict()
-            keys_pattern = "miner:%s:*" % income.account_key
-            miners_capacity_keys = redis_capacity.keys(keys_pattern)
-            total_capacity = sum([int(redis_capacity.get(miner_capacity_key).split(":")[0]) for miner_capacity_key in miners_capacity_keys])
-            income_dict["total_capacity"] = total_capacity
-            incomes[index] = income_dict
-
-        return make_resp(incomes_details=incomes)
+        coop_total_amount = IncomeRecord.query.filter_by(account_key=account_key).with_entities(func.sum(IncomeRecord.amount)).first()[0]
+        ecol_total_amount = IncomeEcologyRecord.query.filter_by(account_key=account_key).with_entities(func.sum(IncomeEcologyRecord.amount)).first()[0]
+        if not coop_total_amount:
+            coop_total_amount = 0
+        if not ecol_total_amount:
+            ecol_total_amount = 0
+        return make_resp(coop_total_amount=coop_total_amount, ecol_total_amount=ecol_total_amount)
 
 
 class DayEarningsApi(Resource):

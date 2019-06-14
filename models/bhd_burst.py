@@ -9,11 +9,10 @@ from datetime import datetime
 from models import db
 
 
-class BurstBlock(db.Model):
+class BurstBlockMixin(object):
     """
         平台爆块记录
     """
-    __tablename__ = 'pool_bhd_burst'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     account_key = db.Column(db.String(255), index=True)
@@ -38,3 +37,11 @@ class BurstBlock(db.Model):
         }
 
         return burst_dict
+
+
+class BurstBlock(BurstBlockMixin, db.Model):
+    __tablename__ = 'pool_bhd_burst'
+
+
+class EcolBurstBlock(BurstBlockMixin, db.Model):
+    __tablename__ = 'pool_bhd_ecology_burst'

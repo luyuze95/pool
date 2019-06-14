@@ -9,8 +9,7 @@ from datetime import datetime
 from models import db
 
 
-class DeadlineFraction(db.Model):
-    __tablename__ = 'pool_bhd_fraction_record'
+class DeadlineFractionMixin(object):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     account_key = db.Column(db.String(64), index=True)
@@ -35,3 +34,11 @@ class DeadlineFraction(db.Model):
         }
 
         return dl_fraction_dict
+
+
+class DeadlineFraction(DeadlineFractionMixin, db.Model):
+    __tablename__ = 'pool_bhd_fraction_record'
+
+
+class DeadlineFractionEcology(DeadlineFractionMixin, db.Model):
+    __tablename__ = 'pool_bhd_ecology_fraction_record'

@@ -14,10 +14,11 @@ from sqlalchemy import and_
 from conf import *
 from logs import api_logger
 from models import db
+from models.income_record import IncomeRecord, IncomeEcologyRecord
 from models.pool_address import PoolAddress
-from models.bhd_burst import BurstBlock
+from models.bhd_burst import BurstBlock, EcolBurstBlock
 from models.deposit_transaction import DepositTranscation
-from models.dl_fraction import DeadlineFraction
+from models.dl_fraction import DeadlineFraction, DeadlineFractionEcology
 from models.transfer_info import AssetTransfer
 from models.user_asset import UserAsset
 from models.withdrawal_transactions import WithdrawalTransaction
@@ -176,6 +177,10 @@ class UserAssetTransferInfoAPI(Resource):
         "blocks": BurstBlock,
         "transfer": AssetTransfer,
         "dl_fraction": DeadlineFraction,
+        "block_earnings": IncomeRecord,
+        "ecol_block_earnings": IncomeEcologyRecord,
+        "ecol_dl_fraction": DeadlineFractionEcology,
+        "ecol_blocks": EcolBurstBlock,
     }
 
     def get(self, transaction_type):
@@ -191,40 +196,35 @@ class UserAssetTransferInfoAPI(Resource):
         parse.add_argument('from', type=int, required=False, default=ten_days)
         parse.add_argument('end', type=int, required=False, default=now)
         parse.add_argument('coin_name', type=str, required=False)
+        parse.add_argument('status', type=int, required=False)
         args = parse.parse_args()
         limit = args.get('limit')
         offset = args.get('offset')
         from_ts = args.get('from')
         end_ts = args.get('end')
         coin_name = args.get('coin_name')
+        status = args.get('status')
         from_dt = datetime.fromtimestamp(from_ts)
         end_dt = datetime.fromtimestamp(end_ts)
-        if coin_name:
-            infos = model.query.filter_by(
-                account_key=account_key,
-                coin_name=coin_name
-            ).filter(
-                and_(model.create_time > from_dt,
-                     model.create_time < end_dt)
-            ).order_by(
-                model.create_time.desc()
-            ).limit(limit).offset(offset).all()
-            total_records = model.query.filter_by(
-                account_key=account_key,
-                coin_name=coin_name
-            ).count()
+        kwargs = {"account_key": account_key}
 
-        else:
-            infos = model.query.filter_by(
-                account_key=account_key,
-            ).filter(
-                and_(model.create_time > from_dt,
-                     model.create_time < end_dt)
-            ).order_by(
-                model.create_time.desc()
-            ).limit(limit).offset(offset).all()
-            total_records = model.query.filter_by(
-                account_key=account_key,
-            ).count()
+        if coin_name:
+            kwargs['coin_name'] = coin_name
+        if status:
+            kwargs['status'] = status
+
+        infos = model.query.filter_by(
+            **kwargs
+        ).filter(
+            and_(model.create_time > from_dt,
+                 model.create_time < end_dt)
+        ).order_by(
+            model.create_time.desc()
+        ).limit(limit).offset(offset).all()
+
+        total_records = model.query.filter_by(
+            **kwargs
+        ).count()
+
         records = [info.to_dict() for info in infos]
         return make_resp(records=records, total_records=total_records)

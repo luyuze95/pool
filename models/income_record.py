@@ -10,8 +10,7 @@ from datetime import datetime
 from models import db
 
 
-class IncomeRecord(db.Model):
-    __tablename__ = 'pool_bhd_income_record'
+class IncomeMixin(object):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     # 用户id
@@ -37,7 +36,7 @@ class IncomeRecord(db.Model):
     update_time = db.Column(db.TIMESTAMP(), default=datetime.now)
 
     def __setattr__(self, key, value):
-        super(IncomeRecord, self).__setattr__(key, value)
+        super().__setattr__(key, value)
         if key != "update_time":
             self.update_time = datetime.now()
 
@@ -53,3 +52,11 @@ class IncomeRecord(db.Model):
             "capacity": self.capacity,
         }
         return income_record_dict
+
+
+class IncomeRecord(IncomeMixin, db.Model):
+    __tablename__ = 'pool_bhd_income_record'
+
+
+class IncomeEcologyRecord(IncomeMixin, db.Model):
+    __tablename__ = 'pool_bhd_ecology_income_record'

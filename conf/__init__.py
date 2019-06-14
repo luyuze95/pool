@@ -88,3 +88,9 @@ DEPOSIT_FAILED = 4
 # 提现手续费率
 WITHDRAWAL_FEE = Decimal("0.005")
 WITHDRAWAL_ACTUAL = Decimal("0.995")
+
+"""
+合作池、生态池
+"""
+COOP_POOL = "coop"
+ECOLOGY_POOL = "ecol"
