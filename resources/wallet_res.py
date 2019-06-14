@@ -9,7 +9,7 @@ from datetime import datetime
 
 from flask import g
 from flask_restful import Resource, reqparse
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 
 from conf import *
 from logs import api_logger
@@ -174,13 +174,15 @@ class UserAssetTransferInfoAPI(Resource):
     transaction_types = {
         "deposit": DepositTranscation,
         "withdrawal": WithdrawalTransaction,
-        "blocks": BurstBlock,
         "transfer": AssetTransfer,
-        "dl_fraction": DeadlineFraction,
         "block_earnings": IncomeRecord,
         "ecol_block_earnings": IncomeEcologyRecord,
+        "dl_fraction": DeadlineFraction,
         "ecol_dl_fraction": DeadlineFractionEcology,
+        "blocks": BurstBlock,
         "ecol_blocks": EcolBurstBlock,
+        "day_earnings": IncomeRecord,
+        "ecol_day_earnings": IncomeEcologyRecord,
     }
 
     def get(self, transaction_type):
@@ -212,19 +214,45 @@ class UserAssetTransferInfoAPI(Resource):
             kwargs['coin_name'] = coin_name
         if status:
             kwargs['status'] = status
+        if "day_earnings" in transaction_type:
+            infos = model.query.filter_by(
+                **kwargs
+            ).with_entities(
+                func.sum(model.amount), func.max(model.create_time), func.avg(model.capacity),
+            ).filter(
+                and_(model.create_time > from_dt,
+                     model.create_time < end_dt)
+            ).order_by(
+                model.create_time.desc()
+            ).group_by(
+                func.to_days(model.create_time)
+            ).limit(limit).offset(offset).all()
 
-        infos = model.query.filter_by(
-            **kwargs
-        ).filter(
-            and_(model.create_time > from_dt,
-                 model.create_time < end_dt)
-        ).order_by(
-            model.create_time.desc()
-        ).limit(limit).offset(offset).all()
+            total_records = model.query.filter_by(
+                **kwargs
+            ).group_by(
+                func.to_days(model.create_time)
+            ).count()
+            records = []
+            for amount, create_time, capacity in infos:
+                records.append({
+                    "amount": amount,
+                    "create_time": create_time,
+                    "capacity": capacity,
+                })
+        else:
+            infos = model.query.filter_by(
+                **kwargs
+            ).filter(
+                and_(model.create_time > from_dt,
+                     model.create_time < end_dt)
+            ).order_by(
+                model.create_time.desc()
+            ).limit(limit).offset(offset).all()
 
-        total_records = model.query.filter_by(
-            **kwargs
-        ).count()
+            total_records = model.query.filter_by(
+                **kwargs
+            ).count()
 
-        records = [info.to_dict() for info in infos]
+            records = [info.to_dict() for info in infos]
         return make_resp(records=records, total_records=total_records)
