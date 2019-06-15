@@ -27,8 +27,8 @@ def setup_period_task(sender, **kwargs):
     #                          add_wallet_address.s())
     # sender.add_periodic_task(crontab(minute='*/1'),
     #                          bhd_block_scan.s())
-    # sender.add_periodic_task(crontab(minute='*/1'),
-    #                          confirm_deposit_transaction.s())
+    sender.add_periodic_task(crontab(minute='*/1'),
+                             confirm_deposit_transaction.s())
     sender.add_periodic_task(crontab(minute='*/1'),
                              bhd_deposit_scan.s())
     sender.add_periodic_task(crontab(minute='*/15'),

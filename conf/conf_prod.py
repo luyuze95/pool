@@ -75,7 +75,7 @@ BHD_MINER_ADDRESS = "3PURWR7vxZRiK8afgLB1Brx9Y9cBEan7gL"
 """ usdt node config"""
 USDT_WITHDRAWAL_ADDRESS = 'n1ErRubbXNKP59gdFf4joWepskgGq7P6mN'
 USDT_CONVERGE_ADDRESS = USDT_WITHDRAWAL_ADDRESS
-USDT_URI = 'http://f1poolusdt:lfkdsjalfdsafjkdshfakjdsffkldsjalfkj@pool.usdt.server:6666'
+USDT_URI = 'http://f1poolusdt:f1pool7ujMko0admin@pool.usdt.server:6666'
 USDT_NAME = "usdt"
 
 

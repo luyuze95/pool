@@ -37,8 +37,7 @@ class WalletAPI(Resource):
         :return:
         """
         parse = reqparse.RequestParser()
-        parse.add_argument('coin_name', type=str, required=True, trim=True,
-                           default='bhd')
+        parse.add_argument('coin_name', type=str, required=True, trim=True)
         args = parse.parse_args()
         account_key = g.account_key
         coin_name = args.get('coin_name').lower()

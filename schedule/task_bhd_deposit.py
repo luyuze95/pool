@@ -125,7 +125,7 @@ def bhd_deposit_scan():
                     continue
 
                 address_vout = tx_out['scriptPubKey']['addresses'][0]
-                if address_vout == BHD_MINER_ADDRESS:
+                if address_vout == BHD_MINER_ADDRESS or address_vout != asset.address:
                     continue
                 if not check_deposit_amount(BHD_COIN_NAME, amount):
                     celery_logger.info("bhd deposit too small, transaction:%s"
