@@ -4,8 +4,7 @@
     @author: anzz
     @date: 2019/5/29
 """
-import time
-from threading import Thread
+from _decimal import ROUND_DOWN
 
 from rpc.authproxy import AuthServiceProxy
 from conf import *
@@ -36,6 +35,9 @@ class BhdRpcClient(object):
         return self.client.listtransactions('*', count, skip)[::-1]
 
     def withdrawal(self, to_address, amount, from_account=None):
+        if not isinstance(amount, Decimal):
+            amount = Decimal(str(amount))
+        amount = amount.quantize(Decimal("0.00000000"), rounding=ROUND_DOWN)
         self.unlock_account()
         if not self.check_address(to_address):
             raise Exception("bhd withdraw exception, invalid address %s"

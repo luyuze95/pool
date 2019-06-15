@@ -31,16 +31,16 @@ AUTH_DB = 0
 
 
 ''' mysql config'''
-MYSQL_USER = 'admin'
-MYSQL_PASSWORD = 'gpafXl1nu6yMuEMHKN6U'
-MYSQL_HOST = 'pooldatabase-instance-1.c3ccengcrirl.ap-northeast-2.rds.amazonaws.com'
+MYSQL_USER = 'f1pool_py'
+MYSQL_PASSWORD = '7ujMko0admin'
+MYSQL_HOST = 'rm-j6clel6jf4mh2bj5p.mysql.rds.aliyuncs.com'
 MYSQL_PORT = 3306
 MYSQL_DB = 'pool'
 
 
 ''' celery config'''
-CELERY_BROKER_DB = 0
-CELERY_BACKEND_DB = 1
+CELERY_BROKER_DB = 2
+CELERY_BACKEND_DB = 3
 CELERY_MAX_CHILDREN_TASK = 10
 
 CELERY_BROKER_URL = 'redis://:%s@%s:%s/%s' %\
