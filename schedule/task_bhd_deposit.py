@@ -144,7 +144,6 @@ def bhd_deposit_scan():
 
 @celery.task
 def usdt_deposit_scan():
-    confirms = 2
     data = usdt_client.get_transactions()
     celery_logger.info("=== usdt deposit task start === %s " % data)
     for wallet_tr in data:
@@ -161,16 +160,16 @@ def usdt_deposit_scan():
         tx_id = wallet_tr['txid']
         tr = DepositTranscation.query.filter_by(tx_id=tx_id).first()
         # 如果充值记录已经存在并且status是3 ，表示读取充值记录完毕， 返回
-        if tr and tr.status == 3:
+        if tr and tr.status == DEPOSIT_CONFIRMED:
             return
         # 如果入库但未确认
-        elif tr and tr.status == 2:
+        elif tr and tr.status == DEPOSIT_CONFIRMING:
             # 设置确认数
-            tr.unconfirmation = confirm
+            tr.confirmed = confirm
             # 判断确认数
-            if confirm >= confirms:
+            if check_min_confirmed(BHD_COIN_NAME, confirm):
                 celery_logger.info("usdt deposit, confirmed %s" % tr.to_dict())
-                tr.status = 3
+                tr.status = DEPOSIT_CONFIRMED
             db.session.commit()
         # 未入库的
         else:
@@ -182,7 +181,7 @@ def usdt_deposit_scan():
                 # 创建充值记录
                 tr = DepositTranscation(asset.account_key, amount, USDT_NAME,
                                         tx_id, block, MIN_CONFIRMED[USDT_NAME],
-                                        confirms)
+                                        confirm)
                 db.session.add(tr)
                 celery_logger.info("usdt deposit, insert into deposit_transaction: %s" % tr.to_dict())
                 db.session.commit()
@@ -209,6 +208,8 @@ def confirm_deposit_transaction():
 def deposit_add_asset():
     confirmed_deposit_transactions = DepositTranscation.query.filter_by(
         status=DEPOSIT_CONFIRMED).all()
+    if not confirmed_deposit_transactions:
+        return
     for transaction in confirmed_deposit_transactions:
         try:
             user_asset = UserAsset.query.filter_by(
