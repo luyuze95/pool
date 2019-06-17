@@ -4,6 +4,7 @@
     @author: anzz
     @date: 2019/5/29
 """
+from time import time
 
 from flask import g
 from flask_restful import Resource, reqparse
@@ -13,10 +14,10 @@ from models import db
 from conf import *
 from logs import api_logger
 from models.income_record import IncomeRecord
-from models.miner_plotter import MinerPlotter
 from models.transfer_info import AssetTransfer
 from models.user_asset import UserAsset
 from resources.auth_decorator import login_required
+from utils.redis_ins import redis_capacity
 from utils.response import make_resp
 
 
@@ -41,18 +42,26 @@ class UserAssetApi(Resource):
         context = user_asset.to_dict()
         if coin_name == USDT_NAME:
             return make_resp(200, True, **context)
-        miner_capacity = MinerPlotter.query.with_entities(
-            func.sum(MinerPlotter.capacity)).filter_by(
-            account_key=account_key).first()[0]
+        keys = "miner:main:%s:*" % account_key
+        miner_machines = redis_capacity.keys(keys)
+
         context.update({
             "earning_rate": 0,
             "theory_pledge": 0,
             "pledge_rate": 0,
             "total_income": 0,
         })
-        if not miner_capacity:
+        if not miner_machines:
             return make_resp(200, True, **context)
-        theory_pledge = miner_capacity/1024*3
+        total_capacity = 0
+        for machine in miner_machines:
+            capacity_ts = redis_capacity.get(machine)
+            capacity, ts = capacity_ts.split(":")
+            period_validity = time() - int(ts[:-3])
+            if period_validity < 7200:
+                total_capacity += int(capacity)
+
+        theory_pledge = total_capacity/1024*3
 
         pledge_rate = user_asset.pledge_asset/theory_pledge
 

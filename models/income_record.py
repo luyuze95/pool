@@ -26,7 +26,7 @@ class IncomeMixin(object):
     mortgage_rate = db.Column(db.DECIMAL(32, 16))
     # 类型
     type = db.Column(db.INTEGER)
-    # 矿机名
+    # 容量
     capacity = db.Column(db.DECIMAL(32, 16))
 
     # 是否已经计算收益
@@ -34,6 +34,15 @@ class IncomeMixin(object):
 
     create_time = db.Column(db.TIMESTAMP(), default=datetime.now)
     update_time = db.Column(db.TIMESTAMP(), default=datetime.now)
+
+    def __init__(self, account_key, amount, income_type, is_add_asset=0, capacity=0):
+        self.account_key = account_key
+        self.amount = amount
+        self.actual_amount = amount
+        self.mortgage_rate = 1
+        self.type = income_type
+        self.is_add_asset = is_add_asset
+        self.capacity = capacity
 
     def __setattr__(self, key, value):
         super().__setattr__(key, value)
@@ -50,6 +59,7 @@ class IncomeMixin(object):
             "create_time": str(self.create_time),
             "is_add_asset": self.is_add_asset,
             "capacity": self.capacity,
+            "type": self.type,
         }
         return income_record_dict
 

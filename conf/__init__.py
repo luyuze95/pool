@@ -86,8 +86,8 @@ DEPOSIT_ADDED = 3
 DEPOSIT_FAILED = 4
 
 # 提现手续费率
-WITHDRAWAL_FEE = Decimal("0.005")
-WITHDRAWAL_ACTUAL = Decimal("0.995")
+WITHDRAWAL_FEE = Decimal("0.001")
+WITHDRAWAL_ACTUAL = Decimal("0.999")
 
 """
 合作池、生态池

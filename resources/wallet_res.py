@@ -14,6 +14,7 @@ from sqlalchemy import and_, func
 from conf import *
 from logs import api_logger
 from models import db
+from models.activity_reward import ActivityReward
 from models.income_record import IncomeRecord, IncomeEcologyRecord
 from models.pool_address import PoolAddress
 from models.bhd_burst import BurstBlock, EcolBurstBlock
@@ -184,6 +185,7 @@ class UserAssetTransferInfoAPI(Resource):
         "ecol_blocks": EcolBurstBlock,
         "day_earnings": IncomeRecord,
         "ecol_day_earnings": IncomeEcologyRecord,
+        "activity_income": ActivityReward,
     }
 
     def get(self, transaction_type):
