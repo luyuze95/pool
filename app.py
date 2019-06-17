@@ -11,6 +11,7 @@ from flask import Flask
 from flask_sqlalchemy import get_debug_queries
 
 from models import db
+from resources.activity_incomes import ActivityRewards
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.pardir))
 
@@ -35,6 +36,7 @@ api.add_resource(UserAssetApi, '/v1/asset/', '/v1/asset', endpoint="asset")
 api.add_resource(EarningsTotalApi, '/v1/earnings/total/', '/v1/earnings/total', endpoint="total_earnings")
 # api.add_resource(DayEarningsApi, '/v1/earnings/days/', '/v1/earnings/days', endpoint="day_earnings")
 api.add_resource(VerifyApi, '/v1/seccode/', '/v1/seccode', endpoint="seccode")
+api.add_resource(ActivityRewards, '/v1/activity_income/', '/v1/activity_income', endpoint="activity_income")
 api.add_resource(UserAssetTransferInfoAPI, '/v1/<string:transaction_type>/', '/v1/<string:transaction_type>', endpoint="transactions")
 
 

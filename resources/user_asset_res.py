@@ -61,7 +61,7 @@ class UserAssetApi(Resource):
             if period_validity < 7200:
                 total_capacity += int(capacity)
 
-        theory_pledge = total_capacity/1024*3
+        theory_pledge = Decimal(total_capacity)/1024*3
 
         pledge_rate = user_asset.pledge_asset/theory_pledge
 

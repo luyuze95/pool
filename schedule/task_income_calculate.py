@@ -80,8 +80,9 @@ def calculate_activity_reward():
                 read=True).first()
             db.session.begin_nested()
             # 添加用户资产
-            user_asset.available_asset += reward.amount
-            user_asset.total_asset += reward.amount
+            if reward.amount > 0:
+                user_asset.available_asset += reward.amount
+                user_asset.total_asset += reward.amount
             reward.is_add_asset = 1
             celery_logger.info("user:%s, income %s " % (
                 user_asset.to_dict(), reward.to_dict()))
