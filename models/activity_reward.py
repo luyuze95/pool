@@ -20,6 +20,7 @@ class ActivityReward(db.Model):
     amount = db.Column(db.DECIMAL(32, 16))
     grade = db.Column(db.String(32))
     update_time = db.Column(db.TIMESTAMP(), default=datetime.now)
+    create_time = db.Column(db.TIMESTAMP(), default=datetime.now)
     is_add_asset = db.Column(db.SmallInteger)
 
     def to_dict(self):
@@ -27,6 +28,7 @@ class ActivityReward(db.Model):
             "account_key": self.account_key,
             "amount": self.amount,
             "is_add_asset": self.is_add_asset,
+            "create_time": self.create_time,
         }
         return activity_reward_dict
 

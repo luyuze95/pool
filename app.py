@@ -35,7 +35,7 @@ api.add_resource(UserAssetApi, '/v1/asset/', '/v1/asset', endpoint="asset")
 api.add_resource(EarningsTotalApi, '/v1/earnings/total/', '/v1/earnings/total', endpoint="total_earnings")
 # api.add_resource(DayEarningsApi, '/v1/earnings/days/', '/v1/earnings/days', endpoint="day_earnings")
 api.add_resource(VerifyApi, '/v1/seccode/', '/v1/seccode', endpoint="seccode")
-api.add_resource(UserAssetTransferInfoAPI, '/v1/<string:transaction_type>/', '/v1/transactions/<string:transaction_type>', endpoint="transactions")
+api.add_resource(UserAssetTransferInfoAPI, '/v1/<string:transaction_type>/', '/v1/<string:transaction_type>', endpoint="transactions")
 
 
 if conf.DEBUG:
