@@ -60,6 +60,8 @@ class UserAssetApi(Resource):
             period_validity = time() - int(ts[:-3])
             if period_validity < 7200:
                 total_capacity += int(capacity)
+        if not total_capacity:
+            return make_resp(200, True, **context)
 
         theory_pledge = Decimal(total_capacity)/1024*3
 

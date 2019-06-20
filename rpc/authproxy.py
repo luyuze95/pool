@@ -60,6 +60,8 @@ from conf import *
 
 def encode_python_object(o):
     if isinstance(o, decimal.Decimal):
+        if o == 0:
+            return 0
         return str(o)
     if isinstance(o, datetime):
         return str(o)

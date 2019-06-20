@@ -22,7 +22,7 @@ def calculate_income():
     latest_height = bhd_client.get_latest_block_number()
     mature_height = latest_height - 100
     not_add_incomes = IncomeRecord.query.filter(and_(IncomeRecord.is_add_asset==0,
-                                                     IncomeRecord.height>mature_height))
+                                                     IncomeRecord.height<mature_height))
     for income in not_add_incomes:
         try:
             user_asset = UserAsset.query.filter_by(

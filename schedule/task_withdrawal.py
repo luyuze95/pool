@@ -22,11 +22,13 @@ def withdrawal_coin():
     for withdrawal_apply in withdrawal_applys:
         account_key = withdrawal_apply.account_key
 
-        user_asset = UserAsset.query.filter_by(
-            account_key=account_key).with_for_update(read=True).first()
-        assert user_asset
-        assert withdrawal_apply.amount <= user_asset.frozen_asset
         try:
+            user_asset = UserAsset.query.filter_by(
+                account_key=account_key).with_for_update(read=True).first()
+            assert user_asset
+            assert withdrawal_apply.amount <= user_asset.frozen_asset
+            assert withdrawal_apply.amount <= user_asset.total_asset - user_asset.available_asset - user_asset.trading_asset - user_asset.pledge_asset
+
             client = get_rpc(withdrawal_apply.coin_name)
             txid = client.withdrawal(withdrawal_apply.to_address,
                                          withdrawal_apply.actual_amount)

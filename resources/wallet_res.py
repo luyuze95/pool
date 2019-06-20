@@ -107,8 +107,8 @@ class WalletAPI(Resource):
             api_logger.error(
                 "withdrawal, user:%s, available_asset:%s, amount:%s"
                 % (account_key, user_asset.available_asset, amount))
-            if user_asset.available_asset < amount:
-                return make_resp(400, False, message="余额不足")
+            if user_asset.available_asset < amount or user_asset.total_asset < amount:
+                return make_resp(400, False, message="可用余额不足")
 
             client = get_rpc(coin_name)
             if not client.check_address(to_address):

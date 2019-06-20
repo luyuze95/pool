@@ -4,6 +4,7 @@
     @author: anzz
     @date: 2019/5/29
 """
+from _decimal import ROUND_DOWN
 from datetime import datetime
 from models import db
 from conf import *
@@ -27,7 +28,10 @@ class WithdrawalTransaction(db.Model):
         self.amount = amount
         self.coin_name = coin_name
         self.to_address = to_address
-        self.actual_amount = amount*WITHDRAWAL_ACTUAL
+        if amount < 100:
+            self.actual_amount = (amount - Decimal("0.1")).quantize(Decimal('.00000000'), rounding=ROUND_DOWN)
+        else:
+            self.actual_amount = (amount*WITHDRAWAL_ACTUAL).quantize(Decimal('.00000000'), rounding=ROUND_DOWN)
         self.status = status
 
     def to_dict(self):
