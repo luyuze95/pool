@@ -113,9 +113,11 @@ class WalletAPI(Resource):
             client = get_rpc(coin_name)
             if not client.check_address(to_address):
                 return make_resp(400, False, message="地址错误")
-
+            if user_asset.get_available_margin_amount() < amount:
+                return make_resp(400, False, message="可提现金额不足")
             user_asset.available_asset -= amount
             user_asset.frozen_asset += amount
+
             withdrawal_transaction = WithdrawalTransaction(account_key,
                                                            amount,
                                                            to_address,

@@ -26,7 +26,8 @@ def bhd_converge():
     # 统计地址未花费交易总额
     for unspent_trx in unspents:
         address = unspent_trx['address']
-        if address == BHD_MINER_ADDRESS:
+        # 老大地址，因为和primary 在一个account，特殊处理。
+        if address == BHD_MINER_ADDRESS or address == "3EZdRhHvzXXgQ4AE1QDLYUqg7PvdRN2zhz":
             continue
         account = unspent_trx['account']
         amount = unspent_trx['amount']
@@ -82,7 +83,7 @@ def usdt_converge():
                 account_key = bhd_address.account_key
             btc_unspent = len(usdt_client.list_unspent(address))
             if btc_unspent == 0:
-                tx_id = usdt_client.withdrawal(address, POUNDAGE_BALANCE)
+                tx_id = usdt_client.withdrawal(address, POUNDAGE_BALANCE, is_btc=True)
                 celery_logger.info("%s converge task,gas txid: %s" % (USDT_NAME, tx_id))
                 billing = Billings(account_key, POUNDAGE_BALANCE, usdt_client.address, address, USDT_CONVERGE_FEE, tx_id)
             else:

@@ -78,6 +78,11 @@ USDT_CONVERGE_ADDRESS = USDT_WITHDRAWAL_ADDRESS
 USDT_URI = 'http://bimaousdt:lfkdsjalfdsafjkdshfakjdsffkldsjalfkj@127.0.0.1:8332'
 USDT_NAME = "usdt"
 
+
+""" boom node config"""
+BOOM_NODE_URI = "http://192.168.10.17:9125/boom"
+BOOM_ACCOUNT = "8237986060609785054"
+
 # 全抵押和非全抵押收益
 MORTGAGE_YIELD_RATE = Decimal('1')
 NOT_MORTGAGE_YIELD_RATE = Decimal('0.3')

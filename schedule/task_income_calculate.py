@@ -29,7 +29,6 @@ def calculate_income():
                 account_key=income.account_key,
                 coin_name=BHD_COIN_NAME).with_for_update(
                 read=True).first()
-            db.session.begin_nested()
             # 添加用户资产
             user_asset.available_asset += income.amount
             user_asset.total_asset += income.amount
@@ -55,7 +54,6 @@ def calculate_income_ecol():
                 account_key=income.account_key,
                 coin_name=BHD_COIN_NAME).with_for_update(
                 read=True).first()
-            db.session.begin_nested()
             # 添加用户资产
             user_asset.available_asset += income.amount
             user_asset.total_asset += income.amount
@@ -78,7 +76,6 @@ def calculate_activity_reward():
             user_asset = UserAsset.query.filter_by(
                 account_key=reward.account_key).with_for_update(
                 read=True).first()
-            db.session.begin_nested()
             # 添加用户资产
             if reward.amount > 0:
                 user_asset.available_asset += reward.amount

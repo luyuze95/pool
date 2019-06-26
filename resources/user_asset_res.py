@@ -90,7 +90,7 @@ class UserAssetApi(Resource):
 
     def put(self):
         """
-        用户资产划转,从抵押到余额划转,余额到抵押
+        用户资产划转,从抵押到余额划转,余额到抵押。
         :return:
         """
         parse = reqparse.RequestParser()
@@ -99,6 +99,15 @@ class UserAssetApi(Resource):
                            help="True:抵押到余额，False:余额到抵押")
         args = parse.parse_args()
         amount = Decimal(args.get('amount'))
+        # todo
+        """
+            到抵押时：
+                1、先从远程借贷中抵押到远程抵押
+                2、不够从可用中抵押到矿机抵押
+            到余额时：
+                1、先从矿机抵押划转到可用
+                2、不够从远程抵押减去
+        """
         direction = args.get('direction')
         account_key = g.account_key
         api_logger.info("asset transfer, amount:%s, user:%s, direction:%s"
@@ -107,20 +116,36 @@ class UserAssetApi(Resource):
             user_asset = UserAsset.query.filter_by(
                 account_key=account_key, coin_name=BHD_COIN_NAME
             ).with_for_update(read=True).first()
-            if direction and user_asset.pledge_asset < amount:
+            total_available_2pledge = user_asset.get_total_available_pledge_amount()
+            total_available_2balance = user_asset.get_total_available_2_balance()
+            if direction and total_available_2balance < amount:
                 api_logger.error(
                     "asset transfer, user:%s, pledge_asset:%s, amount:%s"
                     % (account_key, user_asset.pledge_asset, amount))
                 return make_resp(400, False, message="pledge_asset not enough")
-            if not direction and user_asset.available_asset < amount:
+            if not direction and total_available_2pledge < amount:
                 api_logger.error(
                     "asset transfer, user:%s, available_asset:%s, amount:%s"
                     % (account_key, user_asset.available_asset, amount))
                 return make_resp(400, False, message="available not enough")
-            if not direction:
-                amount = -amount
-            user_asset.pledge_asset -= amount
-            user_asset.available_asset += amount
+
+            if direction:
+                if user_asset.remote_4pledge_asset > amount:
+                    user_asset.remote_4pledge_asset -= amount
+                else:
+                    user_asset.pledge_asset -= (amount-user_asset.remote_4pledge_asset)
+                    user_asset.available_asset += (amount-user_asset.remote_4pledge_asset)
+                    user_asset.remote_4pledge_asset = 0
+            else:
+                remote_avai2_pledge = user_asset.get_remote_avai_amount()
+                if remote_avai2_pledge > amount:
+                    user_asset.remote_4pledge_asset += amount
+                else:
+                    user_asset.remote_4pledge_asset += remote_avai2_pledge
+                    del_available_asset = amount - remote_avai2_pledge
+                    user_asset.available_asset -= del_available_asset
+                    user_asset.pledge_asset += del_available_asset
+
             asset_transfer = AssetTransfer(account_key, abs(amount), direction)
             db.session.add(asset_transfer)
             db.session.commit()

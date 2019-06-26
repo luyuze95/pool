@@ -13,6 +13,7 @@ from flask_restful import Resource, reqparse
 from sqlalchemy import func
 
 from models import db
+from models.activity_reward import ActivityReward
 from models.income_record import IncomeRecord, IncomeEcologyRecord
 from resources.auth_decorator import login_required
 from rpc.authproxy import encode_python_object
@@ -30,11 +31,16 @@ class EarningsTotalApi(Resource):
         account_key = g.account_key
         coop_total_amount = IncomeRecord.query.filter_by(account_key=account_key).with_entities(func.sum(IncomeRecord.amount)).first()[0]
         ecol_total_amount = IncomeEcologyRecord.query.filter_by(account_key=account_key).with_entities(func.sum(IncomeEcologyRecord.amount)).first()[0]
+        activity_rewards_total_amount = ActivityReward.query.filter_by(account_key=account_key).with_entities(func.sum(ActivityReward.amount)).first()[0]
         if not coop_total_amount:
             coop_total_amount = 0
         if not ecol_total_amount:
             ecol_total_amount = 0
-        return make_resp(coop_total_amount=coop_total_amount, ecol_total_amount=ecol_total_amount)
+        if not activity_rewards_total_amount:
+            activity_rewards_total_amount = 0
+        return make_resp(coop_total_amount=coop_total_amount,
+                         ecol_total_amount=ecol_total_amount,
+                         activity_rewards_total_amount=activity_rewards_total_amount)
 
 
 class DayEarningsApi(Resource):

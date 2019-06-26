@@ -20,8 +20,8 @@ class USDTRPCClient():
     def block_info(self, block_number=None):
         return self.client.getblockchaininfo()
 
-    def get_balance(self, address=None, fee=False):
-        if fee:
+    def get_balance(self, address=None, is_btc=False):
+        if is_btc:
             return self.client.getbalance()
         address = address or self.address
         return Decimal(self.client.omni_getbalance(address, self.property_id)['balance'])
@@ -32,13 +32,13 @@ class USDTRPCClient():
     def get_transactions(self, count=5, skip=10):
         return self.client.omni_listtransactions('*', 10000)
 
-    def withdrawal(self, to_address, amount, from_address=None, fee=False):
+    def withdrawal(self, to_address, amount, from_address=None, is_btc=False):
         from_address = from_address or self.address
-        if fee:
-            if self.get_balance(fee) < amount:
+        if is_btc:
+            if self.get_balance(from_address, True) < amount:
                 raise Exception("btc, money not enough,from:%s, to:%s, "
                                 "transfer:%s, amount:%s"
-                                % (self.address, to_address, fee, amount))
+                                % (self.address, to_address, is_btc, amount))
             return self.client.sendtoaddress(to_address, amount)
         if self.get_balance(from_address) < amount:
             raise Exception("usdt withdraw exception, money not enough, "

@@ -94,3 +94,21 @@ WITHDRAWAL_ACTUAL = Decimal("0.999")
 """
 COOP_POOL = "coop"
 ECOLOGY_POOL = "ecol"
+
+"""
+远程借贷状态
+"""
+# 正常借贷状态
+DEBITING = 1
+# 借贷已撤销
+DEBIT_UNDONE = 0
+
+"""
+合作投放状态
+"""
+# 违约
+BadTeamWork = 2
+# 进行中
+TeamWorking = 1
+# 结束
+TeamWorkEnd = 0

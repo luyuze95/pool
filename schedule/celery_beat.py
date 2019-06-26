@@ -20,6 +20,7 @@ from schedule.task_converge import bhd_converge, usdt_converge
 from schedule.task_income_calculate import calculate_income, \
     calculate_income_ecol, calculate_activity_reward
 from schedule.task_withdrawal import withdrawal_coin, withdrawal_confirm
+from schedule.task_timing_remote_pledge import statistic_pledges, check_pledges
 
 
 @celery.on_after_configure.connect
@@ -46,10 +47,15 @@ def setup_period_task(sender, **kwargs):
                              withdrawal_confirm.s())
     sender.add_periodic_task(crontab(minute='*/60'),
                              bhd_converge.s())
-    sender.add_periodic_task(crontab(minute='*/90'),
-                             usdt_converge.s())
+    # sender.add_periodic_task(crontab(minute='*/90'),
+    #                          usdt_converge.s())
     sender.add_periodic_task(crontab(hour='0'),
                              calculate_activity_reward.s())
+    sender.add_periodic_task(crontab(minute="*/1"),
+                             statistic_pledges.s())
+    sender.add_periodic_task(crontab(minute="*/1"),
+                             check_pledges.s())
+
 
 
 @celery.task

@@ -24,7 +24,7 @@ def withdrawal_coin():
 
         try:
             user_asset = UserAsset.query.filter_by(
-                account_key=account_key).with_for_update(read=True).first()
+                account_key=account_key, coin_name=withdrawal_apply.coin_name).with_for_update(read=True).first()
             assert user_asset
             assert withdrawal_apply.amount <= user_asset.frozen_asset
             assert withdrawal_apply.amount <= user_asset.total_asset - user_asset.available_asset - user_asset.trading_asset - user_asset.pledge_asset

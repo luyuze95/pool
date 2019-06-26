@@ -160,7 +160,7 @@ def usdt_deposit_scan():
         tx_id = wallet_tr['txid']
         tr = DepositTranscation.query.filter_by(tx_id=tx_id).first()
         # 如果充值记录已经存在并且status是3 ，表示读取充值记录完毕， 返回
-        if tr and tr.status == DEPOSIT_CONFIRMED:
+        if tr and tr.status in (DEPOSIT_CONFIRMED, DEPOSIT_ADDED):
             return
         # 如果入库但未确认
         elif tr and tr.status == DEPOSIT_CONFIRMING:
@@ -174,8 +174,8 @@ def usdt_deposit_scan():
         # 未入库的
         else:
             # 判断是否存在这个地址
-            asset = PoolAddress.query.filter_by(deposit_address=address,
-                                                coin_code=USDT_NAME).first()
+            asset = PoolAddress.query.filter_by(address=address,
+                                                coin_name=USDT_NAME).first()
             # 如果存在
             if asset:
                 # 创建充值记录

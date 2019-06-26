@@ -90,6 +90,10 @@ class BhdRpcClient(object):
                                            {"minimumAmount": minimumAmount})
         return unspents
 
+    def list_pledges(self, count=1000):
+        pledges = self.client.listpledges(count)
+        return pledges
+
 
 bhd_client = BhdRpcClient(BHD_NODE_URL, BHD_WALLET_PASSWORD)
 if __name__ == '__main__':
@@ -104,4 +108,5 @@ if __name__ == '__main__':
     # print(bhd_client.generate_address(1))
     # print(bhd_client.get_balance())
     # print(bhd_client.list_received_by_address())
-    pprint(bhd_client.list_unspent())
+    # pprint(bhd_client.list_unspent())
+    pprint(bhd_client.list_pledges())
