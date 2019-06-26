@@ -14,6 +14,7 @@ from models.block_offset import BlockOffset
 from models.deposit_transaction import DepositTranscation
 from models.dl_fraction import DeadlineFraction
 from models.transfer_info import AssetTransfer
+from models.remote_pledge import *
 
 migrate = Migrate(app, db, compare_type=True, compare_server_default=True)
 manager = Manager(app)

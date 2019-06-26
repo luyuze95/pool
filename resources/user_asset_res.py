@@ -63,7 +63,8 @@ class UserAssetApi(Resource):
         if not total_capacity:
             return make_resp(200, True, **context)
 
-        theory_pledge = Decimal(total_capacity)/1024*3
+        rate = Decimal(redis_capacity.get(BHD_RATE_KEY))
+        theory_pledge = Decimal(total_capacity)/1024*rate
 
         pledge_rate = user_asset.pledge_asset/theory_pledge
 

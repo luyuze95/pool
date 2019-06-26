@@ -112,3 +112,5 @@ BadTeamWork = 2
 TeamWorking = 1
 # 结束
 TeamWorkEnd = 0
+
+BHD_RATE_KEY = "bhd:ratio"

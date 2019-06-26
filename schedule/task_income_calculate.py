@@ -22,7 +22,7 @@ def calculate_income():
     latest_height = bhd_client.get_latest_block_number()
     mature_height = latest_height - 100
     not_add_incomes = IncomeRecord.query.filter(and_(IncomeRecord.is_add_asset==0,
-                                                     IncomeRecord.height<mature_height))
+                                                     IncomeRecord.height<mature_height)).all()
     for income in not_add_incomes:
         try:
             user_asset = UserAsset.query.filter_by(
@@ -30,6 +30,8 @@ def calculate_income():
                 coin_name=BHD_COIN_NAME).with_for_update(
                 read=True).first()
             # 添加用户资产
+            if not user_asset:
+                continue
             user_asset.available_asset += income.amount
             user_asset.total_asset += income.amount
             income.is_add_asset = 1
@@ -54,6 +56,8 @@ def calculate_income_ecol():
                 account_key=income.account_key,
                 coin_name=BHD_COIN_NAME).with_for_update(
                 read=True).first()
+            if not user_asset:
+                continue
             # 添加用户资产
             user_asset.available_asset += income.amount
             user_asset.total_asset += income.amount
@@ -76,6 +80,8 @@ def calculate_activity_reward():
             user_asset = UserAsset.query.filter_by(
                 account_key=reward.account_key).with_for_update(
                 read=True).first()
+            if not user_asset:
+                continue
             # 添加用户资产
             if reward.amount > 0:
                 user_asset.available_asset += reward.amount
