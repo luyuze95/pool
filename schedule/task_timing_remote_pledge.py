@@ -105,37 +105,38 @@ def check_pledges():
             coop_freeze_asset = user_asset.coop_freeze_asset
             remote_pledge_amount = remote_pledge.pledge_amount
             # 首先扣掉远程借贷总数
-            reside_no_debit_amount = remote_pledge_amount - user_asset.get_remote_avai_amount()
+            reside_no_debit_amount = user_asset.get_remote_avai_amount()
             user_asset.remote_freeze_asset -= remote_pledge_amount
-            if user_asset.get_remote_avai_amount() > reside_no_debit_amount:
+            if reside_no_debit_amount >= remote_pledge_amount:
                 db.session.commit()
                 continue
 
-
+            # 远程抵押中剩余可用不够扣除的。需要扣除远程合作和远程抵押中的资金
+            remote_deduct = remote_pledge_amount - reside_no_debit_amount
             # 如果可用的能覆盖，不需要改动合作冻结资金
-            if user_asset.available_asset >= reside_no_debit_amount:
+            if user_asset.available_asset >= remote_deduct:
                 # 从可用中扣除全部
-                user_asset.available_asset -= reside_no_debit_amount
+                user_asset.available_asset -= remote_deduct
                 # 从远程合作和远程抵押中扣
-                if user_asset.remote_4coop_asset >= reside_no_debit_amount:
+                if user_asset.remote_4coop_asset >= remote_deduct:
                     # 从合作中直接扣除
-                    user_asset.remote_4coop_asset -= reside_no_debit_amount
+                    user_asset.remote_4coop_asset -= remote_deduct
                 else:
                     # 远程合作中扣除全部，抵押中扣除一部分。合作总额、抵押总额不变，可用补足
-                    deduct_pledge_amount = reside_no_debit_amount - user_asset.remote_4coop_asset
+                    deduct_pledge_amount = remote_deduct - user_asset.remote_4coop_asset
                     user_asset.remote_4pledge_asset -= deduct_pledge_amount
                     user_asset.pledge_asset += deduct_pledge_amount
                     user_asset.remote_4coop_asset = 0
             # 如果可用余额不能覆盖，可用余额优先补足抵押
             else:
-                if user_asset.remote_4coop_asset >= reside_no_debit_amount:
+                if user_asset.remote_4coop_asset >= remote_deduct:
                     # 只扣远程合作中的余额
-                    user_asset.remote_4coop_asset -= reside_no_debit_amount
-                    deduct_coop_freeze = reside_no_debit_amount - user_asset.available_asset
+                    user_asset.remote_4coop_asset -= remote_deduct
+                    deduct_coop_freeze = remote_deduct - user_asset.available_asset
                     user_asset.coop_freeze_asset -= deduct_coop_freeze
                 else:
                     # 扣完远程合作中余额，扣远程抵押中余额. 远程抵押中要扣除
-                    deduct_pledge_amount = reside_no_debit_amount - user_asset.remote_4coop_asset
+                    deduct_pledge_amount = remote_deduct - user_asset.remote_4coop_asset
                     if user_asset.available_asset >= deduct_pledge_amount:
                         # 如果远程可用资产中能覆盖远程抵押扣除。添加本地抵押余额，减去远程抵押余额
                         user_asset.pledge_asset += deduct_pledge_amount
@@ -202,3 +203,7 @@ def check_pledges():
         except Exception as e:
             db.session.rollback()
             celery_logger.error("check pledge failed %s" % e)
+
+
+if __name__ == '__main__':
+    check_pledges()
