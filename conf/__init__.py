@@ -40,6 +40,10 @@ PRIVATE_TOKEN_IV = b"zmI666&s_2{+sTuT"
 6、非合作
 7、活动奖励
 8、聚合到挖矿地址
+9、usdt汇聚手续费
+10、usdt汇聚
+11、合作收益
+12、
 """
 DEPOSIT = 1
 WITHDRAWAL = 2
@@ -51,6 +55,10 @@ ACTIVITY_REWORD = 7
 BHD_CONVERGE = 8
 USDT_CONVERGE_FEE = 9
 USDT_CONVERGE = 10
+COOP_FINE = 11
+COOP_MINE_EARNINGS = 12
+ECOL_MINE_EARNINGS = 13
+
 
 
 """ 

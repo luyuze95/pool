@@ -6,12 +6,11 @@
 """
 from time import time
 
-from sqlalchemy import func
-
 from app import celery
 from conf import *
 from logs import celery_logger
 from models import db
+from models.billings import Billings
 from models.remote_pledge import RemotePledgeAddress, RemotePledgeTransaction, \
     TeamWorkRecordActivity
 from models.user_asset import UserAsset
@@ -163,14 +162,14 @@ def check_pledges():
                 ).all()
 
                 # 合作中订单需要的总金额
-                coop_total = TeamWorkRecordActivity.query.with_entities(
-                    func.sum(
-                        TeamWorkRecordActivity.amount
-                    )).filter_by(
-                    account_key=remote_pledge.account_key,
-                    status=TeamWorking).first()[0]
-                if not coop_total:
-                    coop_total = 0
+                # coop_total = TeamWorkRecordActivity.query.with_entities(
+                #     func.sum(
+                #         TeamWorkRecordActivity.amount
+                #     )).filter_by(
+                #     account_key=remote_pledge.account_key,
+                #     status=TeamWorking).first()[0]
+                # if not coop_total:
+                #     coop_total = 0
 
                 # 违约金额= 用户需要金额-剩余金额
                 gap_amount = coop_freeze_asset - user_asset.coop_freeze_asset
@@ -197,7 +196,9 @@ def check_pledges():
                             user_asset.available_asset = 0
                         # 扣除违约金 可用>合作>抵押
                         # 合作冻结中可扣 = 合作冻结 - 远程借贷合作
-
+                        billing = Billings(user_asset.account_key, security_deposit, '', '', COOP_FINE)
+                        db.session.add(billing)
+                        celery_logger.info("deduct security deposit %s " % billing.to_dict())
             remote_pledge.status = DEBIT_UNDONE
             db.session.commit()
         except Exception as e:

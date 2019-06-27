@@ -10,6 +10,7 @@ from app import celery
 from models import db
 from logs import celery_logger
 from models.activity_reward import ActivityReward
+from models.billings import Billings
 from models.income_record import IncomeRecord, IncomeEcologyRecord
 from models.user_asset import UserAsset
 from rpc.bhd_rpc import bhd_client
@@ -37,6 +38,8 @@ def calculate_income():
             income.is_add_asset = 1
             celery_logger.info("user:%s, income %s " % (
                 user_asset.to_dict(), income.to_dict()))
+            billing = Billings(user_asset.account_key, income.amount, '', '', COOP_MINE_EARNINGS)
+            db.session.add(billing)
             db.session.commit()
         except Exception as e:
             celery_logger.error("calculate_income error:%s" % str(e))
@@ -62,6 +65,8 @@ def calculate_income_ecol():
             user_asset.available_asset += income.amount
             user_asset.total_asset += income.amount
             income.is_add_asset = 1
+            billing = Billings(user_asset.account_key, income.amount, '', '', ECOL_MINE_EARNINGS)
+            db.session.add(billing)
             celery_logger.info("user:%s, income %s " % (
                 user_asset.to_dict(), income.to_dict()))
             db.session.commit()
@@ -86,6 +91,8 @@ def calculate_activity_reward():
             if reward.amount > 0:
                 user_asset.available_asset += reward.amount
                 user_asset.total_asset += reward.amount
+            billing = Billings(user_asset.account_key, reward.amount, '', '', ACTIVITY_REWORD)
+            db.session.add(billing)
             reward.is_add_asset = 1
             celery_logger.info("user:%s, income %s " % (
                 user_asset.to_dict(), reward.to_dict()))
