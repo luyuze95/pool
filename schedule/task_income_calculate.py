@@ -38,7 +38,10 @@ def calculate_income():
             income.is_add_asset = 1
             celery_logger.info("user:%s, income %s " % (
                 user_asset.to_dict(), income.to_dict()))
-            billing = Billings(user_asset.account_key, income.amount, '', '', COOP_MINE_EARNINGS)
+            income_type = MINING_COOPERATION
+            if income.type == IncomeTYpeCoopReward:
+                income_type = COOP_MINE_EARNINGS
+            billing = Billings(user_asset.account_key, income.amount, '', '', income_type)
             db.session.add(billing)
             db.session.commit()
         except Exception as e:

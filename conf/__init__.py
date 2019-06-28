@@ -36,8 +36,8 @@ PRIVATE_TOKEN_IV = b"zmI666&s_2{+sTuT"
 3、余额->抵押
 4、抵押->余额
 挖矿收益
-5、合作
-6、非合作
+5、合作池
+6、非合作池
 7、活动奖励
 8、聚合到挖矿地址
 9、usdt汇聚手续费
@@ -122,3 +122,10 @@ TeamWorking = 1
 TeamWorkEnd = 0
 
 BHD_RATE_KEY = "bhd:ratio"
+
+
+"""
+收益类型
+"""
+IncomeTypeMining = 0
+IncomeTYpeCoopReward = 1

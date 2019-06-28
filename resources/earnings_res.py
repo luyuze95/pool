@@ -31,7 +31,8 @@ class EarningsTotalApi(Resource):
         account_key = g.account_key
         coop_total_amount = IncomeRecord.query.filter_by(account_key=account_key).with_entities(func.sum(IncomeRecord.amount)).first()[0]
         ecol_total_amount = IncomeEcologyRecord.query.filter_by(account_key=account_key).with_entities(func.sum(IncomeEcologyRecord.amount)).first()[0]
-        activity_rewards_total_amount = ActivityReward.query.filter_by(account_key=account_key).with_entities(func.sum(ActivityReward.amount)).first()[0]
+        activity_rewards_total_amount = ActivityReward.query.filter_by(
+            account_key=account_key).filter(ActivityReward.amount>0).with_entities(func.sum(ActivityReward.amount)).first()[0]
         if not coop_total_amount:
             coop_total_amount = 0
         if not ecol_total_amount:

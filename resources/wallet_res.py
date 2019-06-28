@@ -219,6 +219,9 @@ class UserAssetTransferInfoAPI(Resource):
             kwargs['coin_name'] = coin_name
         if status:
             kwargs['status'] = status
+        if "block_earnings" in transaction_type:
+            # 只展示用户挖矿收益
+            kwargs['type'] = IncomeTypeMining
         if "day_earnings" in transaction_type:
             infos = model.query.filter_by(
                 **kwargs
