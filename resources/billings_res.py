@@ -15,6 +15,7 @@ from sqlalchemy import and_
 from models.billings import Billings
 from resources.auth_decorator import login_required
 from utils.response import make_resp
+from conf import *
 
 
 class OthersBill(Resource):
@@ -34,8 +35,10 @@ class OthersBill(Resource):
         limit = args.get('limit')
         offset = args.get('offset')
         from_ts = args.get('from')
-        end_ts = args.getlist('end')
+        end_ts = args.get('end')
         billing_types = args.get('type')
+        if not billing_types:
+            billing_types = [str(ACTIVITY_REWORD), str(COOP_FINE), str(COOP_MINE_EARNINGS)]
         billing_types = [int(billing_type) for billing_type in billing_types if
                          billing_type.isalnum()]
         from_dt = datetime.fromtimestamp(from_ts)

@@ -33,8 +33,8 @@ def setup_period_task(sender, **kwargs):
                              confirm_deposit_transaction.s())
     sender.add_periodic_task(crontab(minute='*/1'),
                              bhd_deposit_scan.s())
-    # sender.add_periodic_task(crontab(minute='*/15'),
-    #                          usdt_deposit_scan.s())
+    sender.add_periodic_task(crontab(minute='*/15'),
+                             usdt_deposit_scan.s())
     sender.add_periodic_task(crontab(minute='*/1'),
                              deposit_add_asset.s())
     sender.add_periodic_task(crontab(minute='*/5'),

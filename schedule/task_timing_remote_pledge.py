@@ -107,6 +107,7 @@ def check_pledges():
             reside_no_debit_amount = user_asset.get_remote_avai_amount()
             user_asset.remote_freeze_asset -= remote_pledge_amount
             if reside_no_debit_amount >= remote_pledge_amount:
+                remote_pledge.status = DEBIT_UNDONE
                 db.session.commit()
                 continue
 
