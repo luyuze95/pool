@@ -118,7 +118,7 @@ class UserAssetApi(Resource):
                 account_key=account_key, coin_name=BHD_COIN_NAME
             ).with_for_update(read=True).first()
             total_available_2pledge = user_asset.get_total_available_pledge_amount()
-            total_available_2balance = user_asset.get_total_available_2_balance()
+            total_available_2balance = user_asset.get_pledge_amount()
             if direction and total_available_2balance < amount:
                 api_logger.error(
                     "asset transfer, user:%s, pledge_asset:%s, amount:%s"
@@ -131,7 +131,7 @@ class UserAssetApi(Resource):
                 return make_resp(400, False, message="available not enough")
 
             if direction:
-                if user_asset.remote_4pledge_asset > amount:
+                if user_asset.remote_4pledge_asset >= amount:
                     user_asset.remote_4pledge_asset -= amount
                 else:
                     user_asset.pledge_asset -= (amount-user_asset.remote_4pledge_asset)
@@ -139,7 +139,7 @@ class UserAssetApi(Resource):
                     user_asset.remote_4pledge_asset = 0
             else:
                 remote_avai2_pledge = user_asset.get_remote_avai_amount()
-                if remote_avai2_pledge > amount:
+                if remote_avai2_pledge >= amount:
                     user_asset.remote_4pledge_asset += amount
                 else:
                     user_asset.remote_4pledge_asset += remote_avai2_pledge

@@ -111,6 +111,4 @@ class UserAsset(db.Model):
     def get_total_available_pledge_amount(self):
         return self.get_remote_avai_amount() + self.available_asset
 
-    def get_total_available_2_balance(self):
-        return self.remote_4pledge_asset + self.pledge_asset
 

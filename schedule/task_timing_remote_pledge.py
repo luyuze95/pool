@@ -183,18 +183,14 @@ def check_pledges():
                             for team_work in team_works:
                                 team_work.status = BadTeamWork
                                 gap_amount -= team_work.coo_amount
-                        if user_asset.available_asset > security_deposit:
-                            user_asset.available_asset -= security_deposit
+                        margin_in_coop = user_asset.coop_freeze_asset - user_asset.remote_4coop_asset
+                        deduct_local_pledge_amount = security_deposit - margin_in_coop
+                        if deduct_local_pledge_amount > 0:
+                            user_asset.pledge_asset -= deduct_local_pledge_amount
+                            user_asset.coop_freeze_asset -= margin_in_coop
                         else:
-                            margin_in_coop = user_asset.coop_freeze_asset - user_asset.remote_4coop_asset
-                            deduct_margin_amount = security_deposit - user_asset.available_asset
-                            deduct_local_pledge_amount = deduct_margin_amount - margin_in_coop
-                            if deduct_margin_amount > margin_in_coop:
-                                user_asset.pledge_asset -= deduct_local_pledge_amount
-                                user_asset.coop_freeze_asset -= margin_in_coop
-                            else:
-                                user_asset.coop_freeze_asset -= deduct_local_pledge_amount
-                            user_asset.available_asset = 0
+                            user_asset.coop_freeze_asset -= margin_in_coop
+                        user_asset.total_asset -= security_deposit
                         # 扣除违约金 可用>合作>抵押
                         # 合作冻结中可扣 = 合作冻结 - 远程借贷合作
                         billing = Billings(user_asset.account_key, security_deposit, '', '', COOP_FINE)

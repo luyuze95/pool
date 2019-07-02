@@ -18,6 +18,7 @@ from models.income_record import IncomeRecord, IncomeEcologyRecord
 from resources.auth_decorator import login_required
 from rpc.authproxy import encode_python_object
 from utils.response import make_resp
+from conf import *
 
 
 class EarningsTotalApi(Resource):
@@ -80,14 +81,14 @@ class DayEarningsApi(Resource):
             FROM
 	        pool_bhd_income_record 
             WHERE
-	        is_add_asset=1 and account_key = '%s'
+	        is_add_asset=1 and type = %s and account_key = '%s'
             GROUP BY
             TO_DAYS( create_time )
             ORDER BY 
             create_time
             DESC 
             LIMIT %s, %s
-            """ % (account_key, offset, limit)).fetchall()
+            """ % (IncomeTypeMining, account_key, offset, limit)).fetchall()
         if not results:
             return make_resp(200, True)
         for index, result in enumerate(results):
