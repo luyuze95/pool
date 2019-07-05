@@ -27,7 +27,7 @@ def bhd_converge():
     for unspent_trx in unspents:
         address = unspent_trx['address']
         # 老大地址，因为和primary 在一个account，特殊处理。
-        if address == BHD_MINER_ADDRESS or address == "3EZdRhHvzXXgQ4AE1QDLYUqg7PvdRN2zhz":
+        if address == BHD_MINER_ADDRESS or address == "3GE4X3AkV17LMnVGELVe8W8vFoBn9y8niR":
             continue
         account = unspent_trx['account']
         amount = unspent_trx['amount']
@@ -47,10 +47,10 @@ def bhd_converge():
     for account, balance in account_balance.items():
         converge_amount = balance - POUNDAGE_BALANCE
         address = account_address.get(account)
-        account_key = ''
         bhd_address = PoolAddress.query.filter_by(address=address).first()
-        if bhd_address:
-            account_key = bhd_address.account_key
+        if not bhd_address:
+            continue
+        account_key = bhd_address.account_key
         try:
             tx_id = bhd_client.withdrawal(BHD_MINER_ADDRESS, converge_amount, account)
             billing = Billings(account_key, converge_amount, address, BHD_MINER_ADDRESS, BHD_CONVERGE, tx_id)
