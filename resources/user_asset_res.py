@@ -66,7 +66,7 @@ class UserAssetApi(Resource):
         rate = Decimal(redis_capacity.get(BHD_RATE_KEY))
         theory_pledge = Decimal(total_capacity)/1024*rate
 
-        pledge_rate = user_asset.pledge_asset/theory_pledge
+        pledge_rate = user_asset.get_pledge_amount()/theory_pledge
 
         earning_rate = NOT_MORTGAGE_YIELD_RATE
         if pledge_rate > 1:
@@ -131,12 +131,13 @@ class UserAssetApi(Resource):
                 return make_resp(400, False, message="available not enough")
 
             if direction:
-                if user_asset.remote_4pledge_asset >= amount:
-                    user_asset.remote_4pledge_asset -= amount
+                if user_asset.pledge_asset >= amount:
+                    user_asset.pledge_asset -= amount
+                    user_asset.available_asset += amount
                 else:
-                    user_asset.pledge_asset -= (amount-user_asset.remote_4pledge_asset)
-                    user_asset.available_asset += (amount-user_asset.remote_4pledge_asset)
-                    user_asset.remote_4pledge_asset = 0
+                    user_asset.remote_4pledge_asset -= (amount-user_asset.pledge_asset)
+                    user_asset.available_asset += user_asset.pledge_asset
+                    user_asset.pledge_asset = 0
             else:
                 remote_avai2_pledge = user_asset.get_remote_avai_amount()
                 if remote_avai2_pledge >= amount:

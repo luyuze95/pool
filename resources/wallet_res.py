@@ -197,10 +197,9 @@ class UserAssetTransferInfoAPI(Resource):
         model = self.transaction_types.get(transaction_type)
         parse = reqparse.RequestParser()
         now = int(time.time())
-        ten_days = now - 864000
         parse.add_argument('limit', type=int, required=False, default=10)
         parse.add_argument('offset', type=int, required=False, default=0)
-        parse.add_argument('from', type=int, required=False, default=ten_days)
+        parse.add_argument('from', type=int, required=False, default=0)
         parse.add_argument('end', type=int, required=False, default=now)
         parse.add_argument('coin_name', type=str, required=False)
         parse.add_argument('status', type=int, required=False)
@@ -250,7 +249,7 @@ class UserAssetTransferInfoAPI(Resource):
                 })
         else:
             infos = model.query.filter_by(
-                **kwargs
+                account_key=account_key
             ).filter(
                 and_(model.create_time > from_dt,
                      model.create_time < end_dt)
