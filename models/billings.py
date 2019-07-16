@@ -37,7 +37,7 @@ class Billings(db.Model):
     type = db.Column(db.SmallInteger)
     create_time = db.Column(db.TIMESTAMP(), default=datetime.now)
 
-    def __init__(self, account_key, amount, from_address, to_address, type, txid='', tag=''):
+    def __init__(self, account_key, amount, from_address, to_address, type, txid='', tag='', create_time=datetime.now()):
         self.account_key = account_key
         self.amount = amount
         self.from_address = from_address
@@ -45,6 +45,7 @@ class Billings(db.Model):
         self.type = type
         self.txid = txid
         self.tag = tag
+        self.create_time = create_time
 
     def to_dict(self):
         billing_dict = {

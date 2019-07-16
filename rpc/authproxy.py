@@ -4,7 +4,7 @@
     @author: anzz
     @date: 2019/5/29
 """
-from datetime import datetime
+from datetime import datetime, date
 
 import retrying as retrying
 
@@ -63,7 +63,7 @@ def encode_python_object(o):
         if o == 0:
             return 0
         return str(o)
-    if isinstance(o, datetime):
+    if isinstance(o, (datetime, date)):
         return str(o)
     if isinstance(o, tuple):
         return list(o)

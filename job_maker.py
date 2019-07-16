@@ -96,6 +96,16 @@ def send_latest_msg():
         break
 
 
-if __name__ == '__main__':
-    main()
+def run_always():
+    while 1:
+        try:
+            main()
+        except Exception:
+            run_always()
+            import time
+            time.sleep(1)
+            print("restarting" + "*"*99)
 
+
+if __name__ == '__main__':
+    run_always()

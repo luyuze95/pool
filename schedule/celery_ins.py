@@ -25,7 +25,7 @@ def make_celery(app):
         CELERYD_CONCURRENCY=12,
         CELERYD_FORCE_EXECV=True,
         CELERY_TASK_PUBLISH_RETRY=3,
-        CELERYD_TASK_SOFT_TIME_LIMIT=60,
+        CELERYD_TASK_SOFT_TIME_LIMIT=360,
     )
 
     task_base = celery.Task

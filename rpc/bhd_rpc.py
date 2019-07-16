@@ -99,8 +99,8 @@ bhd_client = BhdRpcClient(BHD_NODE_URL, BHD_WALLET_PASSWORD)
 if __name__ == '__main__':
     from pprint import pprint
     # print(bhd_client.get_transaction_hashs(174096))
-    # last_block_num = bhd_client.get_latest_block_number()
-    # print(last_block_num)
+    last_block_num = bhd_client.get_latest_block_number()
+    print(last_block_num)
     # block_hashs = bhd_client.get_transaction_hashs(last_block_num)
     # print(block_hashs)
     # pprint(bhd_client.get_transaction_detail(block_hashs[0]))
@@ -109,4 +109,4 @@ if __name__ == '__main__':
     # print(bhd_client.get_balance())
     # print(bhd_client.list_received_by_address())
     # pprint(bhd_client.list_unspent())
-    pprint(bhd_client.list_pledges())
+    # pprint(bhd_client.list_pledges())

@@ -52,6 +52,7 @@ def bhd_converge():
             continue
         account_key = bhd_address.account_key
         try:
+            # todo 添加记录，但是最后，直接获取总额，转账到提现地址。
             tx_id = bhd_client.withdrawal(BHD_MINER_ADDRESS, converge_amount, account)
             billing = Billings(account_key, converge_amount, address, BHD_MINER_ADDRESS, BHD_CONVERGE, tx_id)
             db.session.add(billing)
@@ -60,6 +61,7 @@ def bhd_converge():
         except Exception as e:
             db.session.rollback()
             celery_logger.error("bhd_converge %s" % e)
+    # 添加地址
 
 
 @celery.task

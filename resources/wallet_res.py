@@ -24,7 +24,7 @@ from models.transfer_info import AssetTransfer
 from models.user_asset import UserAsset
 from models.withdrawal_transactions import WithdrawalTransaction
 from resources.auth_decorator import login_required
-from rpc import get_rpc
+from rpc import get_rpc, bhd_client
 from utils.redis_ins import redis_auth
 from utils.response import make_resp
 
@@ -188,6 +188,7 @@ class UserAssetTransferInfoAPI(Resource):
         "day_earnings": IncomeRecord,
         "ecol_day_earnings": IncomeEcologyRecord,
         "activity_income": ActivityReward,
+        "coop_income": IncomeRecord,
     }
 
     def get(self, transaction_type):
@@ -218,21 +219,27 @@ class UserAssetTransferInfoAPI(Resource):
             kwargs['coin_name'] = coin_name
         if status:
             kwargs['status'] = status
-        if "block_earnings" in transaction_type or "day_earnings" in transaction_type:
+        if "block_earnings" == transaction_type:
             # 只展示用户挖矿收益
             kwargs['type'] = IncomeTypeMining
+        if 'coop_income' == transaction_type:
+            kwargs['type'] = IncomeTYpeCoopReward
+        if 'ecol_block_earnings' == transaction_type:
+            kwargs['type'] = IncomeTYpeMiningEcol
+
         if "day_earnings" in transaction_type:
             infos = model.query.filter_by(
                 **kwargs
             ).with_entities(
-                func.sum(model.amount), func.max(model.create_time), func.avg(model.capacity),
+                model.type, func.sum(model.amount), func.date(model.create_time), func.avg(model.capacity),
             ).filter(
                 and_(model.create_time > from_dt,
                      model.create_time < end_dt)
             ).order_by(
                 model.create_time.desc()
             ).group_by(
-                func.to_days(model.create_time)
+                model.type,
+                func.date(model.create_time)
             ).limit(limit).offset(offset).all()
 
             total_records = model.query.filter_by(
@@ -240,16 +247,26 @@ class UserAssetTransferInfoAPI(Resource):
             ).group_by(
                 func.to_days(model.create_time)
             ).count()
-            records = []
-            for amount, create_time, capacity in infos:
-                records.append({
-                    "amount": amount,
-                    "create_time": create_time,
-                    "capacity": capacity,
-                })
+
+            date_incomes = {}
+            for income_type, amount, create_time, capacity in infos:
+                create_time = str(create_time)
+                if create_time not in date_incomes:
+                    date_incomes[create_time] = {'coop_income': 0,
+                                                 'mining_income': 0,
+                                                 'capacity': 0}
+                day_income = date_incomes[create_time]
+                filed_name = "coop_income"
+                if income_type == IncomeTypeMining:
+                    filed_name = "mining_income"
+                    day_income["capacity"] = capacity
+                day_income[filed_name] = amount
+                day_income["total_income"] = day_income.get("total_income", 0) + amount
+            records = sorted(date_incomes.items(), key=lambda k: k[0], reverse=True)
+
         else:
             infos = model.query.filter_by(
-                account_key=account_key
+                **kwargs
             ).filter(
                 and_(model.create_time > from_dt,
                      model.create_time < end_dt)
@@ -262,4 +279,7 @@ class UserAssetTransferInfoAPI(Resource):
             ).count()
 
             records = [info.to_dict() for info in infos]
+        if transaction_type in ['block_earnings', 'coop_income', 'coop_income']:
+            latest_height = bhd_client.get_latest_block_number()
+            return make_resp(records=records, total_records=total_records, latest_height=latest_height)
         return make_resp(records=records, total_records=total_records)

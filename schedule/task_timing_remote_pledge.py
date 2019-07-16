@@ -97,7 +97,7 @@ def check_pledges():
             user_asset = UserAsset.query.filter_by(
                 account_key=remote_pledge.account_key,
                 coin_name=BHD_COIN_NAME).with_for_update(
-                read=True).first()
+                read=False).first()
 
             if not user_asset:
                 continue
@@ -154,7 +154,7 @@ def check_pledges():
             # 合作冻结资金修改，检查是否违约
             if coop_freeze_asset != user_asset.coop_freeze_asset:
                 # 进行中的订单
-                team_works = TeamWorkRecordActivity.filter_by(
+                team_works = TeamWorkRecordActivity.query.filter_by(
                     account_key=remote_pledge.account_key,
                     status=TeamWorking).filter(
                     TeamWorkRecordActivity.end_time > time(),

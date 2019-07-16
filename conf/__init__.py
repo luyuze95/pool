@@ -42,8 +42,9 @@ PRIVATE_TOKEN_IV = b"zmI666&s_2{+sTuT"
 8、聚合到挖矿地址
 9、usdt汇聚手续费
 10、usdt汇聚
-11、合作收益
-12、
+11、合作违约罚金
+12、合作挖矿收益
+13、生态挖矿收益
 """
 DEPOSIT = 1
 WITHDRAWAL = 2
@@ -58,7 +59,6 @@ USDT_CONVERGE = 10
 COOP_FINE = 11
 COOP_MINE_EARNINGS = 12
 ECOL_MINE_EARNINGS = 13
-
 
 
 """ 
@@ -129,3 +129,4 @@ BHD_RATE_KEY = "bhd:ratio"
 """
 IncomeTypeMining = 0
 IncomeTYpeCoopReward = 1
+IncomeTYpeMiningEcol = 2

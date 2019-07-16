@@ -93,8 +93,8 @@ class UserAsset(db.Model):
         # 抵押金
         margin_amount = self.remote_freeze_asset/9
 
-        available_pledge_amount = amount - margin_amount
-        return available_pledge_amount
+        available_margin_asset = amount - margin_amount
+        return available_margin_asset
 
     def get_available_pledge_amount(self):
         return self.available_asset+self.remote_freeze_asset-self.remote_4pledge_asset-self.remote_4coop_asset
@@ -110,5 +110,11 @@ class UserAsset(db.Model):
 
     def get_total_available_pledge_amount(self):
         return self.get_remote_avai_amount() + self.available_asset
+
+    def get_available_withdrawal_amount(self):
+        available_asset = self.available_asset + self.get_remote_avai_amount()
+        total_asset = available_asset + self.coop_freeze_asset + self.get_pledge_amount()
+        available_withdrawal_asset = total_asset - self.remote_freeze_asset/9*10
+        return available_withdrawal_asset
 
 

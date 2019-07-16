@@ -10,13 +10,12 @@ from datetime import datetime
 
 from flask import g
 from flask_restful import Resource, reqparse
-from sqlalchemy import func
+from sqlalchemy import func, and_
 
-from models import db
 from models.activity_reward import ActivityReward
 from models.income_record import IncomeRecord, IncomeEcologyRecord
 from resources.auth_decorator import login_required
-from rpc.authproxy import encode_python_object
+from rpc import bhd_client
 from utils.response import make_resp
 from conf import *
 
@@ -30,19 +29,53 @@ class EarningsTotalApi(Resource):
         :return:
         """
         account_key = g.account_key
-        coop_total_amount = IncomeRecord.query.filter_by(account_key=account_key).with_entities(func.sum(IncomeRecord.amount)).first()[0]
-        ecol_total_amount = IncomeEcologyRecord.query.filter_by(account_key=account_key).with_entities(func.sum(IncomeEcologyRecord.amount)).first()[0]
+        # 合作-裸挖-挖矿总收入
+        mining_total_amount = IncomeRecord.query.filter_by(
+            account_key=account_key
+        ).filter(
+            IncomeRecord.type.in_([IncomeTypeMining, IncomeTYpeMiningEcol])
+        ).with_entities(func.sum(IncomeRecord.amount)).first()[0]
+
+        # 昨天挖矿所得
+        mining_last_day = IncomeRecord.query.filter_by(
+            account_key=account_key
+        ).filter(
+            func.to_days(IncomeRecord.create_time) == func.to_days(func.now())-1
+        ).filter(
+            IncomeRecord.type.in_([IncomeTypeMining, IncomeTYpeMiningEcol])
+        ).with_entities(
+            func.sum(IncomeRecord.amount)).first()[0]
+
+        # 合作所得总
+        coop_total_amount = IncomeRecord.query.filter_by(
+            account_key=account_key, type=IncomeTYpeCoopReward
+        ).with_entities(func.sum(IncomeRecord.amount)).first()[0]
+        # 昨日合作所得
+        coop_last_day = IncomeRecord.query.filter_by(
+            account_key=account_key, type=IncomeTYpeCoopReward
+        ).filter(
+            func.to_days(IncomeRecord.create_time) == func.to_days(func.now())-1
+        ).with_entities(func.sum(IncomeRecord.amount)).first()[0]
+
+        # 活动总收益
         activity_rewards_total_amount = ActivityReward.query.filter_by(
-            account_key=account_key).filter(ActivityReward.amount>0).with_entities(func.sum(ActivityReward.amount)).first()[0]
-        if not coop_total_amount:
-            coop_total_amount = 0
-        if not ecol_total_amount:
-            ecol_total_amount = 0
-        if not activity_rewards_total_amount:
-            activity_rewards_total_amount = 0
-        return make_resp(coop_total_amount=coop_total_amount,
-                         ecol_total_amount=ecol_total_amount,
-                         activity_rewards_total_amount=activity_rewards_total_amount)
+            account_key=account_key
+        ).filter(ActivityReward.amount>0
+                 ).with_entities(func.sum(ActivityReward.amount)).first()[0]
+        # 昨日活动收益
+        activity_rewards_last_day = ActivityReward.query.filter_by(
+            account_key=account_key
+        ).filter(
+            func.to_days(IncomeRecord.create_time) == func.to_days(func.now())-1
+        ).filter(ActivityReward.amount>0
+                 ).with_entities(func.sum(ActivityReward.amount)).first()[0]
+
+        return make_resp(mining_total_amount=mining_total_amount,
+                         mining_last_day=mining_last_day,
+                         coop_total_amount=coop_total_amount,
+                         coop_last_day=coop_last_day,
+                         activity_rewards_total_amount=activity_rewards_total_amount,
+                         activity_rewards_last_day=activity_rewards_last_day)
 
 
 class DayEarningsApi(Resource):
@@ -54,46 +87,158 @@ class DayEarningsApi(Resource):
         按天获取收益列表
         :return:
         """
+        account_key = g.account_key
         parse = reqparse.RequestParser()
-
         now = int(time.time())
-        ten_days = now - 864000
         parse.add_argument('limit', type=int, required=False, default=10)
         parse.add_argument('offset', type=int, required=False, default=0)
-        parse.add_argument('from', type=int, required=False, default=ten_days)
+        parse.add_argument('from', type=int, required=False, default=0)
         parse.add_argument('end', type=int, required=False, default=now)
+        parse.add_argument('coin_name', type=str, required=False)
         parse.add_argument('status', type=int, required=False)
         args = parse.parse_args()
         limit = args.get('limit')
         offset = args.get('offset')
         from_ts = args.get('from')
         end_ts = args.get('end')
+        coin_name = args.get('coin_name')
         status = args.get('status')
         from_dt = datetime.fromtimestamp(from_ts)
         end_dt = datetime.fromtimestamp(end_ts)
+        kwargs = {"account_key": account_key}
+        model = IncomeRecord
 
+        infos = model.query.filter_by(
+            **kwargs
+        ).with_entities(
+            model.type, func.sum(model.amount), func.date(model.create_time),
+            func.avg(model.capacity),
+        ).filter(
+            and_(model.create_time > from_dt,
+                 model.create_time < end_dt)
+        ).order_by(
+            model.create_time.desc()
+        ).group_by(
+            model.type,
+            func.date(model.create_time)
+        ).limit(limit).offset(offset).all()
+
+        total_records = model.query.filter_by(
+            **kwargs
+        ).group_by(
+            func.to_days(model.create_time)
+        ).count()
+
+        date_incomes = {}
+        for income_type, amount, create_time, capacity in infos:
+            create_time = str(create_time)
+            if create_time not in date_incomes:
+                date_incomes[create_time] = {'coop_income': 0,
+                                             'mining_income': 0,
+                                             'capacity': 0}
+            day_income = date_incomes[create_time]
+            filed_name = "coop_income"
+            if income_type == IncomeTypeMining:
+                filed_name = "mining_income"
+                day_income["capacity"] = capacity
+            day_income[filed_name] = amount
+            day_income["total_income"] = day_income.get("total_income",
+                                                        0) + amount
+        records = sorted(date_incomes.items(), key=lambda k: k[0], reverse=True)
+        return make_resp(records=records, total_records=total_records)
+
+
+class MiningIncomeApi(Resource):
+    decorators = [login_required]
+
+    def get(self):
         account_key = g.account_key
-        results = db.session.execute("""
-            SELECT
-	        SUM(amount),
-	        MAX(create_time),
-	        AVG(capacity)
-            FROM
-	        pool_bhd_income_record 
-            WHERE
-	        is_add_asset=1 and type = %s and account_key = '%s'
-            GROUP BY
-            TO_DAYS( create_time )
-            ORDER BY 
-            create_time
-            DESC 
-            LIMIT %s, %s
-            """ % (IncomeTypeMining, account_key, offset, limit)).fetchall()
-        if not results:
-            return make_resp(200, True)
-        for index, result in enumerate(results):
-            results[index] = json.loads(json.dumps(list(result), default=encode_python_object))
-        return make_resp(200, True, days_earnings=results)
+        parse = reqparse.RequestParser()
+        now = int(time.time())
+        parse.add_argument('limit', type=int, required=False, default=10)
+        parse.add_argument('offset', type=int, required=False, default=0)
+        parse.add_argument('from', type=int, required=False, default=0)
+        parse.add_argument('end', type=int, required=False, default=now)
+        parse.add_argument('coin_name', type=str, required=False)
+        parse.add_argument('status', type=int, required=False)
+        parse.add_argument('type', type=int, required=False)
+        args = parse.parse_args()
+        limit = args.get('limit')
+        offset = args.get('offset')
+        from_ts = args.get('from')
+        end_ts = args.get('end')
+        coin_name = args.get('coin_name')
+        status = args.get('status')
+        mining_type = args.get('type')
+        if not mining_type:
+            mining_type = [IncomeTypeMining, IncomeTYpeMiningEcol]
+        if mining_type.isalnum():
+            mining_type = [mining_type]
+        from_dt = datetime.fromtimestamp(from_ts)
+        end_dt = datetime.fromtimestamp(end_ts)
+        kwargs = {"account_key": account_key}
+        model = IncomeRecord
+        infos = model.query.filter_by(
+            **kwargs
+        ).filter(
+            model.type.in_(mining_type)
+        ).filter(
+            and_(model.create_time > from_dt,
+                 model.create_time < end_dt)
+        ).order_by(
+            model.create_time.desc()
+        ).limit(limit).offset(offset).all()
+
+        total_records = model.query.filter_by(
+            **kwargs
+        ).count()
+
+        records = [info.to_dict() for info in infos]
+
+        latest_height = bhd_client.get_latest_block_number()
+        return make_resp(records=records, total_records=total_records, latest_height=latest_height)
 
 
+class CoopIncomeApi(Resource):
+    decorators = [login_required]
 
+    def get(self):
+        account_key = g.account_key
+        parse = reqparse.RequestParser()
+        now = int(time.time())
+        parse.add_argument('limit', type=int, required=False, default=10)
+        parse.add_argument('offset', type=int, required=False, default=0)
+        parse.add_argument('from', type=int, required=False, default=0)
+        parse.add_argument('end', type=int, required=False, default=now)
+        parse.add_argument('coin_name', type=str, required=False)
+        parse.add_argument('status', type=int, required=False)
+        args = parse.parse_args()
+        limit = args.get('limit')
+        offset = args.get('offset')
+        from_ts = args.get('from')
+        end_ts = args.get('end')
+        coin_name = args.get('coin_name')
+        status = args.get('status')
+        from_dt = datetime.fromtimestamp(from_ts)
+        end_dt = datetime.fromtimestamp(end_ts)
+        kwargs = {"account_key": account_key}
+        model = IncomeRecord
+        infos = model.query.filter_by(
+            **kwargs
+        ).filter(
+            model.type.in_([IncomeTYpeCoopReward])
+        ).filter(
+            and_(model.create_time > from_dt,
+                 model.create_time < end_dt)
+        ).order_by(
+            model.create_time.desc()
+        ).limit(limit).offset(offset).all()
+
+        total_records = model.query.filter_by(
+            **kwargs
+        ).count()
+
+        records = [info.to_dict() for info in infos]
+
+        latest_height = bhd_client.get_latest_block_number()
+        return make_resp(records=records, total_records=total_records, latest_height=latest_height)

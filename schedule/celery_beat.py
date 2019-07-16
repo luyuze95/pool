@@ -39,8 +39,8 @@ def setup_period_task(sender, **kwargs):
                              deposit_add_asset.s())
     sender.add_periodic_task(crontab(minute='*/5'),
                              calculate_income.s())
-    sender.add_periodic_task(crontab(minute='*/5'),
-                             calculate_income_ecol.s())
+    # sender.add_periodic_task(crontab(minute='*/5'),
+    #                          calculate_income_ecol.s())
     sender.add_periodic_task(crontab(minute='*/5'),
                              withdrawal_coin.s())
     sender.add_periodic_task(crontab(minute='*/3'),
