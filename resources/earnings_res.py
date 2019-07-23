@@ -170,10 +170,10 @@ class MiningIncomeApi(Resource):
         coin_name = args.get('coin_name')
         status = args.get('status')
         mining_type = args.get('type')
-        if not mining_type:
-            mining_type = [IncomeTypeMining, IncomeTYpeMiningEcol]
-        if mining_type.isalnum():
+        if mining_type in [IncomeTypeMining, IncomeTYpeMiningEcol]:
             mining_type = [mining_type]
+        else:
+            mining_type = [IncomeTypeMining, IncomeTYpeMiningEcol]
         from_dt = datetime.fromtimestamp(from_ts)
         end_dt = datetime.fromtimestamp(end_ts)
         kwargs = {"account_key": account_key}
@@ -191,6 +191,8 @@ class MiningIncomeApi(Resource):
 
         total_records = model.query.filter_by(
             **kwargs
+        ).filter(
+            model.type.in_(mining_type)
         ).count()
 
         records = [info.to_dict() for info in infos]
@@ -236,6 +238,8 @@ class CoopIncomeApi(Resource):
 
         total_records = model.query.filter_by(
             **kwargs
+        ).filter(
+            model.type.in_([IncomeTYpeCoopReward])
         ).count()
 
         records = [info.to_dict() for info in infos]

@@ -44,12 +44,14 @@ class UserAssetApi(Resource):
             return make_resp(200, True, **context)
         keys = "miner:main:%s:*" % account_key
         miner_machines = redis_capacity.keys(keys)
+        rate = Decimal(redis_capacity.get(BHD_RATE_KEY))
 
         context.update({
             "earning_rate": 0,
             "theory_pledge": 0,
             "pledge_rate": 0,
             "total_income": 0,
+            "network_rate": rate,
         })
         if not miner_machines:
             return make_resp(200, True, **context)
@@ -63,7 +65,6 @@ class UserAssetApi(Resource):
         if not total_capacity:
             return make_resp(200, True, **context)
 
-        rate = Decimal(redis_capacity.get(BHD_RATE_KEY))
         theory_pledge = Decimal(total_capacity)/1024*rate
 
         pledge_rate = user_asset.get_pledge_amount()/theory_pledge

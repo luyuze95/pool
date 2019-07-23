@@ -67,7 +67,7 @@ class DeadlineFractionApi(Resource):
             and_(DeadlineFractionEcology.create_time > from_dt,
                  DeadlineFractionEcology.create_time < end_dt))
 
-        all_dls = coop_query.union_all(ecol_query).order_by('create_time').all()[::-1]
+        all_dls = coop_query.union_all(ecol_query).order_by('create_time').all()[::-1][offset:limit]
         total_records = len(all_dls)
         return make_resp(records=all_dls, total_records=total_records)
 

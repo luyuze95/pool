@@ -64,6 +64,6 @@ class BurstBlockApi(Resource):
                  EcolBurstBlock.create_time < end_dt))
 
         all_burst = coop_query.union_all(ecol_query).order_by(
-            'create_time').all()[::-1]
+            'create_time').all()[::-1][offset:limit]
         total_records = len(all_burst)
         return make_resp(records=all_burst, total_records=total_records)

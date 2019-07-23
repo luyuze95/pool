@@ -25,10 +25,9 @@ class OthersBill(Resource):
         account_key = g.account_key
         parse = reqparse.RequestParser()
         now = int(time.time())
-        ten_days = now - 864000
         parse.add_argument('limit', type=int, required=False, default=10)
         parse.add_argument('offset', type=int, required=False, default=0)
-        parse.add_argument('from', type=int, required=False, default=ten_days)
+        parse.add_argument('from', type=int, required=False, default=0)
         parse.add_argument('end', type=int, required=False, default=now)
         parse.add_argument('type', type=list, required=False)
         args = parse.parse_args()
@@ -38,7 +37,7 @@ class OthersBill(Resource):
         end_ts = args.get('end')
         billing_types = args.get('type')
         if not billing_types:
-            billing_types = [str(ACTIVITY_REWORD), str(COOP_FINE), str(COOP_MINE_EARNINGS)]
+            billing_types = [str(ACTIVITY_REWORD), str(COOP_FINE)]
         billing_types = [int(billing_type) for billing_type in billing_types if
                          billing_type.isalnum()]
         from_dt = datetime.fromtimestamp(from_ts)

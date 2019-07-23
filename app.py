@@ -33,7 +33,7 @@ api = APIHandleError(app)
 from resources.user_asset_res import UserAssetApi
 from resources.wallet_res import WalletAPI, UserAssetTransferInfoAPI
 from resources.earnings_res import EarningsTotalApi, DayEarningsApi, \
-    MiningIncomeApi
+    MiningIncomeApi, CoopIncomeApi
 from resources.verification_res import VerifyApi
 
 # 生成地址、转账、撤销转账
@@ -47,7 +47,7 @@ api.add_resource(DayEarningsApi, '/v1/earnings/days/', '/v1/earnings/days', endp
 # 挖矿明细
 api.add_resource(MiningIncomeApi, '/v1/earnings/blocks/', '/v1/earnings/blocks', endpoint="block_earnings")
 # 合作收益
-api.add_resource(MiningIncomeApi, '/v1/earnings/coop_incomes/', '/v1/earnings/coop_incomes', endpoint="coop_incomes")
+api.add_resource(CoopIncomeApi, '/v1/earnings/coop_incomes/', '/v1/earnings/coop_incomes', endpoint="coop_incomes")
 # 爆块查询
 api.add_resource(BurstBlockApi, '/v1/blocks/', '/v1/blocks', endpoint="blocks")
 # 贡献点查询
