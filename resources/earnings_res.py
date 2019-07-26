@@ -66,7 +66,7 @@ class EarningsTotalApi(Resource):
         activity_rewards_last_day = ActivityReward.query.filter_by(
             account_key=account_key
         ).filter(
-            func.to_days(IncomeRecord.create_time) == func.to_days(func.now())-1
+            func.to_days(ActivityReward.create_time) == func.to_days(func.now())-1
         ).filter(ActivityReward.amount>0
                  ).with_entities(func.sum(ActivityReward.amount)).first()[0]
 
