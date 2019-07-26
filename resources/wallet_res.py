@@ -153,7 +153,7 @@ class WalletAPI(Resource):
             return make_resp(406, False, message="撤销订单不存在")
         if withdrawal.status != WITHDRAWAL_APPLY:
             api_logger.warning(
-                "account_key:%s, apply revocation:%s" % withdrawal.to_dict())
+                "account_key:%s, apply revocation:%s" % (account_key, withdrawal.to_dict()))
             return make_resp(400, False, message="订单状态不可撤销")
         try:
             user_asset = UserAsset.query.filter_by(

@@ -4,6 +4,7 @@
     @author: anzz
     @date: 2019/6/25
 """
+from datetime import datetime
 from time import time
 
 from app import celery
@@ -156,11 +157,9 @@ def check_pledges():
                 # 进行中的订单
                 team_works = TeamWorkRecordActivity.query.filter_by(
                     account_key=remote_pledge.account_key,
-                    status=TeamWorking).filter(
-                    TeamWorkRecordActivity.end_time > time(),
-                    TeamWorkRecordActivity.begin_time < time()).order_by(
+                    status=TeamWorking).order_by(
                     TeamWorkRecordActivity.create_time.asc()
-                ).all()
+                ).with_for_update(read=True).all()
 
                 # 合作中订单需要的总金额
                 # coop_total = TeamWorkRecordActivity.query.with_entities(
@@ -172,27 +171,35 @@ def check_pledges():
                 # if not coop_total:
                 #     coop_total = 0
 
-                # 违约金额= 用户需要金额-剩余金额
+                # 合作违约金额= 用户需要金额-剩余金额
                 gap_amount = coop_freeze_asset - user_asset.coop_freeze_asset
 
                 if gap_amount > 0:
                     # 实际抵押金额不满足需要金额
                     if team_works:
                         security_deposit = remote_pledge_amount/9
-                        while gap_amount > 0:
-                            for team_work in team_works:
-                                team_work.status = BadTeamWork
+                        for team_work in team_works:
+                            team_work.status = BadTeamWork
+                            if gap_amount > 0:
+                                # 扣除违约订单，部分扣除的返还剩余部分。
                                 gap_amount -= team_work.coo_amount
+                        # 扣除违约金 可用>合作>抵押
+                        # 合作冻结中可扣 = 合作冻结 - 远程借贷合作
                         margin_in_coop = user_asset.coop_freeze_asset - user_asset.remote_4coop_asset
                         deduct_local_pledge_amount = security_deposit - margin_in_coop
                         if deduct_local_pledge_amount > 0:
                             user_asset.pledge_asset -= deduct_local_pledge_amount
-                            user_asset.coop_freeze_asset -= margin_in_coop
-                        else:
-                            user_asset.coop_freeze_asset -= margin_in_coop
+                        user_asset.coop_freeze_asset -= margin_in_coop
                         user_asset.total_asset -= security_deposit
-                        # 扣除违约金 可用>合作>抵押
-                        # 合作冻结中可扣 = 合作冻结 - 远程借贷合作
+                        # 返还剩余部分
+                        if gap_amount < 0:
+                            refund_amount = -gap_amount
+                            if user_asset.remote_4coop_asset > refund_amount:
+                                user_asset.remote_4coop_asset -= refund_amount
+                            else:
+                                user_asset.available_asset += refund_amount-user_asset.remote_4coop_asset
+                                user_asset.remote_4coop_asset = 0
+
                         billing = Billings(user_asset.account_key, security_deposit, '', '', COOP_FINE)
                         db.session.add(billing)
                         celery_logger.info("deduct security deposit %s " % billing.to_dict())

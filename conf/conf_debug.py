@@ -39,8 +39,8 @@ MYSQL_DB = 'pool'
 
 
 ''' celery config'''
-CELERY_BROKER_DB = 0
-CELERY_BACKEND_DB = 1
+CELERY_BROKER_DB = 2
+CELERY_BACKEND_DB = 3
 CELERY_MAX_CHILDREN_TASK = 10
 
 CELERY_BROKER_URL = 'redis://:%s@%s:%s/%s' %\
