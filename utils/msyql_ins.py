@@ -6,11 +6,10 @@
 """
 
 import threading
+import pymysql
 
-import pymysql as pymysql
-
-from models import db
 from conf import MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB
+from models import db
 from models.block_offset import BlockOffset
 
 
@@ -19,7 +18,7 @@ class MysqlSingleton(object):
     MAX_CONNECTION = 10
 
     @staticmethod
-    def instance(db="wallet"):
+    def get_instance(database="wallet"):
         if hasattr(MysqlSingleton, "_instance"):
             return MysqlSingleton._instance
 
@@ -30,15 +29,15 @@ class MysqlSingleton(object):
                                        port=MYSQL_PORT,
                                        user=MYSQL_USER,
                                        password=MYSQL_PASSWORD,
-                                       db=db)
+                                       db=database)
                 MysqlSingleton._instance = conn
         finally:
             MysqlSingleton.lock.release()
         return MysqlSingleton._instance
 
 
-def do_select_all(sql, args=None, db=MYSQL_DB):
-    conn = MysqlSingleton.instance(db)
+def do_select_all(sql, args=None, database=MYSQL_DB):
+    conn = MysqlSingleton.get_instance(database)
     conn.connect()
     result = []
     try:
