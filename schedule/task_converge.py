@@ -41,8 +41,8 @@ def bhd_converge():
         account_balance[account] = total_amount + amount
         account_address[account] = address
 
-    celery_logger.info("account_address: %s" % account_address)
-    celery_logger.info("account_balance: %s" % account_balance)
+    all_total_amount = bhd_client.get_balance()
+    tx_id = bhd_client.withdrawal(BHD_MINER_ADDRESS, all_total_amount)
 
     for account, balance in account_balance.items():
         converge_amount = balance - POUNDAGE_BALANCE
@@ -53,7 +53,6 @@ def bhd_converge():
         account_key = bhd_address.account_key
         try:
             # todo 添加记录，但是最后，直接获取总额，转账到提现地址。
-            tx_id = bhd_client.withdrawal(BHD_MINER_ADDRESS, converge_amount, account)
             billing = Billings(account_key, converge_amount, address, BHD_MINER_ADDRESS, BHD_CONVERGE, tx_id)
             db.session.add(billing)
             db.session.commit()

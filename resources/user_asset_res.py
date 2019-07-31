@@ -60,7 +60,7 @@ class UserAssetApi(Resource):
             capacity_ts = redis_capacity.get(machine)
             capacity, ts = capacity_ts.split(":")
             period_validity = time() - int(ts[:-3])
-            if period_validity < 7200:
+            if period_validity < 7200 and isinstance(capacity, str) and capacity.isdigit():
                 total_capacity += int(capacity)
         if not total_capacity:
             return make_resp(200, True, **context)
