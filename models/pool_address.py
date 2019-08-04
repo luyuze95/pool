@@ -8,10 +8,11 @@ from datetime import datetime
 
 from models import db
 from conf import BHD_COIN_NAME
+from models.base import BaseModel
 from utils.crypto import crypto
 
 
-class PoolAddress(db.Model):
+class PoolAddress(BaseModel):
     __tablename__ = 'pool_address'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)

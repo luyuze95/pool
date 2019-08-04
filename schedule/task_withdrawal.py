@@ -12,9 +12,11 @@ from models.user_asset import UserAsset
 from models.withdrawal_transactions import WithdrawalTransaction
 from rpc import get_rpc
 from conf import *
+from schedule.distributed_lock_decorator import distributed_lock
 
 
 @celery.task
+@distributed_lock
 def withdrawal_coin():
     withdrawal_applys = WithdrawalTransaction.query.filter_by(status=WITHDRAWAL_PASS).all()
     if not withdrawal_applys:
@@ -52,6 +54,7 @@ def withdrawal_coin():
 
 
 @celery.task
+@distributed_lock
 def withdrawal_confirm():
     withdrawal_sendings = WithdrawalTransaction.query.filter_by(
         status=WITHDRAWAL_SENDING).all()

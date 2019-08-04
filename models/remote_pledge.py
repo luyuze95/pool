@@ -9,6 +9,7 @@ from sqlalchemy import func
 
 from models import db
 from conf import *
+from models.base import BaseModel
 
 
 class RemotePledgeAddress(db.Model):
@@ -35,7 +36,7 @@ class RemotePledgeAddress(db.Model):
         return remote_pledge_dict
 
 
-class RemotePledgeTransaction(db.Model):
+class RemotePledgeTransaction(BaseModel):
     __tablename__ = 'pool_remote_pledge_transaction'
     __table_args__ = {'extend_existing': True}
     # id
@@ -49,7 +50,7 @@ class RemotePledgeTransaction(db.Model):
     # 抵押高度
     pledge_height = db.Column(db.Integer)
     # 抵押交易id
-    pledge_txid = db.Column(db.String(64))
+    pledge_txid = db.Column(db.String(64), unique=True)
 
     # 抵押状态, 抵押状态。1，抵押撤销，0
     status = db.Column(db.Integer)
@@ -81,7 +82,7 @@ class RemotePledgeTransaction(db.Model):
         return remote_pledge_tr_dict
 
 
-class TeamWorkRecordActivity(db.Model):
+class TeamWorkRecordActivity(BaseModel):
     __tablename__ = 'pool_team_work_record_activity'
     __table_args__ = {'extend_existing': True}
     # id

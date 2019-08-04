@@ -13,9 +13,11 @@ from models.pool_address import PoolAddress
 from models.billings import Billings
 from rpc.bhd_rpc import bhd_client
 from rpc.usdt_rpc import usdt_client
+from schedule.distributed_lock_decorator import distributed_lock
 
 
 @celery.task
+@distributed_lock
 def bhd_converge():
     # listunspent 获取用户地址未消费收益
     addresses = db.session.query(PoolAddress.address).filter_by(coin_name=BHD_COIN_NAME).all()
@@ -64,6 +66,7 @@ def bhd_converge():
 
 
 @celery.task
+@distributed_lock
 def usdt_converge():
     addresses_balance = usdt_client.get_all_addresses_balance()
     for address_balance in addresses_balance:

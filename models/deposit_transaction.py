@@ -7,9 +7,10 @@
 from datetime import datetime
 from conf import DEPOSIT_CONFIRMING
 from models import db
+from models.base import BaseModel
 
 
-class DepositTranscation(db.Model):
+class DepositTranscation(BaseModel):
     __tablename__ = 'pool_deposit_transaction'
     id = db.Column(db.Integer, primary_key=True)
     # 用户id

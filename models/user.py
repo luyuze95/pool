@@ -5,10 +5,7 @@
     @date: 2019/5/29
 """
 
-
 from datetime import datetime
-
-from sqlalchemy import func
 
 from models import db
 

@@ -8,9 +8,10 @@
 from datetime import datetime
 
 from models import db
+from models.base import BaseModel
 
 
-class IncomeMixin(object):
+class IncomeMixin(BaseModel):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     # 用户id

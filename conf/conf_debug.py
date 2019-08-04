@@ -28,6 +28,7 @@ REDIS_PORT = 6379
 # miner capacity
 CAPACITY_DB = 9
 AUTH_DB = 0
+LOCK_DB = 1
 
 
 ''' mysql config'''

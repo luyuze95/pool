@@ -4,8 +4,6 @@
     @author: anzz
     @date: 2019/6/25
 """
-from datetime import datetime
-from time import time
 
 from app import celery
 from conf import *
@@ -16,9 +14,11 @@ from models.remote_pledge import RemotePledgeAddress, RemotePledgeTransaction, \
     TeamWorkRecordActivity
 from models.user_asset import UserAsset
 from rpc import bhd_client
+from schedule.distributed_lock_decorator import distributed_lock
 
 
 @celery.task
+@distributed_lock
 def statistic_pledges():
     """
     检查链上借贷交易，并给用户添加借贷资产
@@ -29,9 +29,7 @@ def statistic_pledges():
         return
     for pledge in pledges:
         amount = pledge['amount']
-        blockhash = pledge['blockhash']
         blockheight = pledge['blockheight']
-        blocktime = pledge['blocktime']
         category = pledge['category']
         from_address = pledge['from']
         to_address = pledge['to']
@@ -79,6 +77,7 @@ def statistic_pledges():
 
 
 @celery.task
+@distributed_lock
 def check_pledges():
     """
     对比库中和链上数据，检查抵押状态的交易是否撤销，并处理。
@@ -161,16 +160,6 @@ def check_pledges():
                     TeamWorkRecordActivity.create_time.asc()
                 ).with_for_update(read=True).all()
 
-                # 合作中订单需要的总金额
-                # coop_total = TeamWorkRecordActivity.query.with_entities(
-                #     func.sum(
-                #         TeamWorkRecordActivity.amount
-                #     )).filter_by(
-                #     account_key=remote_pledge.account_key,
-                #     status=TeamWorking).first()[0]
-                # if not coop_total:
-                #     coop_total = 0
-
                 # 合作违约金额= 用户需要金额-剩余金额
                 gap_amount = coop_freeze_asset - user_asset.coop_freeze_asset
 
@@ -211,4 +200,4 @@ def check_pledges():
 
 
 if __name__ == '__main__':
-    check_pledges()
+    check_pledges.delay()

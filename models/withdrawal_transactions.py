@@ -8,9 +8,10 @@ from _decimal import ROUND_DOWN
 from datetime import datetime
 from models import db
 from conf import *
+from models.base import BaseModel
 
 
-class WithdrawalTransaction(db.Model):
+class WithdrawalTransaction(BaseModel):
     __tablename__ = 'pool_withdrawal_transaction'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)

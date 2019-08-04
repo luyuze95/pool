@@ -8,9 +8,10 @@
 
 from datetime import datetime
 from models import db
+from models.base import BaseModel
 
 
-class ActivityReward(db.Model):
+class ActivityReward(BaseModel):
     __tablename__ = 'pool_capacity_winning_record_activity'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)

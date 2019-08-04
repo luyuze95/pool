@@ -14,6 +14,7 @@ from models.pool_address import PoolAddress
 from models.user_asset import UserAsset
 from rpc import usdt_client
 from rpc.bhd_rpc import bhd_client
+from schedule.distributed_lock_decorator import distributed_lock
 from utils.msyql_ins import initialize_offset
 
 
@@ -91,6 +92,7 @@ def bhd_block_number_deposit_task(block_number, series):
 
 
 @celery.task
+@distributed_lock
 def bhd_deposit_scan():
     # 获取所有地址收款交易
     addresses_transactions = bhd_client.list_received_by_address()
@@ -188,6 +190,7 @@ def usdt_deposit_scan():
 
 
 @celery.task
+@distributed_lock
 def confirm_deposit_transaction():
     confirming_deposit_transactions = DepositTranscation.query.filter_by(
         status=DEPOSIT_CONFIRMING).all()
@@ -205,6 +208,7 @@ def confirm_deposit_transaction():
 
 
 @celery.task
+@distributed_lock
 def deposit_add_asset():
     confirmed_deposit_transactions = DepositTranscation.query.filter_by(
         status=DEPOSIT_CONFIRMED).all()

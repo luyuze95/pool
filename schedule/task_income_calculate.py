@@ -15,16 +15,14 @@ from models.income_record import IncomeRecord, IncomeEcologyRecord
 from models.user_asset import UserAsset
 from rpc.bhd_rpc import bhd_client
 from conf import *
+from schedule.distributed_lock_decorator import distributed_lock
 from utils.redis_ins import redis_capacity
 
 
 @celery.task
+@distributed_lock
 def calculate_income():
     # 查询未统计收益
-    calculate_income_lock = redis_capacity.get("calculate_income_lock")
-    if calculate_income_lock:
-        return
-    redis_capacity.set("calculate_income_lock", 1)
     latest_height = bhd_client.get_latest_block_number()
     mature_height = latest_height - 100
     not_add_incomes = IncomeRecord.query.filter(and_(IncomeRecord.is_add_asset==0,
@@ -56,7 +54,6 @@ def calculate_income():
         except Exception as e:
             celery_logger.error("calculate_income error:%s" % str(e))
             db.session.rollback()
-    redis_capacity.delete("calculate_income_lock")
 
 
 @celery.task
@@ -92,10 +89,6 @@ def calculate_income_ecol():
 
 @celery.task
 def calculate_activity_reward():
-    calculate_activity_reward_lock = redis_capacity.get("calculate_activity_reward_lock")
-    if calculate_activity_reward_lock:
-        return
-    redis_capacity.set("calculate_activity_reward_lock", 1)
     rewards = ActivityReward.query.filter_by(is_add_asset=0).all()
     if not rewards:
         return
@@ -121,4 +114,3 @@ def calculate_activity_reward():
         except Exception as e:
             celery_logger.error("calculate_activity_reward error:%s" % str(e))
             db.session.rollback()
-    redis_capacity.delete("calculate_activity_reward_lock")

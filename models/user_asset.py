@@ -11,9 +11,10 @@ from sqlalchemy import func
 
 from conf import *
 from models import db
+from models.base import BaseModel
 
 
-class UserAsset(db.Model):
+class UserAsset(BaseModel):
     __tablename__ = 'pool_user_asset'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
