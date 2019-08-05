@@ -101,6 +101,7 @@ def check_pledges():
 
             if not user_asset:
                 continue
+            celery_logger.info("user_asset before deduct %s" % user_asset.to_dict())
             coop_freeze_asset = user_asset.coop_freeze_asset
             remote_pledge_amount = remote_pledge.pledge_amount
             # 首先扣掉远程借贷总数
@@ -192,6 +193,8 @@ def check_pledges():
                         billing = Billings(user_asset.account_key, security_deposit, '', '', COOP_FINE)
                         db.session.add(billing)
                         celery_logger.info("deduct security deposit %s " % billing.to_dict())
+            celery_logger.info(
+                "user_asset after deduct %s" % user_asset.to_dict())
             remote_pledge.status = DEBIT_UNDONE
             db.session.commit()
         except Exception as e:

@@ -80,6 +80,10 @@ class UserAsset(BaseModel):
                 "remote_freeze_asset": self.remote_freeze_asset,
                 # 合作冻结
                 "coop_freeze_asset": self.coop_freeze_asset,
+                # 指向用于抵押
+                "remote_4pledge_asset": self.remote_4pledge_asset,
+                # 指向用于合作
+                "remote_4coop_asset": self.remote_4coop_asset,
                 # 可用抵押资产
                 "available_pledge_asset": self.get_available_pledge_amount(),
                 # 可用保证金

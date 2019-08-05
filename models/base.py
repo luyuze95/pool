@@ -12,6 +12,8 @@ from models import db
 
 class BaseModel(db.Model):
 
+    __abstract__ = True
+
     def __setattr__(self, key, value):
         super().__setattr__(key, value)
         if key != "update_time":

@@ -12,6 +12,7 @@ from models.base import BaseModel
 
 
 class IncomeMixin(BaseModel):
+    __abstract__ = True
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     # 用户id
