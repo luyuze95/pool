@@ -98,3 +98,4 @@ MIN_CONVERGE_AMOUNT_BHD = Decimal('0.1')
 MIN_CONVERGE_AMOUNT_USDT = Decimal('1')
 # 手续费保留金
 POUNDAGE_BALANCE = Decimal('0.00006')
+MIN_FEE = Decimal('0.001')

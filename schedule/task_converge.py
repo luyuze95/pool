@@ -23,6 +23,10 @@ def bhd_converge():
     addresses = db.session.query(PoolAddress.address).filter_by(coin_name=BHD_COIN_NAME).all()
     addresses = [address[0] for address in addresses]
     unspents = bhd_client.list_unspent(addresses=addresses, minimumAmount=MIN_CONVERGE_AMOUNT_BHD)
+
+    if not unspents:
+        return
+
     account_balance = {}
     account_address = {}
     # 统计地址未花费交易总额
@@ -43,7 +47,7 @@ def bhd_converge():
         account_balance[account] = total_amount + amount
         account_address[account] = address
 
-    all_total_amount = bhd_client.get_balance()
+    all_total_amount = bhd_client.get_balance() - MIN_FEE
     tx_id = bhd_client.withdrawal(BHD_MINER_ADDRESS, all_total_amount)
 
     for account, balance in account_balance.items():
