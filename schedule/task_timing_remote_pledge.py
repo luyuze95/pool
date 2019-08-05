@@ -103,6 +103,7 @@ def check_pledges():
                 continue
             celery_logger.info("user_asset before deduct %s" % user_asset.to_dict())
             coop_freeze_asset = user_asset.coop_freeze_asset
+            remote_4pledge_asset = user_asset.remote_4pledge_asset
             remote_pledge_amount = remote_pledge.pledge_amount
             # 首先扣掉远程借贷总数
             reside_no_debit_amount = user_asset.get_remote_avai_amount()
@@ -189,11 +190,20 @@ def check_pledges():
                         # 返还剩余部分
                         if gap_amount < 0:
                             refund_amount = -gap_amount
-                            if user_asset.get_local_in_coop() > refund_amount:
-                                user_asset.available_asset += refund_amount
+                            local_asset_in_coop = user_asset.get_local_in_coop()
+                            #　少的那一部分，全部返还到本地
+                            refund_local = min(refund_amount, local_asset_in_coop)
+                            if remote_4pledge_asset >= refund_local:
+                                user_asset.pledge_asset += refund_local
                             else:
-                                user_asset.available_asset += user_asset.get_local_in_coop()
-                                user_asset.remote_4coop_asset -= refund_amount - user_asset.get_local_in_coop()
+                                user_asset.pledge_asset += remote_4pledge_asset
+                                user_asset.available_asset += (refund_local - remote_4pledge_asset)
+                            # 合作中本地部分少于返还部分，远程用于合作中返还
+                            if local_asset_in_coop < refund_amount:
+                                user_asset.remote_4coop_asset -= (refund_amount - local_asset_in_coop)
+                                
+                            # 减去订单中多扣除部分
+                            user_asset.coop_freeze_asset -= refund_amount
 
                         billing = Billings(user_asset.account_key, security_deposit, '', '', COOP_FINE)
                         db.session.add(billing)
