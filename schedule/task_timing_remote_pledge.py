@@ -168,27 +168,32 @@ def check_pledges():
                     # 实际抵押金额不满足需要金额
                     if team_works:
                         security_deposit = remote_pledge_amount/9
+                        gap_amount += security_deposit
                         for team_work in team_works:
-                            team_work.status = BadTeamWork
                             if gap_amount > 0:
                                 # 扣除违约订单，部分扣除的返还剩余部分。
+                                team_work.status = BadTeamWork
                                 gap_amount -= team_work.coo_amount
+                            else:
+                                break
                         # 扣除违约金 可用>合作>抵押
                         # 合作冻结中可扣 = 合作冻结 - 远程借贷合作
                         margin_in_coop = user_asset.coop_freeze_asset - user_asset.remote_4coop_asset
                         deduct_local_pledge_amount = security_deposit - margin_in_coop
                         if deduct_local_pledge_amount > 0:
                             user_asset.pledge_asset -= deduct_local_pledge_amount
-                        user_asset.coop_freeze_asset -= margin_in_coop
+                            user_asset.coop_freeze_asset = 0
+                        else:
+                            user_asset.coop_freeze_asset -= security_deposit
                         user_asset.total_asset -= security_deposit
                         # 返还剩余部分
                         if gap_amount < 0:
                             refund_amount = -gap_amount
-                            if user_asset.remote_4coop_asset > refund_amount:
-                                user_asset.remote_4coop_asset -= refund_amount
+                            if user_asset.get_local_in_coop() > refund_amount:
+                                user_asset.available_asset += refund_amount
                             else:
-                                user_asset.available_asset += refund_amount-user_asset.remote_4coop_asset
-                                user_asset.remote_4coop_asset = 0
+                                user_asset.available_asset += user_asset.get_local_in_coop()
+                                user_asset.remote_4coop_asset -= refund_amount - user_asset.get_local_in_coop()
 
                         billing = Billings(user_asset.account_key, security_deposit, '', '', COOP_FINE)
                         db.session.add(billing)

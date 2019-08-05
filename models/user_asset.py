@@ -122,4 +122,6 @@ class UserAsset(BaseModel):
         available_withdrawal_asset = total_asset - self.remote_freeze_asset/9*10
         return available_withdrawal_asset
 
+    def get_local_in_coop(self):
+        return self.coop_freeze_asset - self.remote_4coop_asset
 
