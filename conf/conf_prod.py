@@ -65,7 +65,7 @@ JOB_TOPIC_BHD = "JobMakerMsgBhd"
 LATEST_BLOCK_MININGINFO = "latestBlockMiniInfo"
 
 GBT_TOPIC_NEWBI = "NewBiRaw"
-JOB_TOPIC_NEWBI = "JobMakerMsgNew"
+JOB_TOPIC_NEWBI = "JobMakerMsgNewbi"
 NEWBI_LATEST_BLOCK_MININGINFO = "newBilatestBlockMiniInfon"
 
 

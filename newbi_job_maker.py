@@ -41,14 +41,13 @@ def handler_gbt_msg(gbt_msg_str):
 
     block_template = json.loads(block_template_str)
 
-    gbt_result = block_template['result']
+    gbt_result = block_template
 
     baseTarget = gbt_result['baseTarget']
     generationSignature = gbt_result['generationSignature']
-    targetDeadline = gbt_result['targetDeadline']
     height = gbt_result['height']
 
-    if height in gbt_height_msgs.keys() and targetDeadline == gbt_height_msgs[height]['targetDeadline']:
+    if height in gbt_height_msgs.keys():
         return gbt_height_msgs.get(height)
 
     if gbt_height_msgs:
@@ -72,7 +71,6 @@ def handler_gbt_msg(gbt_msg_str):
         "height": height,
         "job_id": str(time()) + str(height),
         "current_time": time(),
-        "targetDeadline": targetDeadline
     }
 
     job_maker_logger.info("send newbi handle msg ", stratum_msg)

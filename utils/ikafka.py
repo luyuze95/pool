@@ -57,7 +57,7 @@ class MyKafkaProducer(object):
 
 
 consumer = KafkaConsumer(GBT_TOPIC_BHD, LATEST_BLOCK_MININGINFO, bootstrap_servers=KAFKA_HOST)
-newbi_consumer = KafkaConsumer(GBT_TOPIC_BHD, NEWBI_LATEST_BLOCK_MININGINFO, bootstrap_servers=KAFKA_HOST)
+newbi_consumer = KafkaConsumer(GBT_TOPIC_NEWBI, NEWBI_LATEST_BLOCK_MININGINFO, bootstrap_servers=KAFKA_HOST)
 
 job_producer = MyKafkaProducer(JOB_TOPIC_BHD)
 

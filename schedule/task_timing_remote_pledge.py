@@ -103,7 +103,7 @@ def check_pledges():
                 continue
             celery_logger.info("user_asset before deduct %s" % user_asset.to_dict())
             coop_freeze_asset = user_asset.coop_freeze_asset
-            remote_4pledge_asset = user_asset.remote_4pledge_asset
+            total_pledge_amount = user_asset.get_pledge_amount()
             remote_pledge_amount = remote_pledge.pledge_amount
             # 首先扣掉远程借贷总数
             reside_no_debit_amount = user_asset.get_remote_avai_amount()
@@ -147,8 +147,7 @@ def check_pledges():
                         user_asset.coop_freeze_asset -= deduct_coop_freeze
                     else:
                         user_asset.pledge_asset += user_asset.available_asset
-                        deduct_pledge_amount_actual = deduct_pledge_amount - user_asset.available_asset
-                        user_asset.remote_4pledge_asset -= deduct_pledge_amount_actual
+                        user_asset.remote_4pledge_asset = user_asset.remote_freeze_asset
                         user_asset.coop_freeze_asset -= user_asset.remote_4coop_asset
                     user_asset.remote_4coop_asset = 0
                 user_asset.available_asset = 0
@@ -193,11 +192,12 @@ def check_pledges():
                             local_asset_in_coop = user_asset.get_local_in_coop()
                             #　少的那一部分，全部返还到本地
                             refund_local = min(refund_amount, local_asset_in_coop)
-                            if remote_4pledge_asset >= refund_local:
+                            deduct_remote_pledge_asset = total_pledge_amount - user_asset.get_pledge_amount()
+                            if deduct_remote_pledge_asset >= refund_local:
                                 user_asset.pledge_asset += refund_local
                             else:
-                                user_asset.pledge_asset += remote_4pledge_asset
-                                user_asset.available_asset += (refund_local - remote_4pledge_asset)
+                                user_asset.pledge_asset += deduct_remote_pledge_asset
+                                user_asset.available_asset += (refund_local - deduct_remote_pledge_asset)
                             # 合作中本地部分少于返还部分，远程用于合作中返还
                             if local_asset_in_coop < refund_amount:
                                 user_asset.remote_4coop_asset -= (refund_amount - local_asset_in_coop)
