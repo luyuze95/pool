@@ -64,6 +64,10 @@ GBT_TOPIC_BHD = "BitcoinHDRaw"
 JOB_TOPIC_BHD = "JobMakerMsgBhd"
 LATEST_BLOCK_MININGINFO = "latestBlockMiniInfo"
 
+GBT_TOPIC_NEWBI = "NewBiRaw"
+JOB_TOPIC_NEWBI = "JobMakerMsgNew"
+NEWBI_LATEST_BLOCK_MININGINFO = "newBilatestBlockMiniInfon"
+
 
 #################### wallet settings #########################
 ''' bhd node config'''

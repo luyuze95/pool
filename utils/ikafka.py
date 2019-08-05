@@ -12,8 +12,7 @@ from kafka import KafkaProducer
 from kafka.errors import KafkaError, KafkaTimeoutError
 
 from logs import job_maker_logger
-from conf import KAFKA_HOST, GBT_TOPIC_BHD, JOB_TOPIC_BHD, \
-    LATEST_BLOCK_MININGINFO
+from conf import *
 
 
 class KafkaClient(object):
@@ -58,6 +57,7 @@ class MyKafkaProducer(object):
 
 
 consumer = KafkaConsumer(GBT_TOPIC_BHD, LATEST_BLOCK_MININGINFO, bootstrap_servers=KAFKA_HOST)
+newbi_consumer = KafkaConsumer(GBT_TOPIC_BHD, NEWBI_LATEST_BLOCK_MININGINFO, bootstrap_servers=KAFKA_HOST)
 
 job_producer = MyKafkaProducer(JOB_TOPIC_BHD)
 
