@@ -45,11 +45,13 @@ class BurstBlockApi(Resource):
 
         if coin_name == BHD_COIN_NAME:
             model = BurstBlock
+            query_deadline = model.deadline
         else:
             model = NBBurstBlock
+            query_deadline = literal("0")
 
         coop_query = db.session.query(model.plotter_id, model.height,
-                                      model.deadline,
+                                      query_deadline,
                                       model.create_time.label(
                                           'create_time'),
                                       literal("coop")

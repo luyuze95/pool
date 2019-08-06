@@ -12,7 +12,7 @@ from rpc.usdt_rpc import usdt_client
 
 def get_rpc(coin_name):
     client = None
-    if coin_name not in (BHD_COIN_NAME, USDT_NAME):
+    if coin_name not in (BHD_COIN_NAME, USDT_NAME, NEWBI_NAME):
         raise Exception("币种不存在")
     if coin_name == BHD_COIN_NAME:
         client = bhd_client

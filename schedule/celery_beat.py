@@ -12,6 +12,7 @@ from conf import *
 from schedule.task_bhd_deposit import confirm_deposit_transaction, \
     deposit_add_asset, bhd_deposit_scan, usdt_deposit_scan, nb_deposit_scan
 from schedule.task_converge import bhd_converge, usdt_converge
+from schedule.task_email import email_sender_task
 from schedule.task_income_calculate import calculate_income, \
     calculate_activity_reward, nb_calculate_income
 from schedule.task_withdrawal import withdrawal_coin, withdrawal_confirm

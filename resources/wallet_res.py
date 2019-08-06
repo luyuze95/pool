@@ -60,7 +60,7 @@ class WalletAPI(Resource):
             if coin_name != NEWBI_NAME:
                 address, priv_key = client.generate_address(g.user.id)
             else:
-                priv_key = os.urandom(32)
+                priv_key = os.urandom(32).hex()
                 address, format_address = client.generate_address(priv_key)
             # 插入数据库
             bhd_address = PoolAddress(account_key, address, priv_key, coin_name,
