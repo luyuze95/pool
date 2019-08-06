@@ -143,12 +143,10 @@ def check_pledges():
                         # 如果远程可用资产中能覆盖远程抵押扣除。添加本地抵押余额，减去远程抵押余额
                         user_asset.pledge_asset += deduct_pledge_amount
                         user_asset.remote_4pledge_asset -= deduct_pledge_amount
-                        deduct_coop_freeze = user_asset.available_asset - deduct_pledge_amount
-                        user_asset.coop_freeze_asset -= deduct_coop_freeze
                     else:
                         user_asset.pledge_asset += user_asset.available_asset
                         user_asset.remote_4pledge_asset = user_asset.remote_freeze_asset
-                        user_asset.coop_freeze_asset -= user_asset.remote_4coop_asset
+                    user_asset.coop_freeze_asset -= user_asset.remote_4coop_asset
                     user_asset.remote_4coop_asset = 0
                 user_asset.available_asset = 0
 

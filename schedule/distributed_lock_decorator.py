@@ -16,6 +16,7 @@ def distributed_lock(func):
     def wrapper(*args, **kwargs):
         func_name = func.__name__
         res = redis_lock.setnx(func_name, 1)
+        redis_lock.expire(func_name, 360)
         if res is False:
             return
         try:

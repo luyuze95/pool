@@ -33,7 +33,7 @@ def bhd_converge():
     for unspent_trx in unspents:
         address = unspent_trx['address']
         # 老大地址，因为和primary 在一个account，特殊处理。
-        if address == BHD_MINER_ADDRESS or address == "3GE4X3AkV17LMnVGELVe8W8vFoBn9y8niR":
+        if address == BHD_MINER_ADDRESS:
             continue
         account = unspent_trx['account']
         amount = unspent_trx['amount']
