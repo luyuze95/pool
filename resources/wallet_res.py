@@ -221,6 +221,8 @@ class UserAssetTransferInfoAPI(Resource):
         end_dt = datetime.fromtimestamp(end_ts)
         kwargs = {"account_key": account_key}
 
+        if not coin_name:
+            coin_name = BHD_COIN_NAME
         if coin_name:
             kwargs['coin_name'] = coin_name
         if status:

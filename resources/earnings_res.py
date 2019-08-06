@@ -32,7 +32,9 @@ class EarningsTotalApi(Resource):
         parse = reqparse.RequestParser()
         parse.add_argument('coin_name', type=str, required=False)
         args = parse.parse_args()
-        coin_name = args.get('coin_name', BHD_COIN_NAME)
+        coin_name = args.get('coin_name')
+        if not coin_name:
+            coin_name = BHD_COIN_NAME
 
         if coin_name == BHD_COIN_NAME:
             model = IncomeRecord
@@ -118,11 +120,13 @@ class DayEarningsApi(Resource):
         offset = args.get('offset')
         from_ts = args.get('from')
         end_ts = args.get('end')
-        coin_name = args.get('coin_name', BHD_COIN_NAME)
+        coin_name = args.get('coin_name')
         status = args.get('status')
         from_dt = datetime.fromtimestamp(from_ts)
         end_dt = datetime.fromtimestamp(end_ts)
         kwargs = {"account_key": account_key}
+        if not coin_name:
+            coin_name = BHD_COIN_NAME
         if coin_name == BHD_COIN_NAME:
             model = IncomeRecord
         else:
@@ -187,7 +191,7 @@ class MiningIncomeApi(Resource):
         offset = args.get('offset')
         from_ts = args.get('from')
         end_ts = args.get('end')
-        coin_name = args.get('coin_name', BHD_COIN_NAME)
+        coin_name = args.get('coin_name')
         status = args.get('status')
         mining_type = args.get('type')
         if mining_type in [IncomeTypeMining, IncomeTYpeMiningEcol]:
@@ -197,6 +201,8 @@ class MiningIncomeApi(Resource):
         from_dt = datetime.fromtimestamp(from_ts)
         end_dt = datetime.fromtimestamp(end_ts)
         kwargs = {"account_key": account_key}
+        if not coin_name:
+            coin_name = BHD_COIN_NAME
         if coin_name == BHD_COIN_NAME:
             model = IncomeRecord
         else:

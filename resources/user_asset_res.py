@@ -31,9 +31,11 @@ class UserAssetApi(Resource):
         """
         account_key = g.account_key
         parse = reqparse.RequestParser()
-        parse.add_argument('coin_name', type=str, required=True)
+        parse.add_argument('coin_name', type=str, required=False)
         args = parse.parse_args()
         coin_name = args.get('coin_name')
+        if not coin_name:
+            coin_name = BHD_COIN_NAME
 
         user_asset = UserAsset.query.filter_by(account_key=account_key,
                                                coin_name=coin_name).first()
