@@ -8,10 +8,10 @@
 from celery import Celery
 
 
-def make_celery(app):
+def make_celery(app, broker='CELERY_BROKER_URL', backend='CELERY_BACKEND_URL'):
     celery = Celery(app.import_name,
-                    broker=app.config['CELERY_BROKER_URL'],
-                    backend=app.config['CELERY_BACKEND_URL'],
+                    broker=app.config[broker],
+                    backend=app.config[backend],
                     )
 
     celery.conf.update(

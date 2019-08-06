@@ -72,3 +72,7 @@ class IncomeRecord(IncomeMixin, db.Model):
 
 class IncomeEcologyRecord(IncomeMixin, db.Model):
     __tablename__ = 'pool_bhd_ecology_income_record'
+
+
+class NBIncomeRecord(IncomeMixin, db.Model):
+    __tablename__ = 'pool_newbi_income_record'

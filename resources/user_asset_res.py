@@ -40,7 +40,7 @@ class UserAssetApi(Resource):
         if not user_asset:
             return make_resp(404, False)
         context = user_asset.to_dict()
-        if coin_name == USDT_NAME:
+        if coin_name != BHD_COIN_NAME:
             return make_resp(200, True, **context)
         keys = "miner:main:%s:*" % account_key
         miner_machines = redis_capacity.keys(keys)

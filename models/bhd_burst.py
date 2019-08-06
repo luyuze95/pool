@@ -45,3 +45,7 @@ class BurstBlock(BurstBlockMixin, db.Model):
 
 class EcolBurstBlock(BurstBlockMixin, db.Model):
     __tablename__ = 'pool_bhd_ecology_burst'
+
+
+class NBBurstBlock(BurstBlockMixin, db.Model):
+    __tablename__ = 'pool_newbi_burst'

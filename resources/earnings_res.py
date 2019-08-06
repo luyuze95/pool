@@ -4,7 +4,7 @@
     @author: anzz
     @date: 2019/5/30
 """
-import json
+
 import time
 from datetime import datetime
 
@@ -13,7 +13,7 @@ from flask_restful import Resource, reqparse
 from sqlalchemy import func, and_
 
 from models.activity_reward import ActivityReward
-from models.income_record import IncomeRecord, IncomeEcologyRecord
+from models.income_record import IncomeRecord, NBIncomeRecord
 from resources.auth_decorator import login_required
 from rpc import bhd_client
 from utils.response import make_resp
@@ -28,23 +28,40 @@ class EarningsTotalApi(Resource):
         获取用户总收益
         :return:
         """
+
+        parse = reqparse.RequestParser()
+        parse.add_argument('coin_name', type=str, required=False)
+        args = parse.parse_args()
+        coin_name = args.get('coin_name', BHD_COIN_NAME)
+
+        if coin_name == BHD_COIN_NAME:
+            model = IncomeRecord
+        elif coin_name == NEWBI_NAME:
+            model = NBIncomeRecord
+        else:
+            return make_resp(400, False, message="请求币种错误")
+
         account_key = g.account_key
         # 合作-裸挖-挖矿总收入
-        mining_total_amount = IncomeRecord.query.filter_by(
+        mining_total_amount = model.query.filter_by(
             account_key=account_key
         ).filter(
-            IncomeRecord.type.in_([IncomeTypeMining, IncomeTYpeMiningEcol])
-        ).with_entities(func.sum(IncomeRecord.amount)).first()[0]
+            model.type.in_([IncomeTypeMining, IncomeTYpeMiningEcol])
+        ).with_entities(func.sum(model.amount)).first()[0]
 
         # 昨天挖矿所得
-        mining_last_day = IncomeRecord.query.filter_by(
+        mining_last_day = model.query.filter_by(
             account_key=account_key
         ).filter(
-            func.to_days(IncomeRecord.create_time) == func.to_days(func.now())-1
+            func.to_days(model.create_time) == func.to_days(func.now())-1
         ).filter(
-            IncomeRecord.type.in_([IncomeTypeMining, IncomeTYpeMiningEcol])
+            model.type.in_([IncomeTypeMining, IncomeTYpeMiningEcol])
         ).with_entities(
-            func.sum(IncomeRecord.amount)).first()[0]
+            func.sum(model.amount)).first()[0]
+
+        if coin_name == NEWBI_NAME:
+            return make_resp(mining_total_amount=mining_total_amount,
+                             mining_last_day=mining_last_day)
 
         # 合作所得总
         coop_total_amount = IncomeRecord.query.filter_by(
@@ -101,12 +118,15 @@ class DayEarningsApi(Resource):
         offset = args.get('offset')
         from_ts = args.get('from')
         end_ts = args.get('end')
-        coin_name = args.get('coin_name')
+        coin_name = args.get('coin_name', BHD_COIN_NAME)
         status = args.get('status')
         from_dt = datetime.fromtimestamp(from_ts)
         end_dt = datetime.fromtimestamp(end_ts)
         kwargs = {"account_key": account_key}
-        model = IncomeRecord
+        if coin_name == BHD_COIN_NAME:
+            model = IncomeRecord
+        else:
+            model = NBIncomeRecord
 
         infos = model.query.filter_by(
             **kwargs
@@ -167,7 +187,7 @@ class MiningIncomeApi(Resource):
         offset = args.get('offset')
         from_ts = args.get('from')
         end_ts = args.get('end')
-        coin_name = args.get('coin_name')
+        coin_name = args.get('coin_name', BHD_COIN_NAME)
         status = args.get('status')
         mining_type = args.get('type')
         if mining_type in [IncomeTypeMining, IncomeTYpeMiningEcol]:
@@ -177,7 +197,10 @@ class MiningIncomeApi(Resource):
         from_dt = datetime.fromtimestamp(from_ts)
         end_dt = datetime.fromtimestamp(end_ts)
         kwargs = {"account_key": account_key}
-        model = IncomeRecord
+        if coin_name == BHD_COIN_NAME:
+            model = IncomeRecord
+        else:
+            model = NBIncomeRecord
         infos = model.query.filter_by(
             **kwargs
         ).filter(

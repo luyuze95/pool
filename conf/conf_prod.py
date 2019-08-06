@@ -83,18 +83,27 @@ USDT_CONVERGE_ADDRESS = USDT_WITHDRAWAL_ADDRESS
 USDT_URI = 'http://f1poolusdt:f1pool7ujMko0admin@pool.usdt.server:6666'
 USDT_NAME = "usdt"
 
+""" newbi node config"""
+NEWBI_NODE_URI = "http://47.75.133.66:8125/burst"
+NEWBI_ACCOUNT = "NEWBI-TRJF-WX42-WMUP-7E7F8"
+# NEWBI_ACCOUNT = "NEWBI-N8AF-3AR9-RRHT-BBBBB"
+NEWBI_ACCOUNT_PASSWORD = "7ujMko0admin"
+NEWBI_NAME = "newbi"
+
 
 # 全抵押和非全抵押收益
 MORTGAGE_YIELD_RATE = Decimal('1')
 NOT_MORTGAGE_YIELD_RATE = Decimal('0.3')
 
 MIN_DEPOSIT_AMOUNT = {
-    BHD_COIN_NAME: Decimal("0.0001")
+    BHD_COIN_NAME: Decimal("0.0001"),
+    NEWBI_NAME: Decimal("0.1")
 }
 
 MIN_CONFIRMED = {
     BHD_COIN_NAME: 3,
     USDT_NAME: 3,
+    NEWBI_NAME: 6,
 }
 
 # 最小汇聚余额

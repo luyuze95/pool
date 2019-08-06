@@ -6,6 +6,7 @@
 """
 from conf import *
 from rpc.bhd_rpc import bhd_client
+from rpc.nb_rpc import nb_client
 from rpc.usdt_rpc import usdt_client
 
 
@@ -17,4 +18,6 @@ def get_rpc(coin_name):
         client = bhd_client
     if coin_name == USDT_NAME:
         client = usdt_client
+    if coin_name == NEWBI_NAME:
+        client = nb_client
     return client

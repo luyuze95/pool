@@ -19,16 +19,18 @@ class PoolAddress(BaseModel):
     account_key = db.Column(db.String(64), index=True)
     coin_name = db.Column(db.String(64), default=BHD_COIN_NAME, nullable=False)
     address = db.Column(db.String(42), index=True, nullable=False)
+    address_rs = db.Column(db.String(26), index=True, nullable=False)
     private_key_crypto = db.Column(db.BLOB(1024), nullable=False)
     create_time = db.Column(db.TIMESTAMP(), default=datetime.now)
     update_time = db.Column(db.TIMESTAMP(), default=datetime.now)
 
     def __init__(self, account_key, address, private_key,
-                 coin_name=BHD_COIN_NAME) -> None:
+                 coin_name=BHD_COIN_NAME, address_rs="") -> None:
         self.account_key = account_key
         self.address = address
         self.private_key = private_key
         self.coin_name = coin_name
+        self.address_rs = address_rs
 
     @property
     def private_key(self):
@@ -49,6 +51,7 @@ class PoolAddress(BaseModel):
         dict_addr = {
             "account_key": self.account_key,
             "address": self.address,
+            "address_rs": self.address_rs,
             "coin_name": self.coin_name,
             "create_time": str(self.create_time),
             "update_time": str(self.update_time),

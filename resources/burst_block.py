@@ -13,9 +13,10 @@ from flask_restful import Resource, reqparse
 from sqlalchemy import and_, literal
 
 from models import db
-from models.bhd_burst import BurstBlock, EcolBurstBlock
+from models.bhd_burst import BurstBlock, EcolBurstBlock, NBBurstBlock
 from resources.auth_decorator import login_required
 from utils.response import make_resp
+from conf import *
 
 
 class BurstBlockApi(Resource):
@@ -36,21 +37,31 @@ class BurstBlockApi(Resource):
         offset = args.get('offset')
         from_ts = args.get('from')
         end_ts = args.get('end')
-        coin_name = args.get('coin_name')
+        coin_name = args.get('coin_name', BHD_COIN_NAME)
         status = args.get('status')
         from_dt = datetime.fromtimestamp(from_ts)
         end_dt = datetime.fromtimestamp(end_ts)
         kwargs = {"account_key": account_key}
 
-        coop_query = db.session.query(BurstBlock.plotter_id, BurstBlock.height,
-                                      BurstBlock.deadline,
-                                      BurstBlock.create_time.label(
+        if coin_name == BHD_COIN_NAME:
+            model = BurstBlock
+        else:
+            model = NBBurstBlock
+
+        coop_query = db.session.query(model.plotter_id, model.height,
+                                      model.deadline,
+                                      model.create_time.label(
                                           'create_time'),
                                       literal("coop")
                                       ).filter_by(account_key=account_key
                                                   ).filter(
-            and_(BurstBlock.create_time > from_dt,
-                 BurstBlock.create_time < end_dt))
+            and_(model.create_time > from_dt,
+                 model.create_time < end_dt))
+
+        if coin_name == NEWBI_NAME:
+            coops = coop_query.limit(limit).offset(offset).all()
+            coops = [coop.to_dict() for coop in coops]
+            return make_resp(records=coops, total_records=len(coops))
 
         ecol_query = db.session.query(EcolBurstBlock.plotter_id,
                                       EcolBurstBlock.height,

@@ -13,9 +13,10 @@ from sqlalchemy import and_, literal
 
 from models import db
 
-from models.dl_fraction import DeadlineFraction, DeadlineFractionEcology
+from models.dl_fraction import DeadlineFraction, DeadlineFractionEcology, NBDeadlineFraction
 from resources.auth_decorator import login_required
 from utils.response import make_resp
+from conf import *
 
 
 class DeadlineFractionApi(Resource):
@@ -37,23 +38,33 @@ class DeadlineFractionApi(Resource):
         offset = args.get('offset')
         from_ts = args.get('from')
         end_ts = args.get('end')
-        coin_name = args.get('coin_name')
+        coin_name = args.get('coin_name', BHD_COIN_NAME)
         status = args.get('status')
         from_dt = datetime.fromtimestamp(from_ts)
         end_dt = datetime.fromtimestamp(end_ts)
         kwargs = {"account_key": account_key}
 
-        coop_query = db.session.query(DeadlineFraction.height,
+        if coin_name == BHD_COIN_NAME:
+            model = DeadlineFraction
+        else:
+            model = NBDeadlineFraction
+
+        coop_query = db.session.query(model.height,
                                       literal("coop"),
-                                      DeadlineFraction.fraction,
-                                      DeadlineFraction.deadline,
-                                      DeadlineFraction.miner_name,
-                                      DeadlineFraction.plotter_id,
-                                      DeadlineFraction.create_time.label('create_time'),
+                                      model.fraction,
+                                      model.deadline,
+                                      model.miner_name,
+                                      model.plotter_id,
+                                      model.create_time.label('create_time'),
                                       ).filter_by(account_key=account_key
                                                   ).filter(
-            and_(DeadlineFraction.create_time > from_dt,
-                 DeadlineFraction.create_time < end_dt))
+            and_(model.create_time > from_dt,
+                 model.create_time < end_dt))
+
+        if coin_name == NEWBI_NAME:
+            all_dls = coop_query.limit(limit).offset(offset).all()
+            dls = [dl.to_dict() for dl in all_dls]
+            return make_resp(records=dls, total_records=len(dls))
 
         ecol_query = db.session.query(DeadlineFractionEcology.height,
                                       literal("ecol"),

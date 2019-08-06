@@ -56,10 +56,15 @@ class WalletAPI(Resource):
         # 从节点获取地址
         client = get_rpc(coin_name)
         try:
-            address, priv_key = client.generate_address(g.user.id)
-
+            format_address = ""
+            if coin_name != NEWBI_NAME:
+                address, priv_key = client.generate_address(g.user.id)
+            else:
+                priv_key = os.urandom(32)
+                address, format_address = client.generate_address(priv_key)
             # 插入数据库
-            bhd_address = PoolAddress(account_key, address, priv_key, coin_name)
+            bhd_address = PoolAddress(account_key, address, priv_key, coin_name,
+                                      format_address)
             db.session.add(bhd_address)
             db.session.commit()
 
@@ -141,10 +146,11 @@ class WalletAPI(Resource):
         """
         parse = reqparse.RequestParser()
         parse.add_argument('id', type=int, required=True)
+        parse.add_argument('coin_name', type=str)
         args = parse.parse_args()
         account_key = g.account_key
         id = args.get('id')
-        coin_name = BHD_COIN_NAME
+        coin_name = args.get('coin_name', BHD_COIN_NAME)
 
         withdrawal = WithdrawalTransaction.query.filter_by(
             id=id, account_key=account_key).first()
@@ -226,59 +232,20 @@ class UserAssetTransferInfoAPI(Resource):
             kwargs['type'] = IncomeTYpeCoopReward
         if 'ecol_block_earnings' == transaction_type:
             kwargs['type'] = IncomeTYpeMiningEcol
+        infos = model.query.filter_by(
+            **kwargs
+        ).filter(
+            and_(model.create_time > from_dt,
+                 model.create_time < end_dt)
+        ).order_by(
+            model.create_time.desc()
+        ).limit(limit).offset(offset).all()
 
-        if "day_earnings" in transaction_type:
-            infos = model.query.filter_by(
-                **kwargs
-            ).with_entities(
-                model.type, func.sum(model.amount), func.date(model.create_time), func.avg(model.capacity),
-            ).filter(
-                and_(model.create_time > from_dt,
-                     model.create_time < end_dt)
-            ).order_by(
-                model.create_time.desc()
-            ).group_by(
-                model.type,
-                func.date(model.create_time)
-            ).limit(limit).offset(offset).all()
+        total_records = model.query.filter_by(
+            **kwargs
+        ).count()
 
-            total_records = model.query.filter_by(
-                **kwargs
-            ).group_by(
-                func.to_days(model.create_time)
-            ).count()
-
-            date_incomes = {}
-            for income_type, amount, create_time, capacity in infos:
-                create_time = str(create_time)
-                if create_time not in date_incomes:
-                    date_incomes[create_time] = {'coop_income': 0,
-                                                 'mining_income': 0,
-                                                 'capacity': 0}
-                day_income = date_incomes[create_time]
-                filed_name = "coop_income"
-                if income_type == IncomeTypeMining:
-                    filed_name = "mining_income"
-                    day_income["capacity"] = capacity
-                day_income[filed_name] = amount
-                day_income["total_income"] = day_income.get("total_income", 0) + amount
-            records = sorted(date_incomes.items(), key=lambda k: k[0], reverse=True)
-
-        else:
-            infos = model.query.filter_by(
-                **kwargs
-            ).filter(
-                and_(model.create_time > from_dt,
-                     model.create_time < end_dt)
-            ).order_by(
-                model.create_time.desc()
-            ).limit(limit).offset(offset).all()
-
-            total_records = model.query.filter_by(
-                **kwargs
-            ).count()
-
-            records = [info.to_dict() for info in infos]
+        records = [info.to_dict() for info in infos]
         if transaction_type in ['block_earnings', 'coop_income', 'coop_income']:
             latest_height = bhd_client.get_latest_block_number()
             return make_resp(records=records, total_records=total_records, latest_height=latest_height)
