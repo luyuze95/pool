@@ -148,6 +148,7 @@ class AuthServiceProxy(object):
                                'params': args,
                                'id': AuthServiceProxy.__id_count},
                               default=encode_python_object)
+        print(self.__url.path)
         self.__conn.request('POST', self.__url.path, postdata,
                             {'Host': self.__url.hostname,
                              'User-Agent': USER_AGENT,

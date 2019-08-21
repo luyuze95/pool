@@ -127,9 +127,9 @@ nb_client = NBRPCClient(NEWBI_NODE_URI)
 if __name__ == '__main__':
     from pprint import pprint
 
-    # pprint(nb_client.get_account_transactions(NEWBI_ACCOUNT))
+    pprint(nb_client.get_account_transactions(NEWBI_ACCOUNT))
     # pprint(nb_client.block_info())
-    pprint(nb_client.generate_address())
+    # pprint(nb_client.generate_address())
     # pprint(nb_client.get_balance())
     # pprint(nb_client.get_latest_block_number())
     # pprint(nb_client.withdrawal("NEWBI-ZN2F-6V46-LLYH-7WKKF", Decimal('0.01')))

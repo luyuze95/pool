@@ -13,7 +13,8 @@ from sqlalchemy import and_, literal
 
 from models import db
 
-from models.dl_fraction import DeadlineFraction, DeadlineFractionEcology, NBDeadlineFraction
+from models.dl_fraction import DeadlineFraction, DeadlineFractionEcology, \
+    NBDeadlineFraction, LHDDeadlineFraction
 from resources.auth_decorator import login_required
 from utils.response import make_resp
 from conf import *
@@ -48,6 +49,8 @@ class DeadlineFractionApi(Resource):
             coin_name = BHD_COIN_NAME
         if coin_name == BHD_COIN_NAME:
             model = DeadlineFraction
+        elif coin_name == LHD_NAME:
+            model = LHDDeadlineFraction
         else:
             model = NBDeadlineFraction
 

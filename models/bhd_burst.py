@@ -64,3 +64,7 @@ class NBBurstBlock(BurstBlockMixin, db.Model):
         }
 
         return burst_dict
+
+
+class LHDBurstBlock(BurstBlockMixin, db.Model):
+    __tablename__ = 'pool_lhd_burst'

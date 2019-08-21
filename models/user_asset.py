@@ -96,13 +96,13 @@ class UserAsset(BaseModel):
         # 充值+收益=可用+抵押+合作冻结-远程借贷合作部分
         amount = self.available_asset + self.pledge_asset + self.coop_freeze_asset - self.remote_4coop_asset
         # 抵押金
-        margin_amount = self.remote_freeze_asset/9
+        margin_amount = self.remote_freeze_asset / 9
 
         available_margin_asset = amount - margin_amount
         return available_margin_asset
 
     def get_available_pledge_amount(self):
-        return self.available_asset+self.remote_freeze_asset-self.remote_4pledge_asset-self.remote_4coop_asset
+        return self.available_asset + self.remote_freeze_asset - self.remote_4pledge_asset - self.remote_4coop_asset
 
     def get_pledge_amount(self):
         return self.pledge_asset + self.remote_4pledge_asset
@@ -119,9 +119,16 @@ class UserAsset(BaseModel):
     def get_available_withdrawal_amount(self):
         available_asset = self.available_asset + self.get_remote_avai_amount()
         total_asset = available_asset + self.coop_freeze_asset + self.get_pledge_amount()
-        available_withdrawal_asset = total_asset - self.remote_freeze_asset/9*10
+        available_withdrawal_asset = total_asset - self.remote_freeze_asset / 9 * 10
         return available_withdrawal_asset
 
     def get_local_in_coop(self):
         return self.coop_freeze_asset - self.remote_4coop_asset
+
+    def withdrawal_asset(self, amount):
+        # todo 自动合并可提现资产，
+        available_amount = self.get_available_withdrawal_amount()
+        if available_amount < amount:
+            raise Exception("available_amount: %s, withdrawal_amount:%s " %
+                            (available_amount, amount))
 

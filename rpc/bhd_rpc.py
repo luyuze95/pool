@@ -58,7 +58,10 @@ class BhdRpcClient(object):
         return True if data['isvalid'] else False
 
     def unlock_account(self, timeout=5):
-        return self.client.walletpassphrase(self.password, timeout)
+        try:
+            return self.client.walletpassphrase(self.password, timeout)
+        except:
+            pass
 
     def list_accounts(self):
         return self.client.listaccounts()

@@ -112,3 +112,10 @@ MIN_CONVERGE_AMOUNT_USDT = Decimal('1')
 # 手续费保留金
 POUNDAGE_BALANCE = Decimal('0.00006')
 MIN_FEE = Decimal('0.001')
+
+
+""" lhd node config"""
+LHD_NAME = "lhd"
+LHD_NODE_URL = "http://hemon:16761123@47.75.133.66:8888/"
+LHD_WALLET_PASSWORD = "7ujMko0admin"
+LHD_MINER_ADDRESS = "3Qch21MpAtkrUQjHpogDigL9LFCjxci3rP"

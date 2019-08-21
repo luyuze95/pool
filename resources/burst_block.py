@@ -13,7 +13,8 @@ from flask_restful import Resource, reqparse
 from sqlalchemy import and_, literal
 
 from models import db
-from models.bhd_burst import BurstBlock, EcolBurstBlock, NBBurstBlock
+from models.bhd_burst import BurstBlock, EcolBurstBlock, NBBurstBlock, \
+    LHDBurstBlock
 from resources.auth_decorator import login_required
 from utils.response import make_resp
 from conf import *
@@ -48,6 +49,9 @@ class BurstBlockApi(Resource):
 
         if coin_name == BHD_COIN_NAME:
             model = BurstBlock
+            query_deadline = model.deadline
+        elif coin_name == LHD_NAME:
+            model = LHDBurstBlock
             query_deadline = model.deadline
         else:
             model = NBBurstBlock

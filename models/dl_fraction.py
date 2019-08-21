@@ -46,3 +46,7 @@ class DeadlineFractionEcology(DeadlineFractionMixin, db.Model):
 
 class NBDeadlineFraction(DeadlineFractionMixin, db.Model):
     __tablename__ = 'pool_newbi_fraction_record'
+
+
+class LHDDeadlineFraction(DeadlineFractionMixin, db.Model):
+    __tablename__ = 'pool_lhd_fraction_record'

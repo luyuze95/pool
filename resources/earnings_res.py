@@ -13,7 +13,7 @@ from flask_restful import Resource, reqparse
 from sqlalchemy import func, and_
 
 from models.activity_reward import ActivityReward
-from models.income_record import IncomeRecord, NBIncomeRecord
+from models.income_record import IncomeRecord, NBIncomeRecord, LHDIncomeRecord
 from resources.auth_decorator import login_required
 from rpc import bhd_client
 from utils.response import make_resp
@@ -38,6 +38,8 @@ class EarningsTotalApi(Resource):
 
         if coin_name == BHD_COIN_NAME:
             model = IncomeRecord
+        elif coin_name == LHD_NAME:
+            model = LHDIncomeRecord
         elif coin_name == NEWBI_NAME:
             model = NBIncomeRecord
         else:
@@ -129,8 +131,12 @@ class DayEarningsApi(Resource):
             coin_name = BHD_COIN_NAME
         if coin_name == BHD_COIN_NAME:
             model = IncomeRecord
-        else:
+        elif coin_name == LHD_NAME:
+            model = LHDIncomeRecord
+        elif coin_name == NEWBI_NAME:
             model = NBIncomeRecord
+        else:
+            return make_resp(400, False, message="请求币种错误")
 
         infos = model.query.filter_by(
             **kwargs
@@ -205,8 +211,12 @@ class MiningIncomeApi(Resource):
             coin_name = BHD_COIN_NAME
         if coin_name == BHD_COIN_NAME:
             model = IncomeRecord
-        else:
+        elif coin_name == LHD_NAME:
+            model = LHDIncomeRecord
+        elif coin_name == NEWBI_NAME:
             model = NBIncomeRecord
+        else:
+            return make_resp(400, False, message="请求币种错误")
         infos = model.query.filter_by(
             **kwargs
         ).filter(

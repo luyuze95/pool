@@ -9,7 +9,7 @@ Created by chuwt on 18/3/6.
 # self
 import logging
 import os
-from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
+from logging import DEBUG, INFO
 from logging.handlers import TimedRotatingFileHandler
 
 from conf import DEBUG as RUN_ENV
@@ -28,14 +28,16 @@ def get_logger(name="debug", level=level):
     logger.setLevel(level=level)
 
     handler = TimedRotatingFileHandler(file_name, when="MIDNIGHT", interval=1,
-                                       backupCount=5,)
-    formatter = logging.Formatter('%(asctime)s-%(filename)s-%(levelname)s-[%(module)s.%(funcName)s.%(lineno)s]---%(message)s')
+                                       backupCount=5, )
+    formatter = logging.Formatter(
+        '%(asctime)s-%(filename)s-%(levelname)s-[%(module)s.%(funcName)s.%(lineno)s]---%(message)s')
     handler.setFormatter(formatter)
 
     ch = logging.StreamHandler()
     ch.setLevel(logging.ERROR)
     # 设置日志格式
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     ch.setFormatter(formatter)
     # 将相应的handler添加在logger对象中
     logger.addHandler(ch)
