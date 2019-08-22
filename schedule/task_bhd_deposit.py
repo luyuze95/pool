@@ -11,7 +11,7 @@ from models import db
 from models.deposit_transaction import DepositTranscation
 from models.pool_address import PoolAddress
 from models.user_asset import UserAsset
-from rpc import usdt_client, get_rpc, nb_client
+from rpc import usdt_client, get_rpc, nb_client, lhd_client
 from rpc.bhd_rpc import bhd_client
 from schedule.distributed_lock_decorator import distributed_lock
 from utils.block_check import check_deposit_amount, check_min_confirmed
@@ -71,6 +71,59 @@ def bhd_deposit_scan():
 
 
 @celery.task
+@distributed_lock
+def lhd_deposit_scan():
+    # 获取所有地址收款交易
+    addresses_transactions = lhd_client.list_received_by_address()
+    for address_recevied in addresses_transactions:
+        address = address_recevied.get("address")
+        account = address_recevied.get("account")
+        total_amount = address_recevied.get("amount")
+        txids = address_recevied.get("txids")
+        # 挖矿地址的交易暂时忽略
+        if address == LHD_MINER_ADDRESS:
+            continue
+        # 根据地址查询用户资产信息
+        asset = PoolAddress.query.filter_by(address=address).first()
+        if asset is None:
+            continue
+        for txid in txids:
+            # 检查交易是否已经存在
+            deposit_tx = DepositTranscation.query.filter_by(
+                tx_id=txid, account_key=asset.account_key).first()
+            if deposit_tx:
+                continue
+
+            # 获取交易详情
+            transaction = lhd_client.get_transaction_detail(txid)
+            tx_outs = transaction.get('vout', [])
+            confirmed = transaction['confirmations']
+            height = transaction['locktime']
+            for tx_out in tx_outs:
+                amount = tx_out['value']
+                tx_type = tx_out['scriptPubKey']['type']
+                if tx_type != 'scripthash':
+                    continue
+
+                address_vout = tx_out['scriptPubKey']['addresses'][0]
+                if address_vout == LHD_MINER_ADDRESS or address_vout != asset.address:
+                    continue
+                if not check_deposit_amount(LHD_NAME, amount):
+                    celery_logger.info("lhd_deposit too small, transaction:%s"
+                                       % transaction)
+                    continue
+                need_confirmed = MIN_CONFIRMED.get(LHD_NAME)
+
+                tr = DepositTranscation(asset.account_key, amount,
+                                        asset.coin_name,
+                                        txid, height,
+                                        need_confirmed, confirmed)
+                celery_logger.info("lhd_deposit transaction: %s" % tr.to_dict())
+                db.session.add(tr)
+                db.session.commit()
+
+
+@celery.task
 def usdt_deposit_scan():
     data = usdt_client.get_transactions()
     celery_logger.info("=== usdt deposit task start === %s " % data)
@@ -95,7 +148,7 @@ def usdt_deposit_scan():
             # 设置确认数
             tr.confirmed = confirm
             # 判断确认数
-            if check_min_confirmed(BHD_COIN_NAME, confirm):
+            if check_min_confirmed(USDT_NAME, confirm):
                 celery_logger.info("usdt deposit, confirmed %s" % tr.to_dict())
                 tr.status = DEPOSIT_CONFIRMED
             db.session.commit()

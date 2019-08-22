@@ -10,7 +10,8 @@ from celery.schedules import crontab
 from app import celery
 from conf import *
 from schedule.task_bhd_deposit import confirm_deposit_transaction, \
-    deposit_add_asset, bhd_deposit_scan, usdt_deposit_scan, nb_deposit_scan
+    deposit_add_asset, bhd_deposit_scan, usdt_deposit_scan, nb_deposit_scan, \
+    lhd_deposit_scan
 from schedule.task_converge import bhd_converge, usdt_converge
 from schedule.task_email import email_sender_task
 from schedule.task_income_calculate import calculate_income, \
@@ -53,3 +54,5 @@ def setup_period_task(sender, **kwargs):
                              nb_calculate_income.s())
     sender.add_periodic_task(crontab(minute="*/1"),
                              lhb_calculate_income.s())
+    sender.add_periodic_task(crontab(minute="*/1"),
+                             lhd_deposit_scan.s())
