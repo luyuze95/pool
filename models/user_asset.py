@@ -72,7 +72,7 @@ class UserAsset(BaseModel):
             "trading_asset": self.trading_asset,
             "create_time": str(self.create_time),
         }
-        if self.coin_name == BHD_COIN_NAME:
+        if self.coin_name in (BHD_COIN_NAME, LHD_NAME):
             user_asset_dict.update({
                 # 矿池抵押
                 "pledge_asset": self.get_pledge_amount(),

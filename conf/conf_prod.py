@@ -90,6 +90,11 @@ NEWBI_ACCOUNT = "NEWBI-TRJF-WX42-WMUP-7E7F8"
 NEWBI_ACCOUNT_PASSWORD = "7ujMko0admin"
 NEWBI_NAME = "newbi"
 
+""" lhd node config"""
+LHD_NAME = "lhd"
+LHD_NODE_URL = "http://hemon:16761123@47.75.133.66:8888/"
+LHD_WALLET_PASSWORD = "7ujMko0admin"
+LHD_MINER_ADDRESS = "3Qch21MpAtkrUQjHpogDigL9LFCjxci3rP"
 
 # 全抵押和非全抵押收益
 MORTGAGE_YIELD_RATE = Decimal('1')
@@ -97,13 +102,15 @@ NOT_MORTGAGE_YIELD_RATE = Decimal('0.3')
 
 MIN_DEPOSIT_AMOUNT = {
     BHD_COIN_NAME: Decimal("0.0001"),
-    NEWBI_NAME: Decimal("0.1")
+    NEWBI_NAME: Decimal("0.1"),
+    LHD_NAME: Decimal('0.01'),
 }
 
 MIN_CONFIRMED = {
     BHD_COIN_NAME: 3,
     USDT_NAME: 3,
     NEWBI_NAME: 6,
+    LHD_NAME: 3,
 }
 
 # 最小汇聚余额
@@ -113,9 +120,3 @@ MIN_CONVERGE_AMOUNT_USDT = Decimal('1')
 POUNDAGE_BALANCE = Decimal('0.00006')
 MIN_FEE = Decimal('0.001')
 
-
-""" lhd node config"""
-LHD_NAME = "lhd"
-LHD_NODE_URL = "http://hemon:16761123@47.75.133.66:8888/"
-LHD_WALLET_PASSWORD = "7ujMko0admin"
-LHD_MINER_ADDRESS = "3Qch21MpAtkrUQjHpogDigL9LFCjxci3rP"
