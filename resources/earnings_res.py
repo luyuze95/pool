@@ -15,7 +15,7 @@ from sqlalchemy import func, and_
 from models.activity_reward import ActivityReward
 from models.income_record import IncomeRecord, NBIncomeRecord, LHDIncomeRecord
 from resources.auth_decorator import login_required
-from rpc import bhd_client
+from rpc import get_rpc
 from utils.response import make_resp
 from conf import *
 
@@ -236,7 +236,8 @@ class MiningIncomeApi(Resource):
 
         records = [info.to_dict() for info in infos]
 
-        latest_height = bhd_client.get_latest_block_number()
+        client = get_rpc(coin_name)
+        latest_height = client.get_latest_block_number()
         return make_resp(records=records, total_records=total_records, latest_height=latest_height)
 
 
@@ -283,5 +284,6 @@ class CoopIncomeApi(Resource):
 
         records = [info.to_dict() for info in infos]
 
-        latest_height = bhd_client.get_latest_block_number()
+        client = get_rpc(coin_name)
+        latest_height = client.get_latest_block_number()
         return make_resp(records=records, total_records=total_records, latest_height=latest_height)
