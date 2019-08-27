@@ -33,16 +33,14 @@ class UserAssetApi(Resource):
         parse = reqparse.RequestParser()
         parse.add_argument('coin_name', type=str, required=False)
         args = parse.parse_args()
-        coin_name = args.get('coin_name')
-        if not coin_name:
-            coin_name = BHD_COIN_NAME
+        coin_name = args.get('coin_name') or BHD_COIN_NAME
 
         user_asset = UserAsset.query.filter_by(account_key=account_key,
                                                coin_name=coin_name).first()
         if not user_asset:
             return make_resp(404, False)
         context = user_asset.to_dict()
-        if coin_name != BHD_COIN_NAME:
+        if coin_name not in (BHD_COIN_NAME, LHD_NAME):
             return make_resp(200, True, **context)
         keys = "miner:main:%s:*" % account_key
         miner_machines = redis_capacity.keys(keys)
