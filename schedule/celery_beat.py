@@ -16,6 +16,7 @@ from schedule.task_converge import bhd_converge, usdt_converge
 from schedule.task_email import email_sender_task
 from schedule.task_income_calculate import calculate_income, \
     calculate_activity_reward, nb_calculate_income, lhb_calculate_income
+from schedule.task_timing_remote_pledge_lhd import lhd_check_pledges, lhd_statistic_pledges
 from schedule.task_withdrawal import withdrawal_coin, withdrawal_confirm
 from schedule.task_timing_remote_pledge import statistic_pledges, check_pledges
 
@@ -56,3 +57,8 @@ def setup_period_task(sender, **kwargs):
                              lhb_calculate_income.s())
     sender.add_periodic_task(crontab(minute="*/1"),
                              lhd_deposit_scan.s())
+    sender.add_periodic_task(crontab(minute="*/1"),
+                             lhd_statistic_pledges.s())
+    sender.add_periodic_task(crontab(minute="*/1"),
+                             lhd_check_pledges.s())
+
