@@ -101,7 +101,9 @@ class UserAssetApi(Resource):
         parse.add_argument('amount', type=str, required=True)
         parse.add_argument('direction', type=bool, required=False, default=True,
                            help="True:抵押到余额，False:余额到抵押")
+        parse.add_argument('coin_name', type=str)
         args = parse.parse_args()
+        coin_name = args.get('coin_name') or BHD_COIN_NAME
         amount = Decimal(args.get('amount'))
         # todo
         """
@@ -118,7 +120,7 @@ class UserAssetApi(Resource):
                         % (amount, account_key, direction))
         try:
             user_asset = UserAsset.query.filter_by(
-                account_key=account_key, coin_name=BHD_COIN_NAME
+                account_key=account_key, coin_name=coin_name
             ).with_for_update(read=True).first()
             total_available_2pledge = user_asset.get_total_available_pledge_amount()
             total_available_2balance = user_asset.get_pledge_amount()

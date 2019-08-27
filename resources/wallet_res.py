@@ -150,7 +150,7 @@ class WalletAPI(Resource):
         args = parse.parse_args()
         account_key = g.account_key
         id = args.get('id')
-        coin_name = args.get('coin_name', BHD_COIN_NAME)
+        coin_name = args.get('coin_name') or BHD_COIN_NAME
 
         withdrawal = WithdrawalTransaction.query.filter_by(
             id=id, account_key=account_key).first()
