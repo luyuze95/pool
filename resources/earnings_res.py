@@ -259,12 +259,14 @@ class CoopIncomeApi(Resource):
         offset = args.get('offset')
         from_ts = args.get('from')
         end_ts = args.get('end')
-        coin_name = args.get('coin_name')
+        coin_name = args.get('coin_name') or BHD_COIN_NAME
         status = args.get('status')
         from_dt = datetime.fromtimestamp(from_ts)
         end_dt = datetime.fromtimestamp(end_ts)
         kwargs = {"account_key": account_key}
         model = IncomeRecord
+        if coin_name == LHD_NAME:
+            model = LHDIncomeRecord
         infos = model.query.filter_by(
             **kwargs
         ).filter(
