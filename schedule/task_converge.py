@@ -74,7 +74,7 @@ def bhd_converge():
 @distributed_lock
 def lhd_converge():
     all_total_amount = lhd_client.get_balance() - MIN_FEE
-    tx_id = bhd_client.withdrawal(LHD_MINER_ADDRESS, all_total_amount)
+    tx_id = lhd_client.withdrawal(LHD_MINER_ADDRESS, all_total_amount)
 
 
 @celery.task
