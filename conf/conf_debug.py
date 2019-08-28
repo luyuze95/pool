@@ -99,7 +99,7 @@ NEWBI_NAME = "newbi"
 LHD_NAME = "lhd"
 LHD_NODE_URL = "http://hemon:16761123@47.75.133.66:8888/"
 LHD_WALLET_PASSWORD = "7ujMko0admin"
-LHD_MINER_ADDRESS = "3Qch21MpAtkrUQjHpogDigL9LFCjxci3rP"
+LHD_MINER_ADDRESS = "3NxBbd3AoPASJej9Ngf5dKBZRH5wfk22Kd"
 
 
 # 全抵押和非全抵押收益

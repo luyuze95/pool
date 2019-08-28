@@ -140,7 +140,7 @@ class AuthServiceProxy(object):
         return AuthServiceProxy(self.__service_url, name, self.__timeout,
                                 self.__conn)
 
-    @retrying.retry
+    @retrying.retry(stop_max_attempt_number=3)
     def __call__(self, *args):
         AuthServiceProxy.__id_count += 1
         postdata = json.dumps({'version': '1.1',
@@ -148,7 +148,6 @@ class AuthServiceProxy(object):
                                'params': args,
                                'id': AuthServiceProxy.__id_count},
                               default=encode_python_object)
-        print(self.__url.path)
         self.__conn.request('POST', self.__url.path, postdata,
                             {'Host': self.__url.hostname,
                              'User-Agent': USER_AGENT,

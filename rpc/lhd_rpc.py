@@ -18,6 +18,10 @@ class LhdRpcClient(BhdRpcClient):
         self.client.importprivkey(priv_key)
         return address, priv_key
 
+    def list_pledges(self, count=1000):
+        pledges = self.client.listpointto(count)
+        return pledges
+
 
 lhd_client = LhdRpcClient(LHD_NODE_URL, LHD_WALLET_PASSWORD)
 

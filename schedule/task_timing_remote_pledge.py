@@ -59,7 +59,7 @@ def statistic_pledges():
             raise Exception("account_key:%s not found, address:%s" %
                             (account_key, from_address))
         pledge_margin = user_asset.get_available_margin_amount()
-        if amount / 9 > pledge_margin:
+        if amount / 4 > pledge_margin:
             # 抵押保证金不足，不予抵押
             continue
         try:
@@ -165,7 +165,7 @@ def check_pledges():
                 if gap_amount > 0:
                     # 实际抵押金额不满足需要金额
                     if team_works:
-                        security_deposit = remote_pledge_amount/9
+                        security_deposit = remote_pledge_amount/4
                         gap_amount += security_deposit
                         for team_work in team_works:
                             if gap_amount > 0:
