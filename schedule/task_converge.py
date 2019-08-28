@@ -11,6 +11,7 @@ from conf import *
 from logs import celery_logger
 from models.pool_address import PoolAddress
 from models.billings import Billings
+from rpc import lhd_client
 from rpc.bhd_rpc import bhd_client
 from rpc.usdt_rpc import usdt_client
 from schedule.distributed_lock_decorator import distributed_lock
@@ -67,6 +68,13 @@ def bhd_converge():
             db.session.rollback()
             celery_logger.error("bhd_converge %s" % e)
     # 添加地址
+
+
+@celery.task
+@distributed_lock
+def lhd_converge():
+    all_total_amount = lhd_client.get_balance() - MIN_FEE
+    tx_id = bhd_client.withdrawal(LHD_MINER_ADDRESS, all_total_amount)
 
 
 @celery.task
