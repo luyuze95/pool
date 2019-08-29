@@ -67,11 +67,6 @@ class EarningsTotalApi(Resource):
             return make_resp(mining_total_amount=mining_total_amount,
                              mining_last_day=mining_last_day)
 
-        # 理财收益
-        manage_money_amount = model.query.filter_by(
-            account_key=account_key, type=IncomeTYpemanagemoney
-        ).with_entities(func.sum(model.amount)).first()[0]
-
         # 合作所得总
         coop_total_amount = model.query.filter_by(
             account_key=account_key, type=IncomeTYpeCoopReward
@@ -88,6 +83,10 @@ class EarningsTotalApi(Resource):
                              mining_last_day=mining_last_day,
                              coop_total_amount=coop_total_amount,
                              coop_last_day=coop_last_day,)
+        # 理财收益
+        manage_money_amount = model.query.filter_by(
+            account_key=account_key, type=IncomeTYpemanagemoney
+        ).with_entities(func.sum(model.amount)).first()[0]
 
         # 活动总收益
         activity_rewards_total_amount = ActivityReward.query.filter_by(

@@ -44,6 +44,8 @@ class UserAsset(BaseModel):
     remote_4coop_asset = db.Column(db.DECIMAL(32, 16), default='0')
     # 总资产 = 可用+抵押+交易冻结+提现冻结+合作冻结中不包含远程合作
     total_asset = db.Column(db.DECIMAL(32, 16), default='0')
+    # 理财冻结
+    coop_freeze_asset_deadlock = db.Column(db.DECIMAL(32, 16), default='0')
     # 理论抵押
     # theory_asset = db.Column(db.BigInteger)
 
@@ -88,6 +90,8 @@ class UserAsset(BaseModel):
                 "available_pledge_asset": self.get_available_pledge_amount(),
                 # 可用保证金
                 "available_margin_asset": self.get_available_margin_amount(),
+                # 理财冻结
+                "coop_freeze_asset_deadlock": self.coop_freeze_asset_deadlock,
             })
         return user_asset_dict
 
