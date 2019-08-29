@@ -130,3 +130,6 @@ BHD_RATE_KEY = "bhd:ratio"
 IncomeTypeMining = 0
 IncomeTYpeCoopReward = 1
 IncomeTYpeMiningEcol = 2
+
+# 理财收益类型
+IncomeTYpemanagemoney = 3

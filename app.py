@@ -35,6 +35,7 @@ from resources.wallet_res import WalletAPI, UserAssetTransferInfoAPI
 from resources.earnings_res import EarningsTotalApi, DayEarningsApi, \
     MiningIncomeApi, CoopIncomeApi
 from resources.verification_res import VerifyApi
+from resources.team_work_order import TeamWorkOrderApi
 
 # 生成地址、转账、撤销转账
 api.add_resource(WalletAPI, '/v1/wallet/', '/v1/wallet', endpoint="wallet")
@@ -52,6 +53,8 @@ api.add_resource(CoopIncomeApi, '/v1/earnings/coop_incomes/', '/v1/earnings/coop
 api.add_resource(BurstBlockApi, '/v1/blocks/', '/v1/blocks', endpoint="blocks")
 # 贡献点查询
 api.add_resource(DeadlineFractionApi, '/v1/dl_fraction/', '/v1/dl_fraction', endpoint="dl_fraction")
+# 用户合作订单
+api.add_resource(TeamWorkOrderApi, '/v1/teamwork_order', '/v1/teamwork_order', endpoint="teamwork_order")
 
 api.add_resource(VerifyApi, '/v1/seccode/', '/v1/seccode', endpoint="seccode")
 api.add_resource(SiteTransfer, '/v1/transfer/', '/v1/transfer', endpoint="transfer")

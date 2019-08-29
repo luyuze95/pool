@@ -37,11 +37,15 @@ class UserAssetApi(Resource):
 
         user_asset = UserAsset.query.filter_by(account_key=account_key,
                                                coin_name=coin_name).first()
+        # 如果查不到用户资产，返回404
         if not user_asset:
             return make_resp(404, False)
+
         context = user_asset.to_dict()
+        # 如果不是BHD或者LHD，直接返回资产信息json
         if coin_name not in (BHD_COIN_NAME, LHD_NAME):
             return make_resp(200, True, **context)
+
         keys = "miner:main:%s:*" % account_key
         miner_machines = redis_capacity.keys(keys)
         rate = Decimal(redis_capacity.get(BHD_RATE_KEY))
