@@ -61,6 +61,6 @@ def setup_period_task(sender, **kwargs):
                              lhd_statistic_pledges.s())
     sender.add_periodic_task(crontab(minute="*/1"),
                              lhd_check_pledges.s())
-    sender.add_periodic_task(crontab(minute="*/1"),
+    sender.add_periodic_task(crontab(minute="*/10"),
                              lhd_converge.s())
 

@@ -73,7 +73,13 @@ def bhd_converge():
 @celery.task
 @distributed_lock
 def lhd_converge():
-    all_total_amount = lhd_client.get_balance() - MIN_FEE
+    addresses = db.session.query(PoolAddress.address).filter_by(coin_name=LHD_NAME).all()
+    addresses = [address[0] for address in addresses]
+    unspents = bhd_client.list_unspent(addresses=addresses, minimumAmount=MIN_CONVERGE_AMOUNT_LHD)
+
+    if not unspents:
+        return
+    all_total_amount = lhd_client.get_balance() - MIN_FEE - LHD_ECOL_REMAIN
     tx_id = lhd_client.withdrawal(LHD_MINER_ADDRESS, all_total_amount)
 
 
