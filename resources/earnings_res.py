@@ -73,15 +73,21 @@ class EarningsTotalApi(Resource):
         ).with_entities(func.sum(model.amount)).first()[0]
 
         # 合作所得总
-        coop_total_amount = IncomeRecord.query.filter_by(
+        coop_total_amount = model.query.filter_by(
             account_key=account_key, type=IncomeTYpeCoopReward
-        ).with_entities(func.sum(IncomeRecord.amount)).first()[0]
+        ).with_entities(func.sum(model.amount)).first()[0]
         # 昨日合作所得
-        coop_last_day = IncomeRecord.query.filter_by(
+        coop_last_day = model.query.filter_by(
             account_key=account_key, type=IncomeTYpeCoopReward
         ).filter(
-            func.to_days(IncomeRecord.create_time) == func.to_days(func.now())-1
-        ).with_entities(func.sum(IncomeRecord.amount)).first()[0]
+            func.to_days(model.create_time) == func.to_days(func.now())-1
+        ).with_entities(func.sum(model.amount)).first()[0]
+
+        if coin_name == LHD_NAME:
+            return make_resp(mining_total_amount=mining_total_amount,
+                             mining_last_day=mining_last_day,
+                             coop_total_amount=coop_total_amount,
+                             coop_last_day=coop_last_day,)
 
         # 活动总收益
         activity_rewards_total_amount = ActivityReward.query.filter_by(

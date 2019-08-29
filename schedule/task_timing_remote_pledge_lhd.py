@@ -38,7 +38,7 @@ def lhd_statistic_pledges():
 
         if not valid:
             continue
-        if category != "point-to":
+        if category != "point-to" and category != "point-from":
             continue
         if to_address != LHD_MINER_ADDRESS:
             continue
