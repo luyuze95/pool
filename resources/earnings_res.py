@@ -149,6 +149,13 @@ class DayEarningsApi(Resource):
         else:
             return make_resp(400, False, message="请求币种错误")
 
+        manage_money_amount = model.query.filter_by(
+            account_key=account_key, type=IncomeTYpemanagemoney
+        ).filter(
+            and_(model.create_time > from_dt,
+                 model.create_time < end_dt)
+        ).with_entities(func.sum(model.amount)).first()[0]
+
         infos = model.query.filter_by(
             **kwargs
         ).with_entities(
@@ -186,7 +193,7 @@ class DayEarningsApi(Resource):
             day_income["total_income"] = day_income.get("total_income",
                                                         0) + amount
         records = sorted(date_incomes.items(), key=lambda k: k[0], reverse=True)
-        return make_resp(records=records, total_records=total_records)
+        return make_resp(records=records, total_records=total_records, manage_money_amount=manage_money_amount)
 
 
 class MiningIncomeApi(Resource):
