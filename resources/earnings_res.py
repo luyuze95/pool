@@ -374,7 +374,17 @@ class ManageIncomeApi(Resource):
             model_record.status
         ).count()
 
-        records = [info.to_dict() for info in infos]
+        records = []
+        for info in infos:
+            dict_pro = {}
+            dict_pro["rate"] = info.rate
+            dict_pro["coo_amount"] = info.coo_amount
+            dict_pro["income"] = info.income
+            dict_pro["deadline"] = info.deadline
+            dict_pro["create_time"] = info.create_time
+            dict_pro["end_time"] = info.end_time
+            dict_pro["status"] = info.status
+            records.append(dict_pro)
 
         return make_resp(records=records, total_records=total_records)
 
