@@ -95,7 +95,7 @@ class TeamWorkRecordActivity(BaseModel):
     status = db.Column(db.Integer)
     is_foul = db.Column(db.Integer)
     cooperation_id = db.Column(db.Integer)
-
+    type = db.Column(db.INTEGER)
     release_time = db.Column(db.TIMESTAMP(),
                              server_default=func.current_timestamp())
     begin_time = db.Column(db.TIMESTAMP(),
@@ -116,6 +116,7 @@ class TeamWorkRecordActivity(BaseModel):
             "status": self.status,
             "cooperation_id": self.cooperation_id,
             "is_foul": self.is_foul,
+            "type": self.type,
             "create_time": str(self.create_time),
         }
         return tr_dict
