@@ -75,7 +75,7 @@ def bhd_converge():
 def lhd_converge():
     addresses = db.session.query(PoolAddress.address).filter_by(coin_name=LHD_NAME).all()
     addresses = [address[0] for address in addresses]
-    unspents = bhd_client.list_unspent(addresses=addresses, minimumAmount=MIN_CONVERGE_AMOUNT_LHD)
+    unspents = lhd_client.list_unspent(addresses=addresses, minimumAmount=MIN_CONVERGE_AMOUNT_LHD)
 
     if not unspents:
         return
