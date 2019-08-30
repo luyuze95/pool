@@ -46,10 +46,13 @@ class UserAssetApi(Resource):
         if coin_name not in (BHD_COIN_NAME, LHD_NAME):
             return make_resp(200, True, **context)
 
-        keys = "miner:main:%s:*" % account_key
+        if coin_name == BHD_COIN_NAME:
+            keys = "miner:main:%s:*" % account_key
+            rate = Decimal(redis_capacity.get(BHD_RATE_KEY))
+        elif coin_name == LHD_NAME:
+            keys = "miner:main:lhd:%s:*" % account_key
+            rate = 6
         miner_machines = redis_capacity.keys(keys)
-        rate = Decimal(redis_capacity.get(BHD_RATE_KEY))
-
         context.update({
             "earning_rate": 0,
             "theory_pledge": 0,

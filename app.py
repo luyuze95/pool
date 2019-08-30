@@ -33,7 +33,7 @@ api = APIHandleError(app)
 from resources.user_asset_res import UserAssetApi
 from resources.wallet_res import WalletAPI, UserAssetTransferInfoAPI
 from resources.earnings_res import EarningsTotalApi, DayEarningsApi, \
-    MiningIncomeApi, CoopIncomeApi
+    MiningIncomeApi, CoopIncomeApi, ManageIncomeApi
 from resources.verification_res import VerifyApi
 from resources.team_work_order import TeamWorkOrderApi
 
@@ -49,6 +49,8 @@ api.add_resource(DayEarningsApi, '/v1/earnings/days/', '/v1/earnings/days', endp
 api.add_resource(MiningIncomeApi, '/v1/earnings/blocks/', '/v1/earnings/blocks', endpoint="block_earnings")
 # 合作收益
 api.add_resource(CoopIncomeApi, '/v1/earnings/coop_incomes/', '/v1/earnings/coop_incomes', endpoint="coop_incomes")
+# 理财收益
+api.add_resource(ManageIncomeApi, '/v1/earnings/manage_incomes/', '/v1/earnings/manage_incomes', endpoint="manage_incomes")
 # 爆块查询
 api.add_resource(BurstBlockApi, '/v1/blocks/', '/v1/blocks', endpoint="blocks")
 # 贡献点查询

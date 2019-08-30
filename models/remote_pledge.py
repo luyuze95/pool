@@ -119,3 +119,42 @@ class TeamWorkRecordActivity(BaseModel):
             "create_time": str(self.create_time),
         }
         return tr_dict
+
+class TeamWorkActivity(BaseModel):
+    __tablename__ = 'pool_team_work_activity'
+    __table_args__ = {'extend_existing': True}
+    # id
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(64))
+    total_amount = db.Column(db.DECIMAL(32, 16))
+    distribution = db.Column(db.DECIMAL(32, 16))
+    available_amount = db.Column(db.DECIMAL(32, 16))
+    deadline = db.Column(db.DECIMAL(32, 16))
+    min_amount = db.Column(db.DECIMAL(32, 16))
+    type = db.Column(db.INTEGER)
+    rate = db.Column(db.DECIMAL(32, 16))
+
+    create_time = db.Column(db.TIMESTAMP(),
+                            server_default=func.current_timestamp())
+    update_time = db.Column(db.TIMESTAMP(),
+                            server_default=func.current_timestamp())
+    end_time = db.Column(db.TIMESTAMP(),
+                         server_default=func.current_timestamp())
+
+    def to_dict(self):
+        tr_dict = {
+            "title": self.title,
+            "total_amount": self.total_amount,
+            "distribution": self.distribution,
+            "available_amount": self.available_amount,
+            "deadline": self.deadline,
+            "min_amount": self.min_amount,
+            "type": self.type,
+            "rate": self.rate,
+            "create_time": str(self.create_time),
+            "end_time": str(self.end_time),
+        }
+        return tr_dict
+
+
+
