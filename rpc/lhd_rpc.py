@@ -24,6 +24,7 @@ class LhdRpcClient(BhdRpcClient):
 
 
 lhd_client = LhdRpcClient(LHD_NODE_URL, LHD_WALLET_PASSWORD)
+lhd_client_main = LhdRpcClient(LHD_NODE_URL_MAIN, LHD_WALLET_PASSWORD)
 
 if __name__ == '__main__':
     from pprint import pprint
