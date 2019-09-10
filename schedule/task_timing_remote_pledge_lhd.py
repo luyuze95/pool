@@ -10,8 +10,7 @@ from conf import *
 from logs import celery_logger
 from models import db
 from models.billings import Billings
-from models.remote_pledge_lhd import LHDRemotePledgeAddress, LHDRemotePledgeTransaction, \
-    LHDTeamWorkRecordActivity
+from models.remote_pledge_lhd import LHDRemotePledgeAddress, LHDRemotePledgeTransaction, LHDTeamWorkRecordActivity
 from models.user_asset import UserAsset
 from rpc import lhd_client
 from schedule.distributed_lock_decorator import distributed_lock
@@ -42,8 +41,7 @@ def lhd_statistic_pledges():
             continue
         if to_address != LHD_MINER_ADDRESS:
             continue
-        remote_pledge_address = LHDRemotePledgeAddress.query.filter_by(
-            address=from_address).first()
+        remote_pledge_address = LHDRemotePledgeAddress.query.filter_by(address=from_address).first()
         if not remote_pledge_address:
             celery_logger.info("pledge address not found: %s" % from_address)
             continue

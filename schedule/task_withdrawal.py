@@ -32,8 +32,7 @@ def withdrawal_coin():
             assert withdrawal_apply.amount <= user_asset.total_asset - user_asset.available_asset - user_asset.trading_asset - user_asset.pledge_asset
 
             client = get_rpc(withdrawal_apply.coin_name)
-            txid = client.withdrawal(withdrawal_apply.to_address,
-                                         withdrawal_apply.actual_amount)
+            txid = client.withdrawal(withdrawal_apply.to_address, withdrawal_apply.actual_amount)
             status = WITHDRAWAL_SENDING
             user_asset.frozen_asset -= withdrawal_apply.amount
             user_asset.total_asset -= withdrawal_apply.amount

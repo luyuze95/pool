@@ -10,8 +10,7 @@ from conf import *
 from logs import celery_logger
 from models import db
 from models.billings import Billings
-from models.remote_pledge import RemotePledgeAddress, RemotePledgeTransaction, \
-    TeamWorkRecordActivity
+from models.remote_pledge import RemotePledgeAddress, RemotePledgeTransaction, TeamWorkRecordActivity
 from models.user_asset import UserAsset
 from rpc import bhd_client
 from schedule.distributed_lock_decorator import distributed_lock
