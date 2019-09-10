@@ -50,7 +50,7 @@ class UserAssetApi(Resource):
             keys = "miner:main:%s:*" % account_key
             rate = Decimal(redis_capacity.get(BHD_RATE_KEY))
         elif coin_name == LHD_NAME:
-            keys = "miner:main:lhd:%s:*" % account_key
+            keys = "miner:ecol:lhd:%s:*" % account_key  # ecol为主矿池算力
             rate = 6
         miner_machines = redis_capacity.keys(keys)
         context.update({
