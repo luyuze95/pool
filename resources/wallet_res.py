@@ -223,7 +223,7 @@ class UserAssetTransferInfoAPI(Resource):
 
         if not coin_name:
             coin_name = BHD_COIN_NAME
-        if coin_name and transaction_type != "transfer":
+        if coin_name:  # and transaction_type != "transfer"
             kwargs['coin_name'] = coin_name
         if status:
             kwargs['status'] = status

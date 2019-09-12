@@ -158,7 +158,7 @@ class UserAssetApi(Resource):
                     user_asset.available_asset -= del_available_asset
                     user_asset.pledge_asset += del_available_asset
 
-            asset_transfer = AssetTransfer(account_key, abs(amount), direction)
+            asset_transfer = AssetTransfer(account_key, abs(amount), direction, coin_name)
             db.session.add(asset_transfer)
             db.session.commit()
         except Exception as e:
