@@ -59,16 +59,37 @@ class BurstBlockApi(Resource):
         else:
             model = NBBurstBlock
             query_deadline = literal("0")
+        if coin_name == BHD_COIN_NAME:
+            coop_query = db.session.query(model.plotter_id, model.height,
+                                          query_deadline,
+                                          model.create_time.label(
+                                              'create_time'),
+                                          literal("coop")
+                                          ).filter_by(account_key=account_key
+                                                      ).filter(
+                and_(model.create_time > from_dt,
+                     model.create_time < end_dt))
+        elif coin_name == LHD_NAME:
+            coop_query = db.session.query(model.plotter_id, model.height,
+                                          query_deadline,
+                                          model.create_time.label(
+                                              'create_time'),
+                                          literal("ecol")
+                                          ).filter_by(account_key=account_key
+                                                      ).filter(
+                and_(model.create_time > from_dt,
+                     model.create_time < end_dt))
+        else:
+            coop_query = db.session.query(model.plotter_id, model.height,
+                                          query_deadline,
+                                          model.create_time.label(
+                                              'create_time'),
+                                          literal("coop")
+                                          ).filter_by(account_key=account_key
+                                                      ).filter(
+                and_(model.create_time > from_dt,
+                     model.create_time < end_dt))
 
-        coop_query = db.session.query(model.plotter_id, model.height,
-                                      query_deadline,
-                                      model.create_time.label(
-                                          'create_time'),
-                                      literal("coop")
-                                      ).filter_by(account_key=account_key
-                                                  ).filter(
-            and_(model.create_time > from_dt,
-                 model.create_time < end_dt))
 
         if coin_name == NEWBI_NAME:
             coops = coop_query.limit(limit).offset(offset).all()
@@ -91,7 +112,7 @@ class BurstBlockApi(Resource):
                                           LHDMainBurstBlock.deadline,
                                           LHDMainBurstBlock.create_time.label(
                                               'create_time'),
-                                          literal("main")
+                                          literal("coop")
                                           ).filter_by(account_key=account_key
                                                       ).filter(
                 and_(LHDMainBurstBlock.create_time > from_dt,

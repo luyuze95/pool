@@ -55,18 +55,43 @@ class DeadlineFractionApi(Resource):
             model = DISKDeadlineFraction
         else:
             model = NBDeadlineFraction
+        if coin_name == BHD_COIN_NAME:
+            coop_query = db.session.query(model.height,
+                                          literal("coop"),
+                                          model.fraction,
+                                          model.deadline,
+                                          model.miner_name,
+                                          model.plotter_id,
+                                          model.create_time.label('create_time'),
+                                          ).filter_by(account_key=account_key
+                                                      ).filter(
+                and_(model.create_time > from_dt,
+                     model.create_time < end_dt))
+        elif coin_name == LHD_NAME:
+            coop_query = db.session.query(model.height,
+                                          literal("ecol"),
+                                          model.fraction,
+                                          model.deadline,
+                                          model.miner_name,
+                                          model.plotter_id,
+                                          model.create_time.label('create_time'),
+                                          ).filter_by(account_key=account_key
+                                                      ).filter(
+                and_(model.create_time > from_dt,
+                     model.create_time < end_dt))
+        else:
+            coop_query = db.session.query(model.height,
+                                          literal("coop"),
+                                          model.fraction,
+                                          model.deadline,
+                                          model.miner_name,
+                                          model.plotter_id,
+                                          model.create_time.label('create_time'),
+                                          ).filter_by(account_key=account_key
+                                                      ).filter(
+                and_(model.create_time > from_dt,
+                     model.create_time < end_dt))
 
-        coop_query = db.session.query(model.height,
-                                      literal("coop"),
-                                      model.fraction,
-                                      model.deadline,
-                                      model.miner_name,
-                                      model.plotter_id,
-                                      model.create_time.label('create_time'),
-                                      ).filter_by(account_key=account_key
-                                                  ).filter(
-            and_(model.create_time > from_dt,
-                 model.create_time < end_dt))
 
         if coin_name == NEWBI_NAME:
             all_dls = coop_query.limit(limit).offset(offset).all()
@@ -86,7 +111,7 @@ class DeadlineFractionApi(Resource):
                      DeadlineFractionEcology.create_time < end_dt))
         elif coin_name == LHD_NAME:
             ecol_query = db.session.query(LHDDeadlineFractionMain.height,
-                                          literal("main"),
+                                          literal("coop"),
                                           LHDDeadlineFractionMain.fraction,
                                           LHDDeadlineFractionMain.deadline,
                                           LHDDeadlineFractionMain.miner_name,
