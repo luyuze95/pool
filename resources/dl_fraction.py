@@ -67,7 +67,7 @@ class DeadlineFractionApi(Resource):
                                                       ).filter(
                 and_(model.create_time > from_dt,
                      model.create_time < end_dt))
-        elif coin_name == LHD_NAME:
+        else:    # coin_name == LHD_NAME:
             coop_query = db.session.query(model.height,
                                           literal("ecol"),
                                           model.fraction,
@@ -79,18 +79,18 @@ class DeadlineFractionApi(Resource):
                                                       ).filter(
                 and_(model.create_time > from_dt,
                      model.create_time < end_dt))
-        else:
-            coop_query = db.session.query(model.height,
-                                          literal("coop"),
-                                          model.fraction,
-                                          model.deadline,
-                                          model.miner_name,
-                                          model.plotter_id,
-                                          model.create_time.label('create_time'),
-                                          ).filter_by(account_key=account_key
-                                                      ).filter(
-                and_(model.create_time > from_dt,
-                     model.create_time < end_dt))
+        # else:
+        #     coop_query = db.session.query(model.height,
+        #                                   literal("coop"),
+        #                                   model.fraction,
+        #                                   model.deadline,
+        #                                   model.miner_name,
+        #                                   model.plotter_id,
+        #                                   model.create_time.label('create_time'),
+        #                                   ).filter_by(account_key=account_key
+        #                                               ).filter(
+        #         and_(model.create_time > from_dt,
+        #              model.create_time < end_dt))
 
 
         if coin_name == NEWBI_NAME:
@@ -123,8 +123,11 @@ class DeadlineFractionApi(Resource):
                 and_(LHDDeadlineFractionMain.create_time > from_dt,
                      LHDDeadlineFractionMain.create_time < end_dt))
 
-
-        all_dls = coop_query.union_all(ecol_query).order_by('create_time').all()[::-1][offset:limit]
+        all_dls = None
+        if coin_name == BHD_COIN_NAME or coin_name == LHD_NAME:
+            all_dls = coop_query.union_all(ecol_query).order_by('create_time').all()[::-1][offset:limit]
+        elif coin_name == DISK_NAME:
+            all_dls = coop_query.order_by('create_time').all()[::-1][offset:limit]
         total_records = len(all_dls)
         return make_resp(records=all_dls, total_records=total_records)
 

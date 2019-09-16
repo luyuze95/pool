@@ -69,7 +69,7 @@ class BurstBlockApi(Resource):
                                                       ).filter(
                 and_(model.create_time > from_dt,
                      model.create_time < end_dt))
-        elif coin_name == LHD_NAME:
+        else:   # coin_name == LHD_NAME:
             coop_query = db.session.query(model.plotter_id, model.height,
                                           query_deadline,
                                           model.create_time.label(
@@ -79,16 +79,16 @@ class BurstBlockApi(Resource):
                                                       ).filter(
                 and_(model.create_time > from_dt,
                      model.create_time < end_dt))
-        else:
-            coop_query = db.session.query(model.plotter_id, model.height,
-                                          query_deadline,
-                                          model.create_time.label(
-                                              'create_time'),
-                                          literal("coop")
-                                          ).filter_by(account_key=account_key
-                                                      ).filter(
-                and_(model.create_time > from_dt,
-                     model.create_time < end_dt))
+        # else:
+        #     coop_query = db.session.query(model.plotter_id, model.height,
+        #                                   query_deadline,
+        #                                   model.create_time.label(
+        #                                       'create_time'),
+        #                                   literal("ecol")
+        #                                   ).filter_by(account_key=account_key
+        #                                               ).filter(
+        #         and_(model.create_time > from_dt,
+        #              model.create_time < end_dt))
 
 
         if coin_name == NEWBI_NAME:
@@ -118,8 +118,12 @@ class BurstBlockApi(Resource):
                                                       ).filter(
                 and_(LHDMainBurstBlock.create_time > from_dt,
                      LHDMainBurstBlock.create_time < end_dt))
-
-        all_burst = coop_query.union_all(ecol_query).order_by(
-            'create_time').all()[::-1][offset:limit]
+        all_burst = None
+        if coin_name == BHD_COIN_NAME or coin_name == LHD_NAME:
+            all_burst = coop_query.union_all(ecol_query).order_by(
+                'create_time').all()[::-1][offset:limit]
+        elif coin_name == DISK_NAME:
+            all_burst = coop_query.order_by(
+                'create_time').all()[::-1][offset:limit]
         total_records = len(all_burst)
         return make_resp(records=all_burst, total_records=total_records)
