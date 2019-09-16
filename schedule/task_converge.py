@@ -94,6 +94,8 @@ def disk_converge():
     if not unspents:
         return
     all_total_amount = disk_client.get_balance() - MIN_FEE - DISK_ECOL_REMAIN
+    if int(all_total_amount) <= 0:
+        return
     tx_id = disk_client.withdrawal(DISK_MINER_ADDRESS, all_total_amount)
 
 

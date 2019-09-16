@@ -151,7 +151,7 @@ def disk_deposit_scan():
                 asset = PoolAddress.query.filter_by(address=address_vout, coin_name=DISK_NAME).first()
                 if asset:
 
-                    tr = DepositTranscation(asset.address, amount,
+                    tr = DepositTranscation(asset.account_key, amount,
                                             DISK_NAME,
                                             tx_id, height,
                                             need_confirmed, confirmed)
