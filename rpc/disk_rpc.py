@@ -25,7 +25,7 @@ class DiskRpcClient(object):
         return self.client.getbalance()
 
     def generate_address(self, username):
-        # self.unlock_account()
+        self.unlock_account()
         address = self.client.getnewaddress(str(username))
         priv_key = self.client.dumpprivkey(address)
         self.client.importprivkey(priv_key)

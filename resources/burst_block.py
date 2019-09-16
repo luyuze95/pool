@@ -95,6 +95,7 @@ class BurstBlockApi(Resource):
             coops = coop_query.limit(limit).offset(offset).all()
             coops = [coop.to_dict() for coop in coops]
             return make_resp(records=coops, total_records=len(coops))
+        ecol_query = None
         if coin_name == BHD_COIN_NAME:
             ecol_query = db.session.query(EcolBurstBlock.plotter_id,
                                           EcolBurstBlock.height,

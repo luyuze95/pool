@@ -97,6 +97,7 @@ class DeadlineFractionApi(Resource):
             all_dls = coop_query.limit(limit).offset(offset).all()
             dls = [dl.to_dict() for dl in all_dls]
             return make_resp(records=dls, total_records=len(dls))
+        ecol_query = None
         if coin_name == BHD_COIN_NAME:
             ecol_query = db.session.query(DeadlineFractionEcology.height,
                                           literal("ecol"),
