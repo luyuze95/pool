@@ -98,6 +98,7 @@ NEWBI_NAME = "newbi"
 """ lhd node config"""
 LHD_NAME = "lhd"
 LHD_NODE_URL = "http://hemon:16761123@47.75.133.66:8888/"
+LHD_NODE_URL_MAIN = "http://hemon:16761123@47.75.133.66:8889/"
 LHD_WALLET_PASSWORD = "7ujMko0admin"
 LHD_MINER_ADDRESS = "3NxBbd3AoPASJej9Ngf5dKBZRH5wfk22Kd"
 
