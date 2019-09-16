@@ -14,7 +14,7 @@ from sqlalchemy import and_, literal
 
 from models import db
 from models.bhd_burst import BurstBlock, EcolBurstBlock, NBBurstBlock, \
-    LHDBurstBlock
+    LHDBurstBlock, DISKBurstBlock, LHDMainBurstBlock
 from resources.auth_decorator import login_required
 from utils.response import make_resp
 from conf import *
@@ -53,6 +53,9 @@ class BurstBlockApi(Resource):
         elif coin_name == LHD_NAME:
             model = LHDBurstBlock
             query_deadline = model.deadline
+        elif coin_name == DISK_NAME:
+            model = DISKBurstBlock
+            query_deadline = model.deadline
         else:
             model = NBBurstBlock
             query_deadline = literal("0")
@@ -71,17 +74,28 @@ class BurstBlockApi(Resource):
             coops = coop_query.limit(limit).offset(offset).all()
             coops = [coop.to_dict() for coop in coops]
             return make_resp(records=coops, total_records=len(coops))
-
-        ecol_query = db.session.query(EcolBurstBlock.plotter_id,
-                                      EcolBurstBlock.height,
-                                      EcolBurstBlock.deadline,
-                                      EcolBurstBlock.create_time.label(
-                                          'create_time'),
-                                      literal("ecol")
-                                      ).filter_by(account_key=account_key
-                                                  ).filter(
-            and_(EcolBurstBlock.create_time > from_dt,
-                 EcolBurstBlock.create_time < end_dt))
+        if coin_name == BHD_COIN_NAME:
+            ecol_query = db.session.query(EcolBurstBlock.plotter_id,
+                                          EcolBurstBlock.height,
+                                          EcolBurstBlock.deadline,
+                                          EcolBurstBlock.create_time.label(
+                                              'create_time'),
+                                          literal("ecol")
+                                          ).filter_by(account_key=account_key
+                                                      ).filter(
+                and_(EcolBurstBlock.create_time > from_dt,
+                     EcolBurstBlock.create_time < end_dt))
+        elif coin_name == LHD_NAME:
+            ecol_query = db.session.query(LHDMainBurstBlock.plotter_id,
+                                          LHDMainBurstBlock.height,
+                                          LHDMainBurstBlock.deadline,
+                                          LHDMainBurstBlock.create_time.label(
+                                              'create_time'),
+                                          literal("main")
+                                          ).filter_by(account_key=account_key
+                                                      ).filter(
+                and_(LHDMainBurstBlock.create_time > from_dt,
+                     LHDMainBurstBlock.create_time < end_dt))
 
         all_burst = coop_query.union_all(ecol_query).order_by(
             'create_time').all()[::-1][offset:limit]

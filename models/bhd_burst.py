@@ -69,3 +69,13 @@ class NBBurstBlock(BurstBlockMixin, db.Model):
 class LHDBurstBlock(BurstBlockMixin, db.Model):
     __tablename__ = 'pool_lhd_burst'
     deadline = db.Column(db.INTEGER)
+
+
+class LHDMainBurstBlock(BurstBlockMixin, db.Model):
+    __tablename__ = 'pool_lhd_main_burst'
+    deadline = db.Column(db.INTEGER)
+
+
+class DISKBurstBlock(BurstBlockMixin, db.Model):
+    __tablename__ = 'pool_disk_burst'
+    deadline = db.Column(db.INTEGER)

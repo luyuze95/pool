@@ -14,7 +14,7 @@ from sqlalchemy import and_, literal
 from models import db
 
 from models.dl_fraction import DeadlineFraction, DeadlineFractionEcology, \
-    NBDeadlineFraction, LHDDeadlineFraction
+    NBDeadlineFraction, LHDDeadlineFraction, DISKDeadlineFraction, LHDDeadlineFractionMain
 from resources.auth_decorator import login_required
 from utils.response import make_resp
 from conf import *
@@ -51,6 +51,8 @@ class DeadlineFractionApi(Resource):
             model = DeadlineFraction
         elif coin_name == LHD_NAME:
             model = LHDDeadlineFraction
+        elif coin_name == DISK_NAME:
+            model = DISKDeadlineFraction
         else:
             model = NBDeadlineFraction
 
@@ -70,18 +72,31 @@ class DeadlineFractionApi(Resource):
             all_dls = coop_query.limit(limit).offset(offset).all()
             dls = [dl.to_dict() for dl in all_dls]
             return make_resp(records=dls, total_records=len(dls))
+        if coin_name == BHD_COIN_NAME:
+            ecol_query = db.session.query(DeadlineFractionEcology.height,
+                                          literal("ecol"),
+                                          DeadlineFractionEcology.fraction,
+                                          DeadlineFractionEcology.deadline,
+                                          DeadlineFractionEcology.miner_name,
+                                          DeadlineFractionEcology.plotter_id,
+                                          DeadlineFractionEcology.create_time.label('create_time'),
+                                          ).filter_by(account_key=account_key
+                                                      ).filter(
+                and_(DeadlineFractionEcology.create_time > from_dt,
+                     DeadlineFractionEcology.create_time < end_dt))
+        elif coin_name == LHD_NAME:
+            ecol_query = db.session.query(LHDDeadlineFractionMain.height,
+                                          literal("main"),
+                                          LHDDeadlineFractionMain.fraction,
+                                          LHDDeadlineFractionMain.deadline,
+                                          LHDDeadlineFractionMain.miner_name,
+                                          LHDDeadlineFractionMain.plotter_id,
+                                          LHDDeadlineFractionMain.create_time.label('create_time'),
+                                          ).filter_by(account_key=account_key
+                                                      ).filter(
+                and_(LHDDeadlineFractionMain.create_time > from_dt,
+                     LHDDeadlineFractionMain.create_time < end_dt))
 
-        ecol_query = db.session.query(DeadlineFractionEcology.height,
-                                      literal("ecol"),
-                                      DeadlineFractionEcology.fraction,
-                                      DeadlineFractionEcology.deadline,
-                                      DeadlineFractionEcology.miner_name,
-                                      DeadlineFractionEcology.plotter_id,
-                                      DeadlineFractionEcology.create_time.label('create_time'),
-                                      ).filter_by(account_key=account_key
-                                                  ).filter(
-            and_(DeadlineFractionEcology.create_time > from_dt,
-                 DeadlineFractionEcology.create_time < end_dt))
 
         all_dls = coop_query.union_all(ecol_query).order_by('create_time').all()[::-1][offset:limit]
         total_records = len(all_dls)

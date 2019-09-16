@@ -50,3 +50,11 @@ class NBDeadlineFraction(DeadlineFractionMixin, db.Model):
 
 class LHDDeadlineFraction(DeadlineFractionMixin, db.Model):
     __tablename__ = 'pool_lhd_fraction_record'
+
+
+class LHDDeadlineFractionMain(DeadlineFractionMixin, db.Model):
+    __tablename__ = 'pool_lhd_main_fraction_record'
+
+
+class DISKDeadlineFraction(DeadlineFractionMixin, db.Model):
+    __tablename__ = 'pool_disk_fraction_record'
