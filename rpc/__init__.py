@@ -9,6 +9,7 @@ from rpc.bhd_rpc import bhd_client
 from rpc.lhd_rpc import lhd_client
 from rpc.nb_rpc import nb_client
 from rpc.usdt_rpc import usdt_client
+from rpc.disk_rpc import disk_client
 
 
 def get_rpc(coin_name):
@@ -23,4 +24,6 @@ def get_rpc(coin_name):
         client = nb_client
     if coin_name == LHD_NAME:
         client = lhd_client
+    if coin_name == DISK_NAME:
+        client = disk_client
     return client

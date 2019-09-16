@@ -42,8 +42,8 @@ class UserAssetApi(Resource):
             return make_resp(404, False)
 
         context = user_asset.to_dict()
-        # 如果不是BHD或者LHD，直接返回资产信息json
-        if coin_name not in (BHD_COIN_NAME, LHD_NAME):
+        # 如果不是BHD或者LHD或者DISk，直接返回资产信息json
+        if coin_name not in (BHD_COIN_NAME, LHD_NAME, DISK_NAME):
             return make_resp(200, True, **context)
 
         if coin_name == BHD_COIN_NAME:
@@ -51,6 +51,9 @@ class UserAssetApi(Resource):
             rate = Decimal(redis_capacity.get(BHD_RATE_KEY))
         elif coin_name == LHD_NAME:
             keys = "miner:ecol:lhd:%s:*" % account_key  # ecol为主矿池算力
+            rate = 6
+        elif coin_name == DISK_NAME:
+            keys = "miner:main:disk:%s:*" % account_key  # ecol为主矿池算力
             rate = 6
         miner_machines = redis_capacity.keys(keys)
         context.update({
@@ -75,8 +78,10 @@ class UserAssetApi(Resource):
         theory_pledge = Decimal(total_capacity)/1024*rate
 
         pledge_rate = user_asset.get_pledge_amount()/theory_pledge
-
-        earning_rate = NOT_MORTGAGE_YIELD_RATE
+        if coin_name == DISK_NAME:
+            earning_rate = DISK_NOT_MORTGAGE_YIELD_RATE
+        else:
+            earning_rate = NOT_MORTGAGE_YIELD_RATE
         if pledge_rate > 1:
             earning_rate = MORTGAGE_YIELD_RATE
 

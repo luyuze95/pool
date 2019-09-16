@@ -101,15 +101,24 @@ LHD_NODE_URL = "http://hemon:16761123@47.75.133.66:8888/"
 LHD_WALLET_PASSWORD = "7ujMko0admin"
 LHD_MINER_ADDRESS = "3NxBbd3AoPASJej9Ngf5dKBZRH5wfk22Kd"
 
+""" disk node config"""
+DISK_NAME = "disk"
+DISK_NODE_URL = "http://hemon:16761123@47.75.133.66:7777/"
+DISK_WALLET_PASSWORD = "7ujMko0admin"
+DISK_MINER_ADDRESS = "12RxeW5VhUWYBmxbzox5duQZUET9hUUDUF"
+
 
 # 全抵押和非全抵押收益
 MORTGAGE_YIELD_RATE = Decimal('1')
 NOT_MORTGAGE_YIELD_RATE = Decimal('0.3')
+DISK_NOT_MORTGAGE_YIELD_RATE = Decimal('0.4')
+
 
 MIN_DEPOSIT_AMOUNT = {
     BHD_COIN_NAME: Decimal("0.0001"),
     NEWBI_NAME: Decimal("0.0001"),
     LHD_NAME: Decimal('0.01'),
+    DISK_NAME: Decimal('0.01'),
 }
 
 MIN_CONFIRMED = {
@@ -117,6 +126,7 @@ MIN_CONFIRMED = {
     USDT_NAME: 3,
     NEWBI_NAME: 10,
     LHD_NAME: 3,
+    DISK_NAME: 3,
 }
 
 # 最小汇聚余额
@@ -127,5 +137,6 @@ MIN_CONVERGE_AMOUNT_USDT = Decimal('1')
 POUNDAGE_BALANCE = Decimal('0.00006')
 MIN_FEE = Decimal('0.01')
 LHD_ECOL_REMAIN = 2
+DISK_ECOL_REMAIN = 2
 
 

@@ -14,6 +14,7 @@ from models.billings import Billings
 from rpc import lhd_client
 from rpc.bhd_rpc import bhd_client
 from rpc.usdt_rpc import usdt_client
+from rpc.disk_rpc import disk_client
 from schedule.distributed_lock_decorator import distributed_lock
 
 
@@ -81,6 +82,19 @@ def lhd_converge():
         return
     all_total_amount = lhd_client.get_balance() - MIN_FEE - LHD_ECOL_REMAIN
     tx_id = lhd_client.withdrawal(LHD_MINER_ADDRESS, all_total_amount)
+
+
+@celery.task
+@distributed_lock
+def disk_converge():
+    addresses = db.session.query(PoolAddress.address).filter_by(coin_name=DISK_NAME).all()
+    addresses = [address[0] for address in addresses]
+    unspents = disk_client.list_unspent(addresses=addresses)
+
+    if not unspents:
+        return
+    all_total_amount = disk_client.get_balance() - MIN_FEE - DISK_ECOL_REMAIN
+    tx_id = disk_client.withdrawal(DISK_MINER_ADDRESS, all_total_amount)
 
 
 @celery.task

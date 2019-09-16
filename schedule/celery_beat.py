@@ -11,11 +11,11 @@ from app import celery
 from conf import *
 from schedule.task_bhd_deposit import confirm_deposit_transaction, \
     deposit_add_asset, bhd_deposit_scan, usdt_deposit_scan, nb_deposit_scan, \
-    lhd_deposit_scan
-from schedule.task_converge import bhd_converge, usdt_converge, lhd_converge
+    lhd_deposit_scan, disk_deposit_scan
+from schedule.task_converge import bhd_converge, usdt_converge, lhd_converge, disk_converge
 from schedule.task_email import email_sender_task
 from schedule.task_income_calculate import calculate_income, \
-    calculate_activity_reward, nb_calculate_income, lhb_calculate_income
+    calculate_activity_reward, nb_calculate_income, lhb_calculate_income, disk_calculate_income
 from schedule.task_timing_remote_pledge_lhd import lhd_check_pledges, lhd_statistic_pledges
 from schedule.task_withdrawal import withdrawal_coin, withdrawal_confirm
 from schedule.task_timing_remote_pledge import statistic_pledges, check_pledges
@@ -63,4 +63,10 @@ def setup_period_task(sender, **kwargs):
                              lhd_check_pledges.s())
     sender.add_periodic_task(crontab(minute="*/10"),
                              lhd_converge.s())
+    sender.add_periodic_task(crontab(minute='*/1'),
+                             disk_deposit_scan.s())
+    sender.add_periodic_task(crontab(minute="*/10"),
+                             disk_converge.s())
+    sender.add_periodic_task(crontab(minute="*/1"),
+                             disk_calculate_income.s())
 

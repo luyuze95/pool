@@ -13,7 +13,7 @@ from flask_restful import Resource, reqparse
 from sqlalchemy import func, and_
 
 from models.activity_reward import ActivityReward
-from models.income_record import IncomeRecord, NBIncomeRecord, LHDIncomeRecord
+from models.income_record import IncomeRecord, NBIncomeRecord, LHDIncomeRecord, DISKIncomeRecord
 from models.remote_pledge import TeamWorkRecordActivity, TeamWorkActivity
 from models.remote_pledge_lhd import LHDTeamWorkRecordActivity, LHDTeamWorkActivity
 from resources.auth_decorator import login_required
@@ -42,6 +42,8 @@ class EarningsTotalApi(Resource):
             model = IncomeRecord
         elif coin_name == LHD_NAME:
             model = LHDIncomeRecord
+        elif coin_name == DISK_NAME:
+            model = DISKIncomeRecord
         elif coin_name == NEWBI_NAME:
             model = NBIncomeRecord
         else:
@@ -146,6 +148,8 @@ class DayEarningsApi(Resource):
             model = IncomeRecord
         elif coin_name == LHD_NAME:
             model = LHDIncomeRecord
+        elif coin_name == DISK_NAME:
+            model = DISKIncomeRecord
         elif coin_name == NEWBI_NAME:
             model = NBIncomeRecord
         else:
@@ -236,6 +240,8 @@ class MiningIncomeApi(Resource):
             model = IncomeRecord
         elif coin_name == LHD_NAME:
             model = LHDIncomeRecord
+        elif coin_name == DISK_NAME:
+            model = DISKIncomeRecord
         elif coin_name == NEWBI_NAME:
             model = NBIncomeRecord
         else:
@@ -290,6 +296,8 @@ class CoopIncomeApi(Resource):
         model = IncomeRecord
         if coin_name == LHD_NAME:
             model = LHDIncomeRecord
+        if coin_name == DISK_NAME:
+            model = DISKIncomeRecord
         infos = model.query.filter_by(
             **kwargs
         ).filter(
