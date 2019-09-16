@@ -14,7 +14,7 @@ from rpc.disk_rpc import disk_client
 
 def get_rpc(coin_name):
     client = None
-    if coin_name not in (BHD_COIN_NAME, USDT_NAME, NEWBI_NAME, LHD_NAME):
+    if coin_name not in (BHD_COIN_NAME, USDT_NAME, NEWBI_NAME, LHD_NAME, DISK_NAME):
         raise Exception("币种不存在")
     if coin_name == BHD_COIN_NAME:
         client = bhd_client
