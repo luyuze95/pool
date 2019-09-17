@@ -96,6 +96,7 @@ DEPOSIT_FAILED = 4
 # 提现手续费率
 WITHDRAWAL_FEE = Decimal("0.001")
 WITHDRAWAL_ACTUAL = Decimal("0.999")
+DISK_WITHDRAWAL_ACTUAL = Decimal("0.99")
 
 """
 合作池、生态池

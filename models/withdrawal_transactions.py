@@ -29,10 +29,18 @@ class WithdrawalTransaction(BaseModel):
         self.amount = amount
         self.coin_name = coin_name
         self.to_address = to_address
-        if amount < 100:
-            self.actual_amount = (amount - Decimal("0.1")).quantize(Decimal('.00000000'), rounding=ROUND_DOWN)
+        if coin_name == DISK_NAME:
+            if amount < 50:
+                raise ValueError
+            elif amount >= 50 and amount <= 500:
+                self.actual_amount = (amount - Decimal("5")).quantize(Decimal('.00000000'), rounding=ROUND_DOWN)
+            elif amount > 500:
+                self.actual_amount = (amount * DISK_WITHDRAWAL_ACTUAL).quantize(Decimal('.00000000'), rounding=ROUND_DOWN)
         else:
-            self.actual_amount = (amount*WITHDRAWAL_ACTUAL).quantize(Decimal('.00000000'), rounding=ROUND_DOWN)
+            if amount < 100:
+                self.actual_amount = (amount - Decimal("0.1")).quantize(Decimal('.00000000'), rounding=ROUND_DOWN)
+            else:
+                self.actual_amount = (amount * WITHDRAWAL_ACTUAL).quantize(Decimal('.00000000'), rounding=ROUND_DOWN)
         self.status = status
 
     def to_dict(self):
