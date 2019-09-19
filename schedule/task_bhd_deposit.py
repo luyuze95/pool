@@ -130,7 +130,7 @@ def disk_deposit_scan():
     transactions = disk_client.get_transactions(50, 0)[::-1]
     if transactions == []:
         return
-    celery_logger.info("=== disk deposit task start === %s " % transactions)
+    # celery_logger.info("=== disk deposit task start === %s " % transactions)
     for transaction in transactions:
         tx_id = transaction["txid"]
         tr = DepositTranscation.query.filter_by(tx_id=tx_id).first()
@@ -163,7 +163,7 @@ def disk_deposit_scan():
 @celery.task
 def usdt_deposit_scan():
     data = usdt_client.get_transactions()
-    celery_logger.info("=== usdt deposit task start === %s " % data)
+    # celery_logger.info("=== usdt deposit task start === %s " % data)
     for wallet_tr in data:
         tr_type = wallet_tr.get('type')
         if tr_type != "Simple Send":
