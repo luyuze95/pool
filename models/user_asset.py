@@ -100,7 +100,10 @@ class UserAsset(BaseModel):
         # 充值+收益=可用+抵押+合作冻结-远程借贷合作部分
         amount = self.available_asset + self.pledge_asset + self.coop_freeze_asset - self.remote_4coop_asset
         # 抵押金
-        margin_amount = self.remote_freeze_asset / 4
+        if self.coin_name == LHD_NAME:
+            margin_amount = self.remote_freeze_asset * 3 / 7
+        else:
+            margin_amount = self.remote_freeze_asset / 4
 
         available_margin_asset = amount - margin_amount
         return available_margin_asset
@@ -123,7 +126,10 @@ class UserAsset(BaseModel):
     def get_available_withdrawal_amount(self):
         available_asset = self.available_asset + self.get_remote_avai_amount()
         total_asset = available_asset + self.coop_freeze_asset + self.get_pledge_amount()
-        available_withdrawal_asset = total_asset - self.remote_freeze_asset / 4 * 5
+        if self.coin_name == LHD_NAME:
+            available_withdrawal_asset = total_asset - self.remote_freeze_asset / 7 * 10
+        else:
+            available_withdrawal_asset = total_asset - self.remote_freeze_asset / 4 * 5
         return available_withdrawal_asset
 
     def get_local_in_coop(self):
