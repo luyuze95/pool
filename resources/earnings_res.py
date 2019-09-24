@@ -13,7 +13,7 @@ from flask_restful import Resource, reqparse
 from sqlalchemy import func, and_
 
 from models.activity_reward import ActivityReward
-from models.income_record import IncomeRecord, NBIncomeRecord, LHDIncomeRecord, DISKIncomeRecord
+from models.income_record import IncomeRecord, NBIncomeRecord, LHDIncomeRecord, DISKIncomeRecord, HDDIncomeRecord
 from models.remote_pledge import TeamWorkRecordActivity, TeamWorkActivity
 from models.remote_pledge_lhd import LHDTeamWorkRecordActivity, LHDTeamWorkActivity
 from resources.auth_decorator import login_required
@@ -44,6 +44,8 @@ class EarningsTotalApi(Resource):
             model = LHDIncomeRecord
         elif coin_name == DISK_NAME:
             model = DISKIncomeRecord
+        elif coin_name == HDD_NAME:
+            model = HDDIncomeRecord
         elif coin_name == NEWBI_NAME:
             model = NBIncomeRecord
         else:
@@ -150,6 +152,8 @@ class DayEarningsApi(Resource):
             model = LHDIncomeRecord
         elif coin_name == DISK_NAME:
             model = DISKIncomeRecord
+        elif coin_name == HDD_NAME:
+            model = HDDIncomeRecord
         elif coin_name == NEWBI_NAME:
             model = NBIncomeRecord
         else:
@@ -242,6 +246,8 @@ class MiningIncomeApi(Resource):
             model = LHDIncomeRecord
         elif coin_name == DISK_NAME:
             model = DISKIncomeRecord
+        elif coin_name == HDD_NAME:
+            model = HDDIncomeRecord
         elif coin_name == NEWBI_NAME:
             model = NBIncomeRecord
         else:
@@ -293,11 +299,14 @@ class CoopIncomeApi(Resource):
         from_dt = datetime.fromtimestamp(from_ts)
         end_dt = datetime.fromtimestamp(end_ts)
         kwargs = {"account_key": account_key}
-        model = IncomeRecord
         if coin_name == LHD_NAME:
             model = LHDIncomeRecord
-        if coin_name == DISK_NAME:
+        elif coin_name == DISK_NAME:
             model = DISKIncomeRecord
+        elif coin_name == HDD_NAME:
+            model = HDDIncomeRecord
+        else:
+            model = IncomeRecord
         infos = model.query.filter_by(
             **kwargs
         ).filter(

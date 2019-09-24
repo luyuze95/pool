@@ -42,8 +42,8 @@ class UserAssetApi(Resource):
             return make_resp(404, False)
 
         context = user_asset.to_dict()
-        # 如果不是BHD或者LHD或者DISk，直接返回资产信息json
-        if coin_name not in (BHD_COIN_NAME, LHD_NAME, DISK_NAME):
+        # 如果不是BHD或者LHD或者DISk或者HDD，直接返回资产信息json
+        if coin_name not in (BHD_COIN_NAME, LHD_NAME, DISK_NAME, HDD_NAME):
             return make_resp(200, True, **context)
 
         if coin_name == BHD_COIN_NAME:
@@ -54,6 +54,9 @@ class UserAssetApi(Resource):
             rate = 6
         elif coin_name == DISK_NAME:
             keys = "miner:main:disk:%s:*" % account_key  # ecol为主矿池算力
+            rate = 6
+        elif coin_name == HDD_NAME:
+            keys = "miner:main:hdd:%s:*" % account_key
             rate = 6
         miner_machines = redis_capacity.keys(keys)
         context.update({

@@ -79,3 +79,8 @@ class LHDMainBurstBlock(BurstBlockMixin, db.Model):
 class DISKBurstBlock(BurstBlockMixin, db.Model):
     __tablename__ = 'pool_disk_burst'
     deadline = db.Column(db.INTEGER)
+
+
+class HDDECOLBurstBlock(BurstBlockMixin, db.Model):
+    __tablename__ = 'pool_hdd_ecol_burst'
+    deadline = db.Column(db.INTEGER)

@@ -14,7 +14,7 @@ from sqlalchemy import and_, literal
 
 from models import db
 from models.bhd_burst import BurstBlock, EcolBurstBlock, NBBurstBlock, \
-    LHDBurstBlock, DISKBurstBlock, LHDMainBurstBlock
+    LHDBurstBlock, DISKBurstBlock, LHDMainBurstBlock, HDDECOLBurstBlock
 from resources.auth_decorator import login_required
 from utils.response import make_resp
 from conf import *
@@ -55,6 +55,9 @@ class BurstBlockApi(Resource):
             query_deadline = model.deadline
         elif coin_name == DISK_NAME:
             model = DISKBurstBlock
+            query_deadline = model.deadline
+        elif coin_name == HDD_NAME:
+            model = HDDECOLBurstBlock
             query_deadline = model.deadline
         else:
             model = NBBurstBlock
@@ -119,10 +122,10 @@ class BurstBlockApi(Resource):
                 and_(LHDMainBurstBlock.create_time > from_dt,
                      LHDMainBurstBlock.create_time < end_dt))
         all_burst = None
-        if coin_name == BHD_COIN_NAME or coin_name == LHD_NAME:
+        if coin_name in [BHD_COIN_NAME, LHD_NAME]:
             all_burst = coop_query.union_all(ecol_query).order_by(
                 'create_time').all()[::-1][offset:limit]
-        elif coin_name == DISK_NAME:
+        elif coin_name in [DISK_NAME, HDD_NAME]:
             all_burst = coop_query.order_by(
                 'create_time').all()[::-1][offset:limit]
         total_records = len(all_burst)

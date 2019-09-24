@@ -15,6 +15,7 @@ from rpc import lhd_client
 from rpc.bhd_rpc import bhd_client
 from rpc.usdt_rpc import usdt_client
 from rpc.disk_rpc import disk_client
+from rpc.hdd_rpc import hdd_client
 from schedule.distributed_lock_decorator import distributed_lock
 
 
@@ -97,6 +98,21 @@ def disk_converge():
     if int(all_total_amount) <= 0:
         return
     tx_id = disk_client.withdrawal(DISK_MINER_ADDRESS, all_total_amount)
+
+
+@celery.task
+@distributed_lock
+def hdd_converge():
+    addresses = db.session.query(PoolAddress.address).filter_by(coin_name=HDD_NAME).all()
+    addresses = [address[0] for address in addresses]
+    unspents = hdd_client.list_unspent(addresses=addresses)
+
+    if not unspents:
+        return
+    all_total_amount = hdd_client.get_balance() - MIN_FEE - HDD_ECOL_REMAIN
+    if int(all_total_amount) <= 0:
+        return
+    tx_id = hdd_client.withdrawal(HDD_MINER_ADDRESS, all_total_amount)
 
 
 @celery.task

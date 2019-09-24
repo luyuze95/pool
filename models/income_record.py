@@ -84,3 +84,7 @@ class LHDIncomeRecord(IncomeMixin, db.Model):
 
 class DISKIncomeRecord(IncomeMixin, db.Model):
     __tablename__ = 'pool_disk_income_record'
+
+
+class HDDIncomeRecord(IncomeMixin, db.Model):
+    __tablename__ = 'pool_hdd_income_record'

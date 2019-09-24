@@ -14,7 +14,7 @@ from sqlalchemy import and_, literal
 from models import db
 
 from models.dl_fraction import DeadlineFraction, DeadlineFractionEcology, \
-    NBDeadlineFraction, LHDDeadlineFraction, DISKDeadlineFraction, LHDDeadlineFractionMain
+    NBDeadlineFraction, LHDDeadlineFraction, DISKDeadlineFraction, LHDDeadlineFractionMain, HDDECOLDeadlineFraction
 from resources.auth_decorator import login_required
 from utils.response import make_resp
 from conf import *
@@ -53,6 +53,8 @@ class DeadlineFractionApi(Resource):
             model = LHDDeadlineFraction
         elif coin_name == DISK_NAME:
             model = DISKDeadlineFraction
+        elif coin_name == HDD_NAME:
+            model = HDDECOLDeadlineFraction
         else:
             model = NBDeadlineFraction
         if coin_name == BHD_COIN_NAME:
@@ -124,9 +126,9 @@ class DeadlineFractionApi(Resource):
                      LHDDeadlineFractionMain.create_time < end_dt))
 
         all_dls = None
-        if coin_name == BHD_COIN_NAME or coin_name == LHD_NAME:
+        if coin_name in [BHD_COIN_NAME, LHD_NAME]:
             all_dls = coop_query.union_all(ecol_query).order_by('create_time').all()[::-1][offset:limit]
-        elif coin_name == DISK_NAME:
+        elif coin_name in [DISK_NAME, HDD_NAME]:
             all_dls = coop_query.order_by('create_time').all()[::-1][offset:limit]
         total_records = len(all_dls)
         return make_resp(records=all_dls, total_records=total_records)

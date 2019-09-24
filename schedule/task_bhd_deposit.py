@@ -14,6 +14,7 @@ from models.user_asset import UserAsset
 from rpc import usdt_client, get_rpc, nb_client, lhd_client
 from rpc.bhd_rpc import bhd_client
 from rpc.disk_rpc import disk_client
+from rpc.hdd_rpc import hdd_client
 from schedule.distributed_lock_decorator import distributed_lock
 from utils.block_check import check_deposit_amount, check_min_confirmed
 
@@ -153,6 +154,41 @@ def disk_deposit_scan():
 
                     tr = DepositTranscation(asset.account_key, amount,
                                             DISK_NAME,
+                                            tx_id, height,
+                                            need_confirmed, confirmed)
+                    celery_logger.info("deposit transaction: %s" % tr.to_dict())
+                    db.session.add(tr)
+                    db.session.commit()
+
+
+@celery.task
+@distributed_lock
+def hdd_deposit_scan():
+    transactions = hdd_client.get_transactions(50, 0)[::-1]
+    if transactions == []:
+        return
+    for transaction in transactions:
+        tx_id = transaction["txid"]
+        tr = DepositTranscation.query.filter_by(tx_id=tx_id).first()
+        if tr:
+            continue
+        else:
+            transaction_detail = hdd_client.get_transaction_detail(tx_id)
+            confirmed = transaction_detail['confirmations']
+            tx_outs = transaction_detail.get('vout', [])
+            height = transaction_detail['locktime']
+            for tx_out in tx_outs:
+                amount = tx_out['value']
+                tx_type = tx_out['scriptPubKey']['type']
+                if tx_type != 'pubkeyhash':
+                    continue
+                address_vout = tx_out['scriptPubKey']['addresses'][0]
+                need_confirmed = MIN_CONFIRMED.get(HDD_NAME)
+                asset = PoolAddress.query.filter_by(address=address_vout, coin_name=HDD_NAME).first()
+                if asset:
+
+                    tr = DepositTranscation(asset.account_key, amount,
+                                            HDD_NAME,
                                             tx_id, height,
                                             need_confirmed, confirmed)
                     celery_logger.info("deposit transaction: %s" % tr.to_dict())
