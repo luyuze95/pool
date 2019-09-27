@@ -27,7 +27,7 @@ from schedule.distributed_lock_decorator import distributed_lock
 def calculate_income():
     # 查询未统计收益
     latest_height = bhd_client.get_latest_block_number()
-    mature_height = latest_height - 100
+    mature_height = latest_height - 6
     not_add_incomes = IncomeRecord.query.filter(and_(IncomeRecord.is_add_asset==0,
                                                      IncomeRecord.height<mature_height)).all()
     for income in not_add_incomes:
@@ -64,7 +64,7 @@ def calculate_income():
 def nb_calculate_income():
     # 查询未统计收益
     latest_height = nb_client.get_latest_block_number()
-    mature_height = latest_height - 100
+    mature_height = latest_height - 6
     not_add_incomes = NBIncomeRecord.query.filter(and_(NBIncomeRecord.is_add_asset==0,
                                                        NBIncomeRecord.height<mature_height)).all()
     for income in not_add_incomes:
@@ -101,7 +101,7 @@ def nb_calculate_income():
 def lhb_calculate_income():
     # 查询未统计收益
     latest_height = lhd_client.get_latest_block_number()
-    mature_height = latest_height - 100
+    mature_height = latest_height - 6
     not_add_incomes = LHDIncomeRecord.query.filter(and_(LHDIncomeRecord.is_add_asset==0,
                                                         LHDIncomeRecord.height<mature_height)).all()
     for income in not_add_incomes:
@@ -138,7 +138,7 @@ def lhb_calculate_income():
 def disk_calculate_income():
     # 查询未统计收益
     latest_height = disk_client.get_latest_block_number()
-    mature_height = latest_height - 100
+    mature_height = latest_height - 6
     not_add_incomes = DISKIncomeRecord.query.filter(and_(DISKIncomeRecord.is_add_asset == 0,
                                                         DISKIncomeRecord.height < mature_height)).all()
     for income in not_add_incomes:
@@ -175,7 +175,7 @@ def disk_calculate_income():
 def hdd_calculate_income():
     # 查询未统计收益
     latest_height = hdd_client.get_latest_block_number()
-    mature_height = latest_height - 100
+    mature_height = latest_height - 6
     not_add_incomes = HDDIncomeRecord.query.filter(and_(HDDIncomeRecord.is_add_asset == 0,
                                                         HDDIncomeRecord.height < mature_height)).all()
     for income in not_add_incomes:
@@ -211,7 +211,7 @@ def hdd_calculate_income():
 def calculate_income_ecol():
     # 查询未统计收益
     latest_height = bhd_client.get_latest_block_number()
-    mature_height = latest_height - 100
+    mature_height = latest_height - 6
     not_add_incomes = IncomeEcologyRecord.query.filter(and_(IncomeEcologyRecord.is_add_asset==0,
                                                             IncomeEcologyRecord.height>mature_height))
     for income in not_add_incomes:
