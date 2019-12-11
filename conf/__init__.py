@@ -1,7 +1,7 @@
 # encoding=utf-8
 
 """
-    @author: anzz
+    @author: lyz
     @date: 2019/5/13
 """
 import os
@@ -22,7 +22,7 @@ else:
 
 
 """the same configure between debug and prod"""
-PRIVATE_TOKEN = b"<O\\wbUn%S~e`@T888@]cyb.,:GanzziM"
+PRIVATE_TOKEN = b"<O\\wbUn%S~e`@T888@]cyb.,:GlyziM"
 
 PRIVATE_TOKEN_IV = b"zmI666&s_2{+sTuT"
 

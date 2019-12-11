@@ -1,7 +1,7 @@
 # encoding=utf-8
 
 """
-    @author: anzz
+    @author: lyz
     @date: 2019/5/30
 """
 from flask_migrate import Migrate, MigrateCommand
