@@ -53,7 +53,3 @@ def mail_task(to_email, title, content):
     client.sendmail(USERNAME, rcptto, msg.as_string())
     client.quit()
     return True
-
-
-if __name__ == '__main__':
-    mail_task("anzhaozhong@163.com", "hello", "qwer")

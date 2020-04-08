@@ -1,6 +1,0 @@
-172.31.141.60 pool.redis.server
-172.31.141.60 pool.kafka.server
-172.31.141.60 pool.zookeeper.server
-
-172.31.141.57 pool.bhd.server
-172.31.141.57 pool.usdt.server
