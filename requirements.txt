@@ -19,7 +19,7 @@ itsdangerous==1.1.0
 Jinja2==2.10.1
 kafka-python==1.4.6
 kombu==4.5.0
-Mako==1.0.10
+Mako==1.2.2
 MarkupSafe==1.1.1
 pycparser==2.19
 pycrypto==2.6.1
